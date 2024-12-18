@@ -420,6 +420,7 @@ async function saveProjectData(projectData, autosave = false) {
                 await writable.write(jsyaml.dump(projectData));
                 await writable.close();
                 statusMessage.textContent = autosave ? 'Autosaved.' : 'Project saved successfully.';
+                statusMessage.style.color = 'green';
             } catch (err) {
                 console.error('Error during save:', err);
                 statusMessage.textContent = 'Error saving project.';
