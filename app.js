@@ -207,13 +207,16 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     const categorySelect = document.getElementById('taskCategory');
     const categoryId = parseInt(categorySelect.value, 10);
 
+    const taskStatus = document.getElementById('taskStatus').value || 'on-track';
+
     const task = {
         name: taskName,
         start: taskStart,
         duration: taskDuration,
         dependencies: dependencies,
         categoryId: categoryId,
-        description: taskDescription
+        description: taskDescription,
+        status: taskStatus
     };
 
     if (editIndex !== null) {
@@ -356,7 +359,19 @@ function renderGanttChart(projectData) {
 
             taskElement.setAttribute('data-tooltip', tooltipContent);
 
+            const taskStartDate = taskStartDates[index];
+            const taskEndDate = new Date(taskStartDate.getTime() + task.duration * 24 * 60 * 60 * 1000);
+
+            let displayStatus = task.status;
+            const currentDate = new Date();
+
+            // If current date is past the task's end date and task is not scrapped
+            if (currentDate > taskEndDate && task.status !== 'scrapped') {
+                displayStatus = 'high risk';
+            }
+
             taskElement.innerHTML = `
+                <div class="status-indicator ${getStatusClass(displayStatus)}"></div>
                 <span class="task-name">${task.name}</span>
                 <div class="task-buttons">
                     <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
@@ -404,6 +419,7 @@ function showTaskDetails(taskIndex) {
         .map(depIndex => projectData.tasks[depIndex]?.name)
         .join(', ') || 'None';
     document.getElementById('detailTaskDescription').textContent = task.description || 'No description.';
+    document.getElementById('detailTaskStatus').textContent = task.status;
 
     // Show the modal
     const taskDetailsModal = document.getElementById('taskDetailsModal');
@@ -440,6 +456,7 @@ function editTask(buttonElement) {
     document.getElementById('taskStart').value = task.start;
     document.getElementById('taskDuration').value = task.duration;
     document.getElementById('taskDescription').value = task.description || '';
+    document.getElementById('taskStatus').value = task.status || 'on-track';
 
     // Pre-select dependencies using Choices.js
     choices.setChoiceByValue(task.dependencies.map(String));
@@ -876,3 +893,17 @@ document.addEventListener('DOMContentLoaded', () => {
     renderGanttChart(projectData);
     updateDependenciesOptions();
 });
+function getStatusClass(status) {
+    switch (status) {
+        case 'on-track':
+            return 'status-on-track';
+        case 'some risk':
+            return 'status-some-risk';
+        case 'high risk':
+            return 'status-high-risk';
+        case 'scrapped':
+            return 'status-scrapped';
+        default:
+            return '';
+    }
+}

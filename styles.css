@@ -623,3 +623,50 @@ input[type="color"] {
         margin-bottom: 5px;
     }
 }
+/* Status indicator styles */
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.status-on-track {
+    background-color: green;
+}
+
+.status-some-risk {
+    background-color: yellow;
+}
+
+.status-high-risk {
+    background-color: red;
+}
+
+.status-scrapped {
+    background-color: red;
+    position: relative;
+}
+
+.status-scrapped::before,
+.status-scrapped::after {
+    content: '';
+    position: absolute;
+    background-color: white;
+    transform: rotate(45deg);
+}
+
+.status-scrapped::before {
+    width: 2px;
+    height: 12px;
+    left: 5px;
+    top: 0;
+}
+
+.status-scrapped::after {
+    width: 12px;
+    height: 2px;
+    left: 0;
+    top: 5px;
+}

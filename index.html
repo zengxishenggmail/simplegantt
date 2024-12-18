@@ -78,6 +78,15 @@
                     <label for="taskDescription">Task Description:</label>
                     <textarea id="taskDescription" placeholder="Enter task description"></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="taskStatus">Task Status:</label>
+                    <select id="taskStatus">
+                        <option value="on-track">On-track</option>
+                        <option value="some risk">Some risk of delay</option>
+                        <option value="high risk">High risk of delay</option>
+                        <option value="scrapped">Scrapped</option>
+                    </select>
+                </div>
                 <div id="formErrorMessage" style="color: red; margin-top: 10px;"></div>
                 <div class="form-group">
                     <label for="taskDependencies">Dependencies:</label>
@@ -137,6 +146,7 @@
                 <p><strong>Dependencies:</strong> <span id="detailTaskDependencies"></span></p>
                 <p><strong>Description:</strong></p>
                 <p id="detailTaskDescription"></p>
+                <p><strong>Status:</strong> <span id="detailTaskStatus"></span></p>
             </div>
         </div>
     </div>
