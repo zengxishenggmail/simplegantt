@@ -302,15 +302,17 @@ function renderGanttChart(projectData) {
 }
 
 document.getElementById('ganttChart').addEventListener('click', function(event) {
-    if (event.target.classList.contains('edit-task')) {
-        editTask(event);
-    } else if (event.target.classList.contains('delete-task')) {
-        deleteTask(event);
+    const editButton = event.target.closest('.edit-task');
+    const deleteButton = event.target.closest('.delete-task');
+    if (editButton) {
+        editTask(editButton);
+    } else if (deleteButton) {
+        deleteTask(deleteButton);
     }
 });
 
-function editTask(event) {
-    const taskIndex = parseInt(event.target.getAttribute('data-index'), 10);
+function editTask(buttonElement) {
+    const taskIndex = parseInt(buttonElement.getAttribute('data-index'), 10);
     const task = projectData.tasks[taskIndex];
 
     // Ensure dependencies is an array
@@ -339,8 +341,8 @@ function editTask(event) {
     taskModal.style.display = 'block';
 }
 
-async function deleteTask(event) {
-    const taskIndex = event.target.getAttribute('data-index');
+async function deleteTask(buttonElement) {
+    const taskIndex = buttonElement.getAttribute('data-index');
     const taskName = projectData.tasks[taskIndex].name;
 
     const confirmDelete = confirm(`Are you sure you want to delete the task "${taskName}"?`);
