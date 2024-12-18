@@ -95,6 +95,11 @@ document.getElementById('loadProject').addEventListener('click', async function(
                 throw new Error('Failed to parse YAML: ' + parseError.message);
             }
 
+            // Initialize `categories` if it's undefined
+            if (!Array.isArray(projectData.categories)) {
+                projectData.categories = [];
+            }
+
             console.log('Loaded projectData:', projectData);
 
             if (!projectData || typeof projectData !== 'object') {
