@@ -1,6 +1,10 @@
 let projectData = { tasks: [] };
 let fileHandle;
 
+function displayProjectName(name) {
+    document.getElementById('projectName').textContent = `Project: ${name}`;
+}
+
 document.getElementById('loadProject').addEventListener('change', function(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -8,15 +12,34 @@ document.getElementById('loadProject').addEventListener('change', function(event
         const yamlText = e.target.result;
         projectData = jsyaml.load(yamlText);
         renderGanttChart(projectData);
+        displayProjectName(file.name);
     };
     reader.readAsText(file);
 });
 
-document.getElementById('newProject').addEventListener('click', function() {
+document.getElementById('newProject').addEventListener('click', async function() {
+    if ('showSaveFilePicker' in window) {
+        try {
+            fileHandle = await window.showSaveFilePicker({
+                suggestedName: 'project.yaml',
+                types: [{
+                    description: 'YAML Files',
+                    accept: {'text/yaml': ['.yaml', '.yml']},
+                }],
+            });
+        } catch (err) {
+            console.error('File selection cancelled:', err);
+            return;
+        }
+    } else {
+        alert('Your browser does not support the File System Access API.');
+        return;
+    }
+
     projectData = { tasks: [] };
-    fileHandle = null; // Reset the file handle
+    displayProjectName(fileHandle.name);
     renderGanttChart(projectData);
-    onProjectDataChange(projectData); // Notify that project data has changed
+    onProjectDataChange(projectData);
 });
 
 document.getElementById('addTaskForm').addEventListener('submit', function(event) {
@@ -47,11 +70,7 @@ function renderGanttChart(projectData) {
 
 async function saveProjectData(projectData) {
     if ('showSaveFilePicker' in window) {
-        if (fileHandle) {
-            const writable = await fileHandle.createWritable();
-            await writable.write(jsyaml.dump(projectData));
-            await writable.close();
-        } else {
+        if (!fileHandle) {
             fileHandle = await window.showSaveFilePicker({
                 suggestedName: 'project.yaml',
                 types: [{
@@ -59,8 +78,11 @@ async function saveProjectData(projectData) {
                     accept: {'text/yaml': ['.yaml', '.yml']},
                 }],
             });
-            await saveProjectData(projectData);
+            displayProjectName(fileHandle.name);
         }
+        const writable = await fileHandle.createWritable();
+        await writable.write(jsyaml.dump(projectData));
+        await writable.close();
     } else {
         alert('Your browser does not support automatic saving. Please use a modern browser.');
     }
