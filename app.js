@@ -208,6 +208,7 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     const categoryId = parseInt(categorySelect.value, 10);
 
     const taskStatus = document.getElementById('taskStatus').value || 'on-track';
+    const statusExplanation = document.getElementById('statusExplanation').value.trim();
 
     const task = {
         name: taskName,
@@ -216,7 +217,8 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
         dependencies: dependencies,
         categoryId: categoryId,
         description: taskDescription,
-        status: taskStatus
+        status: taskStatus,
+        statusExplanation: statusExplanation
     };
 
     if (editIndex !== null) {
@@ -427,6 +429,7 @@ function showTaskDetails(taskIndex) {
         .join(', ') || 'None';
     document.getElementById('detailTaskDescription').textContent = task.description || 'No description.';
     document.getElementById('detailTaskStatus').textContent = task.status;
+    document.getElementById('detailStatusExplanation').textContent = task.statusExplanation || 'No status explanation.';
 
     // Show the modal
     const taskDetailsModal = document.getElementById('taskDetailsModal');
@@ -464,6 +467,7 @@ function editTask(buttonElement) {
     document.getElementById('taskDuration').value = task.duration;
     document.getElementById('taskDescription').value = task.description || '';
     document.getElementById('taskStatus').value = task.status || 'on-track';
+    document.getElementById('statusExplanation').value = task.statusExplanation || '';
 
     // Pre-select dependencies using Choices.js
     choices.setChoiceByValue(task.dependencies.map(String));

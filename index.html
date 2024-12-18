@@ -88,6 +88,10 @@
                         <option value="finished">Finished</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="statusExplanation">Status Explanation:</label>
+                    <textarea id="statusExplanation" placeholder="Add any comments about the status"></textarea>
+                </div>
                 <div id="formErrorMessage" style="color: red; margin-top: 10px;"></div>
                 <div class="form-group">
                     <label for="taskDependencies">Dependencies:</label>
@@ -148,6 +152,8 @@
                 <p><strong>Description:</strong></p>
                 <p id="detailTaskDescription"></p>
                 <p><strong>Status:</strong> <span id="detailTaskStatus"></span></p>
+                <p><strong>Status Explanation:</strong></p>
+                <p id="detailStatusExplanation"></p>
             </div>
         </div>
     </div>

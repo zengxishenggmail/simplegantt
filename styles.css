@@ -623,6 +623,11 @@ input[type="color"] {
         margin-bottom: 5px;
     }
 }
+
+/* Style for the status explanation in the task details modal */
+.modal .task-details-content p {
+    margin-bottom: 10px;
+}
 /* Status indicator styles */
 .status-indicator {
     width: 12px;
