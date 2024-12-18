@@ -207,6 +207,8 @@ function renderGanttChart(projectData) {
     const timeScale = renderTimeScale(projectStartDate, projectEndDate);
     ganttChart.appendChild(timeScale);
 
+    const fragment = document.createDocumentFragment();
+
     projectData.tasks.forEach((task, index) => {
         const taskElement = document.createElement('div');
         taskElement.classList.add('task-bar');
@@ -239,8 +241,10 @@ function renderGanttChart(projectData) {
         taskElement.setAttribute('tabindex', '0');
         taskElement.setAttribute('aria-label', `Task: ${task.name}`);
 
-        ganttChart.appendChild(taskElement);
+        fragment.appendChild(taskElement);
     });
+
+    ganttChart.appendChild(fragment);
 
     const ganttChartHeight = projectData.tasks.length * (TASK_HEIGHT + TASK_SPACING);
     ganttChart.style.height = `${ganttChartHeight}px`;
