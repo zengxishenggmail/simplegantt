@@ -8,13 +8,14 @@ body {
     margin-top: 20px;
     border: 1px solid #ccc;
     min-height: 200px;
+    position: relative;
 }
 
 .task-bar {
     background-color: #4CAF50;
     height: 30px;
     margin: 5px 0;
-    position: relative;
+    position: absolute;
 }
 
 form {

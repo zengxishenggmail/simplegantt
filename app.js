@@ -58,12 +58,25 @@ document.getElementById('addTaskForm').addEventListener('submit', function(event
 function renderGanttChart(projectData) {
     const ganttChart = document.getElementById('ganttChart');
     ganttChart.innerHTML = '';
+
+    if (projectData.tasks.length === 0) return;
+
+    const startDates = projectData.tasks.map(task => new Date(task.start));
+    const projectStartDate = new Date(Math.min(...startDates));
+
     projectData.tasks.forEach(task => {
         const taskElement = document.createElement('div');
         taskElement.classList.add('task-bar');
+
         taskElement.style.width = `${task.duration * 20}px`;
-        taskElement.style.left = `${new Date(task.start).getTime() * 0.02}px`;
+
+        const taskStartDate = new Date(task.start);
+        const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
+
+        taskElement.style.left = `${daysFromStart * 20}px`;
+
         taskElement.textContent = task.name;
+
         ganttChart.appendChild(taskElement);
     });
 }
