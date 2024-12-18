@@ -31,7 +31,14 @@
                 <button id="newProject"><i class="fas fa-file"></i> New Project</button>
             </div>
         </nav>
-        <!-- Zoom Controls -->
+    </header>
+
+    <main>
+        <div class="project-header">
+            <button id="openTaskModal"><i class="fas fa-plus"></i> Add Task</button>
+            <button id="manageCategoriesButton"><i class="fas fa-tags"></i> Manage Categories</button>
+        </div>
+        <!-- Zoom Controls moved here -->
         <div class="zoom-controls">
             <!-- Horizontal Zoom Controls -->
             <div class="zoom-group">
@@ -45,13 +52,6 @@
                 <input type="range" id="verticalZoom" min="10" max="60" value="30" step="5">
                 <span id="verticalZoomValue">30</span>
             </div>
-        </div>
-    </header>
-
-    <main>
-        <div class="project-header">
-            <button id="openTaskModal"><i class="fas fa-plus"></i> Add Task</button>
-            <button id="manageCategoriesButton"><i class="fas fa-tags"></i> Manage Categories</button>
         </div>
         <div id="statusMessage"></div>
         <div id="ganttChart"></div>

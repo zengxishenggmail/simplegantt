@@ -39,7 +39,8 @@ header h1 {
     display: flex;
     gap: 20px;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .zoom-group {
