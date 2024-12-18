@@ -364,13 +364,21 @@ function renderGanttChart(projectData) {
             let displayStatus = task.status;
             const currentDate = new Date();
 
-            // If current date is past the task's end date and task is not scrapped
-            if (currentDate > taskEndDate && task.status !== 'scrapped') {
+            // If current date is past the task's end date and task is not scrapped or finished
+            if (currentDate > taskEndDate && task.status !== 'scrapped' && task.status !== 'finished') {
                 displayStatus = 'high risk';
             }
 
+            let statusIndicatorHTML;
+
+            if (displayStatus === 'finished') {
+                statusIndicatorHTML = `<div class="status-indicator ${getStatusClass(displayStatus)}">🎉</div>`;
+            } else {
+                statusIndicatorHTML = `<div class="status-indicator ${getStatusClass(displayStatus)}"></div>`;
+            }
+
             taskElement.innerHTML = `
-                <div class="status-indicator ${getStatusClass(displayStatus)}"></div>
+                ${statusIndicatorHTML}
                 <span class="task-name">${task.name}</span>
                 <div class="task-buttons">
                     <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
@@ -902,6 +910,8 @@ function getStatusClass(status) {
             return 'status-high-risk';
         case 'scrapped':
             return 'status-scrapped';
+        case 'finished':
+            return 'status-finished';
         default:
             return '';
     }

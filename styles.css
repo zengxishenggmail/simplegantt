@@ -670,3 +670,13 @@ input[type="color"] {
     left: 0;
     top: 5px;
 }
+
+.status-finished {
+    background: none;    /* Remove any background color */
+    width: auto;         /* Allow width to adjust to content */
+    height: auto;        /* Allow height to adjust */
+    font-size: 16px;     /* Adjust font size as needed */
+    line-height: 1;      /* Align the emoji properly */
+    display: flex;
+    align-items: center;
+}
