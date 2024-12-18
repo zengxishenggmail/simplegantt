@@ -10,6 +10,8 @@ body {
     min-height: 200px;
     position: relative;
     padding-top: 30px;  /* Space for the time scale */
+    overflow-x: auto; /* Allow horizontal scrolling */
+    white-space: nowrap; /* Prevent content from wrapping */
 }
 
 .task-bar {
@@ -43,6 +45,9 @@ body {
     position: absolute;
     font-size: 0.8em;
     top: 5px;
+    transform: rotate(-45deg); /* Rotate labels to save space */
+    transform-origin: left top;
+    width: 50px; /* Adjust as needed */
 }
 
 form {

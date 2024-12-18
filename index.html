@@ -11,11 +11,17 @@
     <h1>Gantt Chart Application</h1>
     <input type="file" id="loadProject" accept=".yaml, .yml">
     <button id="newProject">New Project</button>
+    <button id="saveProject">Save</button>
+    <button id="saveAsProject">Save As</button>
     <div id="projectName">No project loaded</div>
     <form id="addTaskForm">
         <input type="text" id="taskName" placeholder="Task Name" required>
         <input type="date" id="taskStart" required>
         <input type="number" id="taskDuration" placeholder="Duration in days" required>
+        <select id="taskDependencies" multiple>
+            <!-- Options will be populated dynamically -->
+        </select>
+        <label for="taskDependencies">Select Dependencies</label>
         <button type="submit">Add Task</button>
     </form>
     <div id="ganttChart"></div>

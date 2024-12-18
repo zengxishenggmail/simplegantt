@@ -1,20 +1,33 @@
 let projectData = { tasks: [] };
 let fileHandle;
 
+const PIXELS_PER_DAY = 30; // Increase the value for better spacing
+
 function displayProjectName(name) {
     document.getElementById('projectName').textContent = `Project: ${name}`;
 }
 
-document.getElementById('loadProject').addEventListener('change', function(event) {
+document.getElementById('loadProject').addEventListener('change', async function(event) {
     const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const yamlText = e.target.result;
-        projectData = jsyaml.load(yamlText);
-        renderGanttChart(projectData);
-        displayProjectName(file.name);
-    };
-    reader.readAsText(file);
+    if (!file) return; // Exit if no file is selected
+
+    // Update fileHandle if possible
+    if ('showOpenFilePicker' in window) {
+        [fileHandle] = await window.showOpenFilePicker({
+            types: [{
+                description: 'YAML Files',
+                accept: {'text/yaml': ['.yaml', '.yml']},
+            }],
+        });
+    } else {
+        fileHandle = null; // Set to null if File System Access API is not supported
+    }
+
+    const yamlText = await file.text();
+    projectData = jsyaml.load(yamlText);
+    renderGanttChart(projectData);
+    displayProjectName(file.name);
+    updateDependenciesOptions();
 });
 
 document.getElementById('newProject').addEventListener('click', async function() {
@@ -39,7 +52,16 @@ document.getElementById('newProject').addEventListener('click', async function()
     projectData = { tasks: [] };
     displayProjectName(fileHandle.name);
     renderGanttChart(projectData);
-    onProjectDataChange(projectData);
+    updateDependenciesOptions();
+});
+
+document.getElementById('saveProject').addEventListener('click', async function() {
+    await saveProjectData(projectData);
+});
+
+document.getElementById('saveAsProject').addEventListener('click', async function() {
+    fileHandle = null; // Reset fileHandle to prompt for new save location
+    await saveProjectData(projectData);
 });
 
 document.getElementById('addTaskForm').addEventListener('submit', function(event) {
@@ -47,11 +69,14 @@ document.getElementById('addTaskForm').addEventListener('submit', function(event
     const submitButton = event.target.querySelector('button[type="submit"]');
     const editIndex = submitButton.getAttribute('data-edit-index');
 
+    const dependenciesSelect = document.getElementById('taskDependencies');
+    const dependencies = Array.from(dependenciesSelect.selectedOptions).map(option => parseInt(option.value));
+
     const task = {
         name: document.getElementById('taskName').value,
         start: document.getElementById('taskStart').value,
         duration: parseInt(document.getElementById('taskDuration').value),
-        dependencies: []
+        dependencies: dependencies
     };
 
     if (editIndex !== null) {
@@ -65,22 +90,28 @@ document.getElementById('addTaskForm').addEventListener('submit', function(event
     }
 
     renderGanttChart(projectData);
-    onProjectDataChange(projectData);
+    updateDependenciesOptions();
     event.target.reset();
 });
 
 function renderTimeScale(projectStartDate, projectEndDate) {
+    // Convert to UTC
+    projectStartDate = new Date(projectStartDate.toISOString().split('T')[0] + 'T00:00:00Z');
+    projectEndDate = new Date(projectEndDate.toISOString().split('T')[0] + 'T00:00:00Z');
+
     const timeScale = document.createElement('div');
     timeScale.classList.add('time-scale');
 
     const days = (projectEndDate - projectStartDate) / (1000 * 60 * 60 * 24);
     for (let i = 0; i <= days; i++) {
-        const date = new Date(projectStartDate.getTime() + i * 24 * 60 * 60 * 1000);
-        const dateLabel = document.createElement('div');
-        dateLabel.classList.add('date-label');
-        dateLabel.style.left = `${i * 20}px`;
-        dateLabel.textContent = date.toLocaleDateString();
-        timeScale.appendChild(dateLabel);
+        if (i % 2 === 0) { // Show label every 2 days
+            const date = new Date(projectStartDate.getTime() + i * 24 * 60 * 60 * 1000);
+            const dateLabel = document.createElement('div');
+            dateLabel.classList.add('date-label');
+            dateLabel.style.left = `${i * PIXELS_PER_DAY}px`;
+            dateLabel.textContent = date.toLocaleDateString();
+            timeScale.appendChild(dateLabel);
+        }
     }
 
     return timeScale;
@@ -92,9 +123,9 @@ function renderGanttChart(projectData) {
 
     if (projectData.tasks.length === 0) return;
 
-    const startDates = projectData.tasks.map(task => new Date(task.start));
+    const startDates = projectData.tasks.map(task => new Date(task.start + 'T00:00:00Z'));
     const endDates = projectData.tasks.map(task => {
-        const startDate = new Date(task.start);
+        const startDate = new Date(task.start + 'T00:00:00Z');
         return new Date(startDate.getTime() + task.duration * 24 * 60 * 60 * 1000);
     });
     const projectStartDate = new Date(Math.min(...startDates));
@@ -104,15 +135,31 @@ function renderGanttChart(projectData) {
     ganttChart.appendChild(timeScale);
 
     projectData.tasks.forEach((task, index) => {
+        // If the task has dependencies, adjust its start date
+        if (task.dependencies && task.dependencies.length > 0) {
+            const latestDependencyEnd = task.dependencies.reduce((latestDate, depIndex) => {
+                const depTask = projectData.tasks[depIndex];
+                const depStart = new Date(depTask.start + 'T00:00:00Z');
+                const depEnd = new Date(depStart.getTime() + depTask.duration * 24 * 60 * 60 * 1000);
+                return depEnd > latestDate ? depEnd : latestDate;
+            }, new Date(0));
+
+            // Adjust task start date if necessary
+            const taskStartDate = new Date(task.start + 'T00:00:00Z');
+            if (latestDependencyEnd > taskStartDate) {
+                task.start = latestDependencyEnd.toISOString().split('T')[0];
+            }
+        }
+
         const taskElement = document.createElement('div');
         taskElement.classList.add('task-bar');
 
-        taskElement.style.width = `${task.duration * 20}px`;
+        taskElement.style.width = `${task.duration * PIXELS_PER_DAY}px`;
 
-        const taskStartDate = new Date(task.start);
+        const taskStartDate = new Date(task.start + 'T00:00:00Z');
         const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
 
-        taskElement.style.left = `${daysFromStart * 20}px`;
+        taskElement.style.left = `${daysFromStart * PIXELS_PER_DAY}px`;
 
         taskElement.innerHTML = `
             ${task.name}
@@ -122,19 +169,18 @@ function renderGanttChart(projectData) {
 
         ganttChart.appendChild(taskElement);
     });
-
-    addTaskEventListeners();
 }
 
-function addTaskEventListeners() {
-    document.querySelectorAll('.edit-task').forEach(button => {
-        button.addEventListener('click', editTask);
-    });
+// Remove the addTaskEventListeners function
 
-    document.querySelectorAll('.delete-task').forEach(button => {
-        button.addEventListener('click', deleteTask);
-    });
-}
+// Add a single event listener to the ganttChart element
+document.getElementById('ganttChart').addEventListener('click', function(event) {
+    if (event.target.classList.contains('edit-task')) {
+        editTask(event);
+    } else if (event.target.classList.contains('delete-task')) {
+        deleteTask(event);
+    }
+});
 
 function editTask(event) {
     const taskIndex = event.target.getAttribute('data-index');
@@ -144,7 +190,13 @@ function editTask(event) {
     document.getElementById('taskStart').value = task.start;
     document.getElementById('taskDuration').value = task.duration;
 
-    // Change the form submit button to "Update Task"
+    // Update the dependencies select
+    const dependenciesSelect = document.getElementById('taskDependencies');
+    Array.from(dependenciesSelect.options).forEach(option => {
+        option.selected = task.dependencies.includes(parseInt(option.value));
+    });
+
+    // Update the submit button for editing
     const submitButton = document.querySelector('#addTaskForm button[type="submit"]');
     submitButton.textContent = 'Update Task';
     submitButton.setAttribute('data-edit-index', taskIndex);
@@ -154,31 +206,56 @@ function deleteTask(event) {
     const taskIndex = event.target.getAttribute('data-index');
     projectData.tasks.splice(taskIndex, 1);
     renderGanttChart(projectData);
-    onProjectDataChange(projectData);
+    updateDependenciesOptions();
+}
+
+function updateDependenciesOptions() {
+    const dependenciesSelect = document.getElementById('taskDependencies');
+    dependenciesSelect.innerHTML = ''; // Clear existing options
+
+    projectData.tasks.forEach((task, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = task.name;
+        dependenciesSelect.appendChild(option);
+    });
 }
 
 async function saveProjectData(projectData) {
     if ('showSaveFilePicker' in window) {
         if (!fileHandle) {
-            fileHandle = await window.showSaveFilePicker({
-                suggestedName: 'project.yaml',
-                types: [{
-                    description: 'YAML Files',
-                    accept: {'text/yaml': ['.yaml', '.yml']},
-                }],
-            });
-            displayProjectName(fileHandle.name);
+            try {
+                fileHandle = await window.showSaveFilePicker({
+                    suggestedName: 'project.yaml',
+                    types: [{
+                        description: 'YAML Files',
+                        accept: {'text/yaml': ['.yaml', '.yml']},
+                    }],
+                });
+                displayProjectName(fileHandle.name);
+            } catch (err) {
+                console.error('Save cancelled:', err);
+                return;
+            }
         }
         const writable = await fileHandle.createWritable();
         await writable.write(jsyaml.dump(projectData));
         await writable.close();
+        alert('Project saved successfully.');
     } else {
-        alert('Your browser does not support automatic saving. Please use a modern browser.');
+        // Fallback for browsers without File System Access API
+        const yamlData = jsyaml.dump(projectData);
+        const blob = new Blob([yamlData], {type: 'text/yaml'});
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'project.yaml';
+        link.click();
+        URL.revokeObjectURL(url);
     }
 }
 
-function onProjectDataChange(projectData) {
-    saveProjectData(projectData);
-}
+// Remove the onProjectDataChange function as we're no longer auto-saving
 
 renderGanttChart(projectData);
+updateDependenciesOptions();
