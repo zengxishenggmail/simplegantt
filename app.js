@@ -162,8 +162,15 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     const submitButton = event.target.querySelector('button[type="submit"]');
     const editIndex = submitButton.getAttribute('data-edit-index');
 
-    const dependencies = Array.from(document.querySelectorAll('input[name="taskDependencies"]:checked'))
+    // Collect dependencies
+    let dependencies = Array.from(document.querySelectorAll('input[name="taskDependencies"]:checked'))
         .map(checkbox => parseInt(checkbox.value));
+
+    // If editing, remove self-dependency just in case
+    if (editIndex !== null) {
+        const currentIndex = parseInt(editIndex, 10);
+        dependencies = dependencies.filter(depIndex => depIndex !== currentIndex);
+    }
 
     const task = {
         name: document.getElementById('taskName').value,
@@ -173,7 +180,7 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     };
 
     if (editIndex !== null) {
-        projectData.tasks[editIndex] = task;
+        projectData.tasks[parseInt(editIndex, 10)] = task;
         submitButton.textContent = 'Add Task';
         submitButton.removeAttribute('data-edit-index');
     } else {
@@ -306,13 +313,15 @@ document.getElementById('ganttChart').addEventListener('click', function(event) 
 });
 
 function editTask(event) {
-    const taskIndex = event.target.getAttribute('data-index');
+    const taskIndex = parseInt(event.target.getAttribute('data-index'), 10);
     const task = projectData.tasks[taskIndex];
 
     // Ensure dependencies is an array
     if (!Array.isArray(task.dependencies)) {
         task.dependencies = [];
     }
+
+    updateDependenciesOptions(taskIndex);
 
     document.getElementById('taskName').value = task.name;
     document.getElementById('taskStart').value = task.start;
@@ -347,11 +356,15 @@ async function deleteTask(event) {
     await saveProjectData(projectData, true);
 }
 
-function updateDependenciesOptions() {
+function updateDependenciesOptions(excludeIndex = null) {
     const dependenciesContainer = document.getElementById('taskDependenciesContainer');
     dependenciesContainer.innerHTML = '';
 
     projectData.tasks.forEach((task, index) => {
+        if (index === excludeIndex) {
+            // Skip adding a dependency option for the task itself
+            return;
+        }
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = `dependency-${index}`;
@@ -446,6 +459,8 @@ const modalTitle = document.getElementById('modalTitle');
 
 openTaskModalButton.addEventListener('click', () => {
     modalTitle.textContent = 'Add Task';
+    // Include all tasks as potential dependencies
+    updateDependenciesOptions();
     taskModal.style.display = 'block';
 });
 
