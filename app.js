@@ -147,7 +147,7 @@ document.getElementById('loadProject').addEventListener('click', async function(
 });
 
 document.getElementById('newProject').addEventListener('click', async function() {
-    projectData = { projectName: 'Untitled Project', tasks: [], categories: [] };
+    projectData = { projectName: 'Untitled Project', tasks: [], categories: [], people: [] };
     fileHandle = null; // Reset the fileHandle
     updateProjectNameDisplay();
     renderGanttChart(projectData);
