@@ -7,17 +7,26 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <h1>Gantt Chart Application</h1>
-    <button id="loadProject">Load Project</button>
-    <button id="newProject">New Project</button>
-    <button id="saveProject">Save</button>
-    <button id="saveAsProject">Save As</button>
-    <button id="openTaskModal">Add Task</button>
-    <div id="projectName">No project loaded</div>
-    <div id="statusMessage"></div>
-    <div id="ganttChart"></div>
+    <header>
+        <h1>Gantt Chart Application</h1>
+        <nav>
+            <button id="loadProject"><i class="fas fa-folder-open"></i> Load Project</button>
+            <button id="newProject"><i class="fas fa-file"></i> New Project</button>
+            <button id="saveProject"><i class="fas fa-save"></i> Save</button>
+            <button id="saveAsProject"><i class="fas fa-save"></i> Save As</button>
+            <button id="openTaskModal"><i class="fas fa-plus"></i> Add Task</button>
+        </nav>
+    </header>
+
+    <main>
+        <h2 id="projectName">No project loaded</h2>
+        <div id="statusMessage"></div>
+        <div id="ganttChart"></div>
+    </main>
 
     <div id="taskModal" class="modal">
         <div class="modal-content">

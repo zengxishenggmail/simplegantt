@@ -159,14 +159,15 @@ function renderTimeScale(projectStartDate, projectEndDate) {
     const days = (projectEndDate - projectStartDate) / (1000 * 60 * 60 * 24);
     for (let i = 0; i <= days; i++) {
         const date = new Date(projectStartDate.getTime() + i * 24 * 60 * 60 * 1000);
-        const dayOfWeek = date.getUTCDay();
 
+        // Create vertical grid lines
         const daySeparator = document.createElement('div');
         daySeparator.classList.add('day-separator');
         daySeparator.style.left = `${i * PIXELS_PER_DAY}px`;
         timeScale.appendChild(daySeparator);
 
-        if (i % 7 === 0) {
+        // Add date labels at intervals
+        if (i % 7 === 0 || i === 0 || i === days) {
             const dateLabel = document.createElement('div');
             dateLabel.classList.add('date-label');
             dateLabel.style.left = `${i * PIXELS_PER_DAY}px`;
@@ -231,9 +232,12 @@ function renderGanttChart(projectData) {
 
         taskElement.innerHTML = `
             ${task.name}
-            <button class="edit-task" data-index="${index}">Edit</button>
-            <button class="delete-task" data-index="${index}">Delete</button>
+            <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
+            <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
         `;
+        taskElement.setAttribute('role', 'button');
+        taskElement.setAttribute('tabindex', '0');
+        taskElement.setAttribute('aria-label', `Task: ${task.name}`);
 
         ganttChart.appendChild(taskElement);
     });
