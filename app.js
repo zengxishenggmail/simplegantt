@@ -100,6 +100,11 @@ document.getElementById('loadProject').addEventListener('click', async function(
                 projectData.categories = [];
             }
 
+            // Initialize `people` if it's undefined
+            if (!Array.isArray(projectData.people)) {
+                projectData.people = [];
+            }
+
             console.log('Loaded projectData:', projectData);
 
             if (!projectData || typeof projectData !== 'object') {
@@ -950,6 +955,11 @@ document.addEventListener('DOMContentLoaded', () => {
             projectData.categories = [];
         }
 
+        // Initialize `people` if it's undefined
+        if (!Array.isArray(projectData.people)) {
+            projectData.people = [];
+        }
+
         updateProjectNameDisplay();
         updateCategoryOptions();
         renderCategoriesList();
@@ -968,7 +978,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else {
         // No saved project data; use default empty projectData
-        projectData = { projectName: 'Untitled Project', tasks: [], categories: [] };
+        projectData = { projectName: 'Untitled Project', tasks: [], categories: [], people: [] };
         updateProjectNameDisplay();
         updateCategoryOptions();
         renderCategoriesList();
