@@ -9,6 +9,37 @@ function displayProjectName(name) {
     document.getElementById('projectName').textContent = `Project: ${name}`;
 }
 
+function computeTaskStartDate(index, taskStartDates, projectData, visited = {}) {
+    if (taskStartDates[index]) {
+        return taskStartDates[index];
+    }
+
+    if (visited[index]) {
+        throw new Error('Circular dependency detected in tasks.');
+    }
+    visited[index] = true;
+
+    const task = projectData.tasks[index];
+    let taskStartDate = new Date(task.start + 'T00:00:00Z');
+
+    if (task.dependencies && task.dependencies.length > 0) {
+        const latestDependencyEnd = task.dependencies.reduce((latestDate, depIndex) => {
+            const depStartDate = computeTaskStartDate(depIndex, taskStartDates, projectData, visited);
+            const depTask = projectData.tasks[depIndex];
+            const depEndDate = new Date(depStartDate.getTime() + depTask.duration * 24 * 60 * 60 * 1000);
+            return depEndDate > latestDate ? depEndDate : latestDate;
+        }, new Date(0));
+
+        if (latestDependencyEnd > taskStartDate) {
+            taskStartDate = latestDependencyEnd;
+        }
+    }
+
+    taskStartDates[index] = taskStartDate;
+    delete visited[index];
+    return taskStartDate;
+}
+
 document.getElementById('loadProject').addEventListener('click', async function() {
     if ('showOpenFilePicker' in window) {
         try {
@@ -42,6 +73,13 @@ document.getElementById('loadProject').addEventListener('click', async function(
                 projectData.tasks = [];
                 console.warn('Project data did not contain tasks array. Initialized as empty.');
             }
+
+            // Initialize dependencies as an array for all tasks
+            projectData.tasks.forEach(task => {
+                if (!Array.isArray(task.dependencies)) {
+                    task.dependencies = [];
+                }
+            });
 
             renderGanttChart(projectData);
             displayProjectName(fileHandle.name);
@@ -98,7 +136,14 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     renderGanttChart(projectData);
     updateDependenciesOptions();
     
-    await saveProjectData(projectData, true);
+    try {
+        await saveProjectData(projectData, true);
+    } catch (error) {
+        console.error('Error during save:', error);
+        const statusMessage = document.getElementById('statusMessage');
+        statusMessage.textContent = 'Error saving project.';
+        statusMessage.style.color = 'red';
+    }
     
     event.target.reset();
     taskModal.style.display = 'none';
@@ -144,11 +189,17 @@ function renderGanttChart(projectData) {
 
     if (projectData.tasks.length === 0) return;
 
-    const startDates = projectData.tasks.map(task => new Date(task.start + 'T00:00:00Z'));
-    const endDates = projectData.tasks.map(task => {
-        const startDate = new Date(task.start + 'T00:00:00Z');
+    const taskStartDates = {};
+    projectData.tasks.forEach((task, index) => {
+        computeTaskStartDate(index, taskStartDates, projectData);
+    });
+
+    const startDates = Object.values(taskStartDates).map(date => date);
+    const endDates = projectData.tasks.map((task, index) => {
+        const startDate = taskStartDates[index];
         return new Date(startDate.getTime() + task.duration * 24 * 60 * 60 * 1000);
     });
+
     const projectStartDate = new Date(Math.min(...startDates));
     const projectEndDate = new Date(Math.max(...endDates));
 
@@ -156,26 +207,12 @@ function renderGanttChart(projectData) {
     ganttChart.appendChild(timeScale);
 
     projectData.tasks.forEach((task, index) => {
-        if (task.dependencies && task.dependencies.length > 0) {
-            const latestDependencyEnd = task.dependencies.reduce((latestDate, depIndex) => {
-                const depTask = projectData.tasks[depIndex];
-                const depStart = new Date(depTask.start + 'T00:00:00Z');
-                const depEnd = new Date(depStart.getTime() + depTask.duration * 24 * 60 * 60 * 1000);
-                return depEnd > latestDate ? depEnd : latestDate;
-            }, new Date(0));
-
-            const taskStartDate = new Date(task.start + 'T00:00:00Z');
-            if (latestDependencyEnd > taskStartDate) {
-                task.start = latestDependencyEnd.toISOString().split('T')[0];
-            }
-        }
-
         const taskElement = document.createElement('div');
         taskElement.classList.add('task-bar');
 
         taskElement.style.width = `${task.duration * PIXELS_PER_DAY}px`;
 
-        const taskStartDate = new Date(task.start + 'T00:00:00Z');
+        const taskStartDate = taskStartDates[index];
         const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
 
         taskElement.style.left = `${daysFromStart * PIXELS_PER_DAY}px`;
@@ -185,7 +222,7 @@ function renderGanttChart(projectData) {
 
         const tooltipContent = `
             Name: ${task.name}
-            Start: ${task.start}
+            Start: ${taskStartDate.toISOString().split('T')[0]}
             Duration: ${task.duration} days
             Dependencies: ${task.dependencies.map(depIndex => projectData.tasks[depIndex]?.name).join(', ') || 'None'}
         `;
