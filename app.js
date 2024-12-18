@@ -135,7 +135,7 @@ document.getElementById('loadProject').addEventListener('click', async function(
 });
 
 document.getElementById('newProject').addEventListener('click', async function() {
-    projectData = { projectName: 'Untitled Project', tasks: [] };
+    projectData = { projectName: 'Untitled Project', tasks: [], categories: [] };
     fileHandle = null; // Reset the fileHandle
     updateProjectNameDisplay();
     renderGanttChart(projectData);
@@ -672,6 +672,12 @@ flatpickr("#taskStart", {
 const savedProjectData = localStorage.getItem('projectData');
 if (savedProjectData) {
     projectData = JSON.parse(savedProjectData);
+
+    // Initialize `categories` if it's undefined
+    if (!Array.isArray(projectData.categories)) {
+        projectData.categories = [];
+    }
+
     updateProjectNameDisplay();
     const savedFileName = localStorage.getItem('fileName') || 'Last Project';
 
@@ -687,7 +693,7 @@ if (savedProjectData) {
     });
 } else {
     // No saved project data; use default empty projectData
-    projectData = { projectName: 'Untitled Project', tasks: [] };
+    projectData = { projectName: 'Untitled Project', tasks: [], categories: [] };
     updateProjectNameDisplay();
 }
 
