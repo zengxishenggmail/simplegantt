@@ -126,6 +126,8 @@ document.getElementById('loadProject').addEventListener('click', async function(
             updateProjectNameDisplay();
             updateDependenciesOptions();
             renderGanttChart(projectData);
+            updateCategoryOptions();
+            renderCategoriesList();
 
             // Save project data and file name to localStorage
             localStorage.setItem('projectData', JSON.stringify(projectData));
@@ -652,6 +654,7 @@ openTaskModalButton.addEventListener('click', () => {
     modalTitle.textContent = 'Add Task';
     // Include all tasks as potential dependencies
     updateDependenciesOptions();
+    updateCategoryOptions();
     taskModal.style.display = 'block';
 });
 
@@ -684,6 +687,9 @@ if (savedProjectData) {
     }
 
     updateProjectNameDisplay();
+    updateCategoryOptions();
+    renderCategoriesList();
+
     const savedFileName = localStorage.getItem('fileName') || 'Last Project';
 
     // Inform user that autosave to file is not enabled
@@ -700,6 +706,8 @@ if (savedProjectData) {
     // No saved project data; use default empty projectData
     projectData = { projectName: 'Untitled Project', tasks: [], categories: [] };
     updateProjectNameDisplay();
+    updateCategoryOptions();
+    renderCategoriesList();
 }
 
 // Now render the chart and update dependencies
