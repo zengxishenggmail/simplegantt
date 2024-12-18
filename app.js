@@ -429,6 +429,45 @@ document.addEventListener('DOMContentLoaded', () => {
         searchResultLimit: 10,
         placeholderValue: 'Select dependencies...',
     });
+
+    // Attach event listener to the addCategoryForm
+    document.getElementById('addCategoryForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        console.log('Add Category form submitted');
+        const categoryName = document.getElementById('categoryName').value.trim();
+        const categoryColor = document.getElementById('categoryColor').value;
+
+        // Create a new category object
+        const category = {
+            id: Date.now(), // Simple unique ID
+            name: categoryName,
+            color: categoryColor
+        };
+
+        projectData.categories.push(category);
+
+        // Update the UI
+        renderCategoriesList();
+        updateCategoryOptions();
+
+        // Save project data
+        saveProjectData(projectData, true);
+
+        // Reset the form
+        event.target.reset();
+    });
+
+    // Attach event listener to the manage categories button
+    manageCategoriesButton.addEventListener('click', () => {
+        categoriesModal.style.display = 'block';
+        renderCategoriesList();
+    });
+
+    // Attach event listener to the close button of the categories modal
+    closeCategoriesModalButton.addEventListener('click', () => {
+        categoriesModal.style.display = 'none';
+        document.getElementById('addCategoryForm').reset();
+    });
 });
 
 function updateDependenciesOptions(excludeIndex = null) {
@@ -550,31 +589,7 @@ window.addEventListener('click', (event) => {
     }
 });
 
-// Handle category form submission
-document.getElementById('addCategoryForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const categoryName = document.getElementById('categoryName').value.trim();
-    const categoryColor = document.getElementById('categoryColor').value;
-
-    // Create a new category object
-    const category = {
-        id: Date.now(), // Simple unique ID
-        name: categoryName,
-        color: categoryColor
-    };
-
-    projectData.categories.push(category);
-
-    // Update the UI
-    renderCategoriesList();
-    updateCategoryOptions();
-
-    // Save project data
-    saveProjectData(projectData, true);
-
-    // Reset the form
-    event.target.reset();
-});
+// This event listener is now moved inside the DOMContentLoaded event
 
 function renderCategoriesList() {
     const categoriesList = document.getElementById('categoriesList');
