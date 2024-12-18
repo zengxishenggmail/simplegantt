@@ -427,9 +427,17 @@ function showTaskDetails(taskIndex) {
     document.getElementById('detailTaskDependencies').textContent = task.dependencies
         .map(depIndex => projectData.tasks[depIndex]?.name)
         .join(', ') || 'None';
-    document.getElementById('detailTaskDescription').textContent = task.description || 'No description.';
+    // Parse and sanitize the task description
+    const rawDescription = marked.parse(task.description || 'No description.');
+    const sanitizedDescription = DOMPurify.sanitize(rawDescription);
+    document.getElementById('detailTaskDescription').innerHTML = sanitizedDescription;
+
     document.getElementById('detailTaskStatus').textContent = task.status;
-    document.getElementById('detailStatusExplanation').textContent = task.statusExplanation || 'No status explanation.';
+
+    // Parse and sanitize the status explanation
+    const rawStatusExplanation = marked.parse(task.statusExplanation || 'No status explanation.');
+    const sanitizedStatusExplanation = DOMPurify.sanitize(rawStatusExplanation);
+    document.getElementById('detailStatusExplanation').innerHTML = sanitizedStatusExplanation;
 
     // Show the modal
     const taskDetailsModal = document.getElementById('taskDetailsModal');

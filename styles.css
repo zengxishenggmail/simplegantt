@@ -628,6 +628,46 @@ input[type="color"] {
 .modal .task-details-content p {
     margin-bottom: 10px;
 }
+
+/* Styles for rendered markdown content */
+.task-details-content p {
+    margin-bottom: 10px;
+}
+
+.task-details-content h1,
+.task-details-content h2,
+.task-details-content h3,
+.task-details-content h4,
+.task-details-content h5,
+.task-details-content h6 {
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.task-details-content ul,
+.task-details-content ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.task-details-content a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.task-details-content code {
+    background-color: #f4f4f4;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.task-details-content pre code {
+    display: block;
+    padding: 10px;
+    overflow-x: auto;
+}
 /* Status indicator styles */
 .status-indicator {
     width: 12px;
