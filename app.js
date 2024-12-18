@@ -4,6 +4,7 @@ let fileHandle;
 const PIXELS_PER_DAY = 30;
 const TASK_HEIGHT = 30;
 const TASK_SPACING = 5;
+const GANTT_CHART_PADDING_TOP = 60; // This should match the padding-top in styles.css
 
 function displayProjectName(name) {
     document.getElementById('projectName').textContent = `Project: ${name}`;
@@ -220,7 +221,7 @@ function renderGanttChart(projectData) {
 
         taskElement.style.left = `${daysFromStart * PIXELS_PER_DAY}px`;
 
-        const taskTopPosition = index * (TASK_HEIGHT + TASK_SPACING);
+        const taskTopPosition = GANTT_CHART_PADDING_TOP + index * (TASK_HEIGHT + TASK_SPACING);
         taskElement.style.top = `${taskTopPosition}px`;
 
         const tooltipContent = `
