@@ -85,6 +85,10 @@ document.getElementById('loadProject').addEventListener('click', async function(
             renderGanttChart(projectData);
             displayProjectName(fileHandle.name);
             updateDependenciesOptions();
+
+            // Save project data and file name to localStorage
+            localStorage.setItem('projectData', JSON.stringify(projectData));
+            localStorage.setItem('fileName', fileHandle.name);
         } catch (error) {
             alert('Failed to load project: ' + error.message);
             console.error('Error loading project:', error);
@@ -100,6 +104,10 @@ document.getElementById('newProject').addEventListener('click', async function()
     displayProjectName('Untitled Project');
     renderGanttChart(projectData);
     updateDependenciesOptions();
+
+    // Clear localStorage when creating a new project
+    localStorage.removeItem('projectData');
+    localStorage.removeItem('fileName');
 });
 
 document.getElementById('saveProject').addEventListener('click', async function() {
@@ -359,6 +367,12 @@ async function saveProjectData(projectData, autosave = false) {
             await writable.write(jsyaml.dump(projectData));
             await writable.close();
             statusMessage.textContent = autosave ? 'Autosaved.' : 'Project saved successfully.';
+
+            // Update localStorage with the latest project data and file name
+            localStorage.setItem('projectData', JSON.stringify(projectData));
+            if (fileHandle && fileHandle.name) {
+                localStorage.setItem('fileName', fileHandle.name);
+            }
         } catch (err) {
             console.error('Error during save:', err);
             statusMessage.textContent = 'Error saving project.';
@@ -413,5 +427,18 @@ flatpickr("#taskStart", {
     dateFormat: "Y-m-d",
 });
 
+// Initial loading of project data from local storage
+const savedProjectData = localStorage.getItem('projectData');
+if (savedProjectData) {
+    projectData = JSON.parse(savedProjectData);
+    const savedFileName = localStorage.getItem('fileName') || 'Last Project';
+    displayProjectName(savedFileName);
+} else {
+    // No saved project data; use default empty projectData
+    projectData = { tasks: [] };
+    displayProjectName('No project loaded');
+}
+
+// Now render the chart and update dependencies
 renderGanttChart(projectData);
 updateDependenciesOptions();
