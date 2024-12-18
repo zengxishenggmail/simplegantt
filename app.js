@@ -182,8 +182,9 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     formErrorMessage.textContent = '';
 
     // Collect dependencies
-    let dependencies = Array.from(document.querySelectorAll('input[name="taskDependencies"]:checked'))
-        .map(checkbox => parseInt(checkbox.value));
+    const dependenciesSelect = document.getElementById('taskDependencies');
+    let dependencies = Array.from(dependenciesSelect.selectedOptions)
+        .map(option => parseInt(option.value));
 
     // If editing, remove self-dependency just in case
     if (editIndex !== null) {
@@ -220,6 +221,7 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     
     event.target.reset();
     taskModal.style.display = 'none';
+    choices.removeActiveItems();
 });
 
 function renderTimeScale(projectStartDate, projectEndDate) {
@@ -350,12 +352,8 @@ function editTask(buttonElement) {
     document.getElementById('taskStart').value = task.start;
     document.getElementById('taskDuration').value = task.duration;
 
-    projectData.tasks.forEach((_, index) => {
-        const checkbox = document.getElementById(`dependency-${index}`);
-        if (checkbox) {
-            checkbox.checked = task.dependencies.includes(index);
-        }
-    });
+    // Pre-select dependencies using Choices.js
+    choices.setChoiceByValue(task.dependencies.map(String));
 
     const submitButton = document.querySelector('#addTaskForm button[type="submit"]');
     submitButton.textContent = 'Update Task';
@@ -379,31 +377,29 @@ async function deleteTask(buttonElement) {
     await saveProjectData(projectData, true);
 }
 
-function updateDependenciesOptions(excludeIndex = null) {
-    const dependenciesContainer = document.getElementById('taskDependenciesContainer');
-    dependenciesContainer.innerHTML = '';
+let choices;
 
-    projectData.tasks.forEach((task, index) => {
-        if (index === excludeIndex) {
-            // Skip adding a dependency option for the task itself
-            return;
-        }
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = `dependency-${index}`;
-        checkbox.name = 'taskDependencies';
-        checkbox.value = index;
-
-        const label = document.createElement('label');
-        label.htmlFor = `dependency-${index}`;
-        label.textContent = task.name;
-
-        const checkboxContainer = document.createElement('div');
-        checkboxContainer.appendChild(checkbox);
-        checkboxContainer.appendChild(label);
-
-        dependenciesContainer.appendChild(checkboxContainer);
+document.addEventListener('DOMContentLoaded', () => {
+    choices = new Choices('#taskDependencies', {
+        removeItemButton: true,
+        shouldSort: false,
+        searchResultLimit: 10,
+        placeholderValue: 'Select dependencies...',
     });
+});
+
+function updateDependenciesOptions(excludeIndex = null) {
+    const choicesList = projectData.tasks
+        .map((task, index) => {
+            if (index !== excludeIndex) {
+                return { value: index.toString(), label: task.name };
+            }
+            return null;
+        })
+        .filter(item => item !== null);
+
+    choices.clearChoices();
+    choices.setChoices(choicesList, 'value', 'label', false);
 }
 
 async function saveProjectData(projectData, autosave = false) {
@@ -497,6 +493,7 @@ closeModalButton.addEventListener('click', () => {
     taskModal.style.display = 'none';
     document.getElementById('addTaskForm').reset();
     document.getElementById('formErrorMessage').textContent = '';
+    choices.removeActiveItems();
 });
 
 window.addEventListener('click', (event) => {
