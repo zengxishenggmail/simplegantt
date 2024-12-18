@@ -589,6 +589,16 @@ input[type="color"] {
     opacity: 1;
 }
 
+/* Style for the task details content */
+.modal .task-details-content p {
+    margin-bottom: 10px;
+}
+
+.modal .task-details-content p strong {
+    display: inline-block;
+    width: 120px;
+}
+
 /* ===== Responsive Styles ===== */
 @media (max-width: 600px) {
     nav {
