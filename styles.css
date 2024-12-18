@@ -34,6 +34,33 @@ header h1 {
     margin: 0;
 }
 
+/* Zoom Controls Styling */
+.zoom-controls {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.zoom-group {
+    display: flex;
+    align-items: center;
+}
+
+.zoom-group label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.zoom-group input[type="range"] {
+    width: 150px;
+}
+
+.zoom-group span {
+    margin-left: 10px;
+    font-weight: bold;
+}
+
 /* Style for the project name display */
 #projectNameDisplay {
     font-weight: bold;
@@ -162,7 +189,6 @@ main {
 
 .task-bar {
     background-color: var(--primary-color);
-    height: var(--task-height);
     position: absolute;
     display: flex;
     align-items: center;

@@ -27,6 +27,21 @@
             <button id="saveProject"><i class="fas fa-save"></i> Save</button>
             <button id="saveAsProject"><i class="fas fa-save"></i> Save As</button>
         </nav>
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+            <!-- Horizontal Zoom Controls -->
+            <div class="zoom-group">
+                <label for="horizontalZoom">Horizontal Zoom:</label>
+                <input type="range" id="horizontalZoom" min="10" max="100" value="30" step="5">
+                <span id="horizontalZoomValue">30</span>
+            </div>
+            <!-- Vertical Zoom Controls -->
+            <div class="zoom-group">
+                <label for="verticalZoom">Vertical Zoom:</label>
+                <input type="range" id="verticalZoom" min="10" max="60" value="30" step="5">
+                <span id="verticalZoomValue">30</span>
+            </div>
+        </div>
     </header>
 
     <main>

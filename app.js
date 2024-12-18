@@ -35,9 +35,9 @@ projectNameInput.addEventListener('keyup', (event) => {
     }
 });
 
-const PIXELS_PER_DAY = 30;
-const TASK_HEIGHT = 30;
-const TASK_SPACING = 5;
+let pixelsPerDay = 30; // For horizontal zoom
+let taskHeight = 30;   // For vertical zoom
+let taskSpacing = 5;
 const GANTT_CHART_PADDING_TOP = 60; // This should match the padding-top in styles.css
 
 
@@ -251,14 +251,14 @@ function renderTimeScale(projectStartDate, projectEndDate) {
         // Create vertical grid lines
         const daySeparator = document.createElement('div');
         daySeparator.classList.add('day-separator');
-        daySeparator.style.left = `${i * PIXELS_PER_DAY}px`;
+        daySeparator.style.left = `${i * pixelsPerDay}px`;
         timeScale.appendChild(daySeparator);
 
         // Add date labels at intervals
         if (i % 7 === 0 || i === 0 || i === days) {
             const dateLabel = document.createElement('div');
             dateLabel.classList.add('date-label');
-            dateLabel.style.left = `${i * PIXELS_PER_DAY}px`;
+            dateLabel.style.left = `${i * pixelsPerDay}px`;
             dateLabel.textContent = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
             timeScale.appendChild(dateLabel);
         }
@@ -324,19 +324,20 @@ function renderGanttChart(projectData) {
         categoryElement.textContent = category ? category.name : 'Uncategorized';
         categoryElement.style.borderLeftColor = category ? category.color : '#999';
         fragment.appendChild(categoryElement);
-        currentTop += CATEGORY_HEADING_HEIGHT;
+        currentTop += taskHeight + 10; // Adjust category heading height
 
         // Render tasks within this category
         categoryTasks.forEach(({ task, index }) => {
             const taskElement = document.createElement('div');
             taskElement.classList.add('task-bar');
 
-            taskElement.style.width = `${task.duration * PIXELS_PER_DAY}px`;
+            taskElement.style.width = `${task.duration * pixelsPerDay}px`;
+            taskElement.style.height = `${taskHeight}px`;
 
             const taskStartDate = taskStartDates[index];
             const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
 
-            taskElement.style.left = `${daysFromStart * PIXELS_PER_DAY}px`;
+            taskElement.style.left = `${daysFromStart * pixelsPerDay}px`;
             taskElement.style.top = `${currentTop}px`;
 
             // Set task color based on category
@@ -363,7 +364,7 @@ function renderGanttChart(projectData) {
             taskElement.setAttribute('aria-label', `Task: ${task.name}`);
 
             fragment.appendChild(taskElement);
-            currentTop += TASK_HEIGHT + TASK_SPACING;
+            currentTop += taskHeight + taskSpacing;
         });
     }
 
@@ -437,6 +438,40 @@ document.addEventListener('DOMContentLoaded', () => {
         searchResultLimit: 10,
         placeholderValue: 'Select dependencies...',
     });
+
+    // Get references to the zoom controls
+    const horizontalZoomInput = document.getElementById('horizontalZoom');
+    const verticalZoomInput = document.getElementById('verticalZoom');
+    const horizontalZoomValue = document.getElementById('horizontalZoomValue');
+    const verticalZoomValue = document.getElementById('verticalZoomValue');
+
+    // Update the values on page load
+    horizontalZoomValue.textContent = pixelsPerDay;
+    verticalZoomValue.textContent = taskHeight;
+
+    // Debounce function
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    // Event listener for horizontal zoom
+    horizontalZoomInput.addEventListener('input', debounce(() => {
+        pixelsPerDay = parseInt(horizontalZoomInput.value, 10);
+        horizontalZoomValue.textContent = pixelsPerDay;
+        renderGanttChart(projectData);
+    }, 100));
+
+    // Event listener for vertical zoom
+    verticalZoomInput.addEventListener('input', debounce(() => {
+        taskHeight = parseInt(verticalZoomInput.value, 10);
+        verticalZoomValue.textContent = taskHeight;
+        taskSpacing = Math.round(taskHeight / 6);
+        renderGanttChart(projectData);
+    }, 100));
 
     // Tab functionality for categories modal
     const tabButtons = categoriesModal.querySelectorAll('.tab-button');
