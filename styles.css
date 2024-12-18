@@ -184,6 +184,28 @@ main {
     font-size: 1em;
 }
 
+/* Style for the Manage People button */
+#managePeopleButton {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#managePeopleButton:hover {
+    background-color: var(--secondary-color-dark);
+}
+
+#managePeopleButton i {
+    font-size: 1em;
+}
+
 /* ===== Gantt Chart Styles ===== */
 #ganttChart {
     margin-top: 20px;
