@@ -44,16 +44,47 @@ document.getElementById('newProject').addEventListener('click', async function()
 
 document.getElementById('addTaskForm').addEventListener('submit', function(event) {
     event.preventDefault();
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    const editIndex = submitButton.getAttribute('data-edit-index');
+
     const task = {
         name: document.getElementById('taskName').value,
         start: document.getElementById('taskStart').value,
         duration: parseInt(document.getElementById('taskDuration').value),
         dependencies: []
     };
-    projectData.tasks.push(task);
+
+    if (editIndex !== null) {
+        // Update existing task
+        projectData.tasks[editIndex] = task;
+        submitButton.textContent = 'Add Task';
+        submitButton.removeAttribute('data-edit-index');
+    } else {
+        // Add new task
+        projectData.tasks.push(task);
+    }
+
     renderGanttChart(projectData);
     onProjectDataChange(projectData);
+    event.target.reset();
 });
+
+function renderTimeScale(projectStartDate, projectEndDate) {
+    const timeScale = document.createElement('div');
+    timeScale.classList.add('time-scale');
+
+    const days = (projectEndDate - projectStartDate) / (1000 * 60 * 60 * 24);
+    for (let i = 0; i <= days; i++) {
+        const date = new Date(projectStartDate.getTime() + i * 24 * 60 * 60 * 1000);
+        const dateLabel = document.createElement('div');
+        dateLabel.classList.add('date-label');
+        dateLabel.style.left = `${i * 20}px`;
+        dateLabel.textContent = date.toLocaleDateString();
+        timeScale.appendChild(dateLabel);
+    }
+
+    return timeScale;
+}
 
 function renderGanttChart(projectData) {
     const ganttChart = document.getElementById('ganttChart');
@@ -62,9 +93,17 @@ function renderGanttChart(projectData) {
     if (projectData.tasks.length === 0) return;
 
     const startDates = projectData.tasks.map(task => new Date(task.start));
+    const endDates = projectData.tasks.map(task => {
+        const startDate = new Date(task.start);
+        return new Date(startDate.getTime() + task.duration * 24 * 60 * 60 * 1000);
+    });
     const projectStartDate = new Date(Math.min(...startDates));
+    const projectEndDate = new Date(Math.max(...endDates));
 
-    projectData.tasks.forEach(task => {
+    const timeScale = renderTimeScale(projectStartDate, projectEndDate);
+    ganttChart.appendChild(timeScale);
+
+    projectData.tasks.forEach((task, index) => {
         const taskElement = document.createElement('div');
         taskElement.classList.add('task-bar');
 
@@ -75,10 +114,47 @@ function renderGanttChart(projectData) {
 
         taskElement.style.left = `${daysFromStart * 20}px`;
 
-        taskElement.textContent = task.name;
+        taskElement.innerHTML = `
+            ${task.name}
+            <button class="edit-task" data-index="${index}">Edit</button>
+            <button class="delete-task" data-index="${index}">Delete</button>
+        `;
 
         ganttChart.appendChild(taskElement);
     });
+
+    addTaskEventListeners();
+}
+
+function addTaskEventListeners() {
+    document.querySelectorAll('.edit-task').forEach(button => {
+        button.addEventListener('click', editTask);
+    });
+
+    document.querySelectorAll('.delete-task').forEach(button => {
+        button.addEventListener('click', deleteTask);
+    });
+}
+
+function editTask(event) {
+    const taskIndex = event.target.getAttribute('data-index');
+    const task = projectData.tasks[taskIndex];
+
+    document.getElementById('taskName').value = task.name;
+    document.getElementById('taskStart').value = task.start;
+    document.getElementById('taskDuration').value = task.duration;
+
+    // Change the form submit button to "Update Task"
+    const submitButton = document.querySelector('#addTaskForm button[type="submit"]');
+    submitButton.textContent = 'Update Task';
+    submitButton.setAttribute('data-edit-index', taskIndex);
+}
+
+function deleteTask(event) {
+    const taskIndex = event.target.getAttribute('data-index');
+    projectData.tasks.splice(taskIndex, 1);
+    renderGanttChart(projectData);
+    onProjectDataChange(projectData);
 }
 
 async function saveProjectData(projectData) {
