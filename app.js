@@ -80,7 +80,7 @@ document.getElementById('saveAsProject').addEventListener('click', async functio
     await saveProjectData(projectData);
 });
 
-document.getElementById('addTaskForm').addEventListener('submit', function(event) {
+document.getElementById('addTaskForm').addEventListener('submit', async function(event) {
     event.preventDefault();
     const submitButton = event.target.querySelector('button[type="submit"]');
     const editIndex = submitButton.getAttribute('data-edit-index');
@@ -107,6 +107,10 @@ document.getElementById('addTaskForm').addEventListener('submit', function(event
 
     renderGanttChart(projectData);
     updateDependenciesOptions();
+    
+    // Auto-save the project data
+    await saveProjectData(projectData);
+    
     event.target.reset();
 });
 
@@ -231,11 +235,14 @@ function editTask(event) {
     submitButton.setAttribute('data-edit-index', taskIndex);
 }
 
-function deleteTask(event) {
+async function deleteTask(event) {
     const taskIndex = event.target.getAttribute('data-index');
     projectData.tasks.splice(taskIndex, 1);
     renderGanttChart(projectData);
     updateDependenciesOptions();
+    
+    // Auto-save the project data
+    await saveProjectData(projectData);
 }
 
 function updateDependenciesOptions() {
@@ -267,10 +274,14 @@ async function saveProjectData(projectData) {
                 return;
             }
         }
-        const writable = await fileHandle.createWritable();
-        await writable.write(jsyaml.dump(projectData));
-        await writable.close();
-        alert('Project saved successfully.');
+        try {
+            const writable = await fileHandle.createWritable();
+            await writable.write(jsyaml.dump(projectData));
+            await writable.close();
+            console.log('Project auto-saved successfully.');
+        } catch (err) {
+            console.error('Error during auto-save:', err);
+        }
     } else {
         // Fallback for browsers without File System Access API
         const yamlData = jsyaml.dump(projectData);
@@ -281,7 +292,7 @@ async function saveProjectData(projectData) {
         link.download = 'project.yaml';
         link.click();
         URL.revokeObjectURL(url);
-        alert('Project saved successfully.');
+        console.log('Project auto-saved successfully (fallback method).');
     }
 }
 
