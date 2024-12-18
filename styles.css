@@ -725,3 +725,38 @@ input[type="color"] {
     display: flex;
     align-items: center;
 }
+/* Person Items Styles */
+.person-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.person-item:last-child {
+    border-bottom: none;
+}
+
+.person-item span {
+    flex-grow: 1;
+    font-size: 1em;
+}
+
+.person-item button {
+    background-color: transparent;
+    color: var(--text-color);
+    border: none;
+    padding: 5px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: background-color 0.2s;
+}
+
+.person-item button:hover {
+    background-color: #f0f0f0;
+}
+
+.person-item button i {
+    pointer-events: none;
+}

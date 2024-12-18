@@ -1,4 +1,4 @@
-let projectData = { projectName: 'Untitled Project', categories: [], tasks: [] };
+let projectData = { projectName: 'Untitled Project', categories: [], tasks: [], people: [] };
 const CATEGORY_HEADING_HEIGHT = 30; // Adjust as needed
 let fileHandle;
 
@@ -210,6 +210,11 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     const taskStatus = document.getElementById('taskStatus').value || 'on-track';
     const statusExplanation = document.getElementById('statusExplanation').value.trim();
 
+    // Collect assigned people
+    const assignedPeopleSelect = document.getElementById('taskPeople');
+    const assignedPeople = Array.from(assignedPeopleSelect.selectedOptions)
+        .map(option => parseInt(option.value));
+
     const task = {
         name: taskName,
         start: taskStart,
@@ -218,7 +223,8 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
         categoryId: categoryId,
         description: taskDescription,
         status: taskStatus,
-        statusExplanation: statusExplanation
+        statusExplanation: statusExplanation,
+        assignedPeople: assignedPeople
     };
 
     if (editIndex !== null) {
@@ -439,6 +445,11 @@ function showTaskDetails(taskIndex) {
     const sanitizedStatusExplanation = DOMPurify.sanitize(rawStatusExplanation);
     document.getElementById('detailStatusExplanation').innerHTML = sanitizedStatusExplanation;
 
+    // Display assigned people
+    document.getElementById('detailAssignedPeople').textContent = task.assignedPeople
+        .map(personId => projectData.people.find(p => p.id === personId)?.name)
+        .join(', ') || 'None';
+
     // Show the modal
     const taskDetailsModal = document.getElementById('taskDetailsModal');
     taskDetailsModal.style.display = 'block';
@@ -469,6 +480,7 @@ function editTask(buttonElement) {
 
     updateDependenciesOptions(taskIndex);
     updateCategoryOptions();
+    updatePeopleOptions();
 
     document.getElementById('taskName').value = task.name;
     document.getElementById('taskStart').value = task.start;
@@ -479,6 +491,9 @@ function editTask(buttonElement) {
 
     // Pre-select dependencies using Choices.js
     choices.setChoiceByValue(task.dependencies.map(String));
+
+    // Pre-select assigned people using Choices.js
+    peopleChoices.setChoiceByValue(task.assignedPeople.map(String));
 
     // Set the selected category
     const categorySelect = document.getElementById('taskCategory');
@@ -507,6 +522,7 @@ async function deleteTask(buttonElement) {
 }
 
 let choices;
+let peopleChoices;
 
 document.addEventListener('DOMContentLoaded', () => {
     choices = new Choices('#taskDependencies', {
@@ -514,6 +530,13 @@ document.addEventListener('DOMContentLoaded', () => {
         shouldSort: false,
         searchResultLimit: 10,
         placeholderValue: 'Select dependencies...',
+    });
+
+    peopleChoices = new Choices('#taskPeople', {
+        removeItemButton: true,
+        shouldSort: false,
+        searchResultLimit: 10,
+        placeholderValue: 'Assign people...',
     });
 
     // Get references to the zoom controls
@@ -741,6 +764,11 @@ const manageCategoriesButton = document.getElementById('manageCategoriesButton')
 const categoriesModal = document.getElementById('categoriesModal');
 const closeCategoriesModalButton = categoriesModal.querySelector('.close-button');
 
+// Get references to the manage people button and modal
+const managePeopleButton = document.getElementById('managePeopleButton');
+const peopleModal = document.getElementById('peopleModal');
+const closePeopleModalButton = peopleModal.querySelector('.close-button');
+
 // Open the categories modal when the button is clicked
 manageCategoriesButton.addEventListener('click', () => {
     categoriesModal.style.display = 'block';
@@ -759,6 +787,44 @@ window.addEventListener('click', (event) => {
         categoriesModal.style.display = 'none';
         document.getElementById('addCategoryForm').reset();
     }
+});
+
+// Open the people modal when the button is clicked
+managePeopleButton.addEventListener('click', () => {
+    peopleModal.style.display = 'block';
+    renderPeopleList();
+});
+
+// Close the people modal when the close button is clicked
+closePeopleModalButton.addEventListener('click', () => {
+    peopleModal.style.display = 'none';
+    document.getElementById('addPersonForm').reset();
+});
+
+// Close the people modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    if (event.target === peopleModal) {
+        peopleModal.style.display = 'none';
+        document.getElementById('addPersonForm').reset();
+    }
+});
+
+// Tab functionality for people modal
+const peopleTabButtons = peopleModal.querySelectorAll('.tab-button');
+const peopleTabContents = peopleModal.querySelectorAll('.tab-content');
+
+peopleTabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const targetTab = button.getAttribute('data-tab');
+
+        // Deactivate all tabs and contents
+        peopleTabButtons.forEach(btn => btn.classList.remove('active'));
+        peopleTabContents.forEach(content => content.classList.remove('active'));
+
+        // Activate selected tab and content
+        button.classList.add('active');
+        peopleModal.querySelector(`#${targetTab}Tab`).classList.add('active');
+    });
 });
 
 // This event listener is now moved inside the DOMContentLoaded event
@@ -928,3 +994,116 @@ function getStatusClass(status) {
             return '';
     }
 }
+function renderPeopleList() {
+    const peopleList = document.getElementById('peopleList');
+    peopleList.innerHTML = '';
+
+    projectData.people.forEach((person) => {
+        const personItem = document.createElement('div');
+        personItem.classList.add('person-item');
+
+        const personName = document.createElement('span');
+        personName.textContent = person.name;
+
+        const editButton = document.createElement('button');
+        editButton.innerHTML = '<i class="fas fa-edit"></i>';
+        editButton.addEventListener('click', () => {
+            editPerson(person.id);
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteButton.addEventListener('click', () => {
+            deletePerson(person.id);
+        });
+
+        personItem.appendChild(personName);
+        personItem.appendChild(editButton);
+        personItem.appendChild(deleteButton);
+
+        peopleList.appendChild(personItem);
+    });
+}
+
+function editPerson(personId) {
+    const person = projectData.people.find(p => p.id === personId);
+    if (!person) return;
+
+    // Switch to the "Add Person" tab
+    peopleModal.querySelector('.tab-button[data-tab="add-person"]').click();
+
+    // Populate the form with existing person data
+    document.getElementById('personName').value = person.name;
+
+    // Store the person ID in the form for editing
+    document.getElementById('addPersonForm').setAttribute('data-edit-id', personId);
+    document.querySelector('#addPersonForm button[type="submit"]').textContent = 'Update Person';
+}
+
+function deletePerson(personId) {
+    const confirmDelete = confirm('Are you sure you want to delete this person?');
+    if (!confirmDelete) return;
+
+    // Remove person from projectData
+    projectData.people = projectData.people.filter(p => p.id !== personId);
+
+    // Remove personId from tasks that have this person assigned
+    projectData.tasks.forEach(task => {
+        if (Array.isArray(task.assignedPeople)) {
+            task.assignedPeople = task.assignedPeople.filter(id => id !== personId);
+        }
+    });
+
+    renderPeopleList();
+    updatePeopleOptions();
+    saveProjectData(projectData, true);
+}
+
+function updatePeopleOptions() {
+    const peopleChoicesList = projectData.people.map(person => ({
+        value: person.id.toString(),
+        label: person.name
+    }));
+
+    peopleChoices.clearChoices();
+    peopleChoices.setChoices(peopleChoicesList, 'value', 'label', false);
+}
+
+document.getElementById('addPersonForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const personNameInput = document.getElementById('personName');
+    const personName = personNameInput.value.trim();
+
+    if (!personName) {
+        personNameInput.focus();
+        return;
+    }
+
+    const editId = event.target.getAttribute('data-edit-id');
+
+    if (editId) {
+        // Update existing person
+        const person = projectData.people.find(p => p.id === parseInt(editId, 10));
+        if (person) {
+            person.name = personName;
+        }
+        // Reset form
+        event.target.removeAttribute('data-edit-id');
+        document.querySelector('#addPersonForm button[type="submit"]').textContent = 'Add Person';
+    } else {
+        // Add new person
+        const person = {
+            id: Date.now(),
+            name: personName
+        };
+        projectData.people.push(person);
+    }
+
+    // Update UI and save data
+    renderPeopleList();
+    updatePeopleOptions();
+    saveProjectData(projectData, true);
+
+    // Reset the form
+    event.target.reset();
+});

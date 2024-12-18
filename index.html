@@ -37,6 +37,7 @@
         <div class="project-header">
             <button id="openTaskModal"><i class="fas fa-plus"></i> Add Task</button>
             <button id="manageCategoriesButton"><i class="fas fa-tags"></i> Manage Categories</button>
+            <button id="managePeopleButton"><i class="fas fa-users"></i> Manage People</button>
         </div>
         <!-- Zoom Controls moved here -->
         <div class="zoom-controls">
@@ -103,6 +104,10 @@
                         <!-- Categories will be populated dynamically -->
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="taskPeople">Assigned People:</label>
+                    <select id="taskPeople" multiple></select>
+                </div>
                 <button type="submit">Add Task</button>
             </form>
         </div>
@@ -154,6 +159,35 @@
                 <p><strong>Status:</strong> <span id="detailTaskStatus"></span></p>
                 <p><strong>Status Explanation:</strong></p>
                 <p id="detailStatusExplanation"></p>
+                <p><strong>Assigned People:</strong> <span id="detailAssignedPeople"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="peopleModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Manage People</h2>
+
+            <div class="tabs">
+                <button class="tab-button active" data-tab="add-person">Add Person</button>
+                <button class="tab-button" data-tab="list-people">View People</button>
+            </div>
+
+            <div class="tab-content active" id="add-personTab">
+                <form id="addPersonForm">
+                    <div class="form-group">
+                        <label for="personName">Person Name:</label>
+                        <input type="text" id="personName" placeholder="Enter person's name" required>
+                    </div>
+                    <button type="submit">Add Person</button>
+                </form>
+            </div>
+
+            <div class="tab-content" id="list-peopleTab">
+                <div id="peopleList">
+                    <!-- Existing people will be listed here -->
+                </div>
             </div>
         </div>
     </div>
