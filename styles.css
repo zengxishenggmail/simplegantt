@@ -58,6 +58,40 @@ main {
     padding: 20px;
 }
 
+/* ===== Project Header ===== */
+.project-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.project-header h2 {
+    margin: 0;
+}
+
+/* ===== Add Task Button ===== */
+#openTaskModal {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#openTaskModal:hover {
+    background-color: var(--secondary-color-dark);
+}
+
+#openTaskModal i {
+    font-size: 1em;
+}
+
 /* ===== Gantt Chart Styles ===== */
 #ganttChart {
     margin-top: 20px;
