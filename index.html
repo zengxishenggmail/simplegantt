@@ -72,25 +72,42 @@
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2>Manage Categories</h2>
-            <form id="addCategoryForm">
-                <div class="form-group">
-                    <label for="categoryName">Category Name:</label>
-                    <input type="text" id="categoryName" placeholder="Enter category name" required>
+
+            <div class="tabs">
+                <button class="tab-button active" data-tab="add">Add Category</button>
+                <button class="tab-button" data-tab="list">View Categories</button>
+            </div>
+
+            <div class="tab-content active" id="addTab">
+                <form id="addCategoryForm">
+                    <div class="form-group">
+                        <label for="categoryName">Category Name:</label>
+                        <input type="text" id="categoryName" placeholder="Enter category name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoryColor">Category Color:</label>
+                        <input type="color" id="categoryColor" value="#4CAF50" required>
+                    </div>
+                    <button type="submit">Add Category</button>
+                </form>
+            </div>
+
+            <div class="tab-content" id="listTab">
+                <div id="categoriesList">
+                    <!-- Existing categories will be listed here -->
                 </div>
-                <div class="form-group">
-                    <label for="categoryColor">Category Color:</label>
-                    <input type="color" id="categoryColor" value="#4CAF50" required>
-                </div>
-                <button type="submit">Add Category</button>
-            </form>
-            <div id="categoriesList">
-                <!-- Existing categories will be listed here -->
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <!-- Spectrum CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css" />
+    <!-- jQuery (required for Spectrum) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Spectrum JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

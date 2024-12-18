@@ -159,13 +159,14 @@ main {
 
 .category-heading {
     position: absolute;
-    font-weight: bold;
-    font-size: 1.1em;
-    background-color: #f0f0f0;
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
+    font-weight: 500;
+    font-size: 1em;
+    background-color: #f9f9f9;
+    padding: 5px 10px;
+    border-left: 4px solid var(--primary-color);
     width: 100%;
     box-sizing: border-box;
+    color: var(--text-color);
 }
 
 /* Styles for category items in the modal */

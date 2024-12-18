@@ -322,6 +322,7 @@ function renderGanttChart(projectData) {
         categoryElement.classList.add('category-heading');
         categoryElement.style.top = `${currentTop}px`;
         categoryElement.textContent = category ? category.name : 'Uncategorized';
+        categoryElement.style.borderLeftColor = category ? category.color : '#999';
         fragment.appendChild(categoryElement);
         currentTop += CATEGORY_HEADING_HEIGHT;
 
@@ -437,27 +438,65 @@ document.addEventListener('DOMContentLoaded', () => {
         placeholderValue: 'Select dependencies...',
     });
 
+    // Tab functionality for categories modal
+    const tabButtons = categoriesModal.querySelectorAll('.tab-button');
+    const tabContents = categoriesModal.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+
+            // Deactivate all tabs and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Activate selected tab and content
+            button.classList.add('active');
+            categoriesModal.querySelector(`#${targetTab}Tab`).classList.add('active');
+        });
+    });
+
+    // Initialize Spectrum color picker
+    $("#categoryColor").spectrum({
+        preferredFormat: "hex",
+        showInput: true,
+        showPalette: true,
+        palette: [
+            ["#4CAF50", "#FF9800", "#2196F3", "#9C27B0", "#F44336", "#FFC107"]
+        ]
+    });
+
     // Attach event listener to the addCategoryForm
     document.getElementById('addCategoryForm').addEventListener('submit', function(event) {
         event.preventDefault();
-        console.log('Add Category form submitted');
         const categoryName = document.getElementById('categoryName').value.trim();
         const categoryColor = document.getElementById('categoryColor').value;
+        const editId = event.target.getAttribute('data-edit-id');
 
-        // Create a new category object
-        const category = {
-            id: Date.now(), // Simple unique ID
-            name: categoryName,
-            color: categoryColor
-        };
+        if (editId) {
+            // Update existing category
+            const category = projectData.categories.find(cat => cat.id === parseInt(editId, 10));
+            if (category) {
+                category.name = categoryName;
+                category.color = categoryColor;
+            }
+            // Reset form
+            event.target.removeAttribute('data-edit-id');
+            document.querySelector('#addCategoryForm button[type="submit"]').textContent = 'Add Category';
+        } else {
+            // Add new category
+            const category = {
+                id: Date.now(),
+                name: categoryName,
+                color: categoryColor
+            };
+            projectData.categories.push(category);
+        }
 
-        projectData.categories.push(category);
-
-        // Update the UI
+        // Update UI and save data
         renderCategoriesList();
         updateCategoryOptions();
-
-        // Save project data
+        renderGanttChart(projectData);
         saveProjectData(projectData, true);
 
         // Reset the form
@@ -475,6 +514,10 @@ document.addEventListener('DOMContentLoaded', () => {
         categoriesModal.style.display = 'none';
         document.getElementById('addCategoryForm').reset();
     });
+
+    // Now render the chart and update dependencies options
+    renderGanttChart(projectData);
+    updateDependenciesOptions();
 });
 
 function updateDependenciesOptions(excludeIndex = null) {
@@ -613,29 +656,61 @@ function renderCategoriesList() {
         const categoryName = document.createElement('span');
         categoryName.textContent = category.name;
 
+        const editButton = document.createElement('button');
+        editButton.innerHTML = '<i class="fas fa-edit"></i>';
+        editButton.addEventListener('click', () => {
+            editCategory(category.id);
+        });
+
         const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
+        deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
         deleteButton.addEventListener('click', () => {
-            // Remove category from projectData
-            projectData.categories = projectData.categories.filter(cat => cat.id !== category.id);
-            // Remove categoryId from tasks that had this category
-            projectData.tasks.forEach(task => {
-                if (task.categoryId === category.id) {
-                    delete task.categoryId;
-                }
-            });
-            renderCategoriesList();
-            updateCategoryOptions();
-            renderGanttChart(projectData);
-            saveProjectData(projectData, true);
+            deleteCategory(category.id);
         });
 
         categoryItem.appendChild(colorIndicator);
         categoryItem.appendChild(categoryName);
+        categoryItem.appendChild(editButton);
         categoryItem.appendChild(deleteButton);
 
         categoriesList.appendChild(categoryItem);
     });
+}
+
+function editCategory(categoryId) {
+    const category = projectData.categories.find(cat => cat.id === categoryId);
+    if (!category) return;
+
+    // Switch to the "Add Category" tab
+    categoriesModal.querySelector('.tab-button[data-tab="add"]').click();
+
+    // Populate the form with existing category data
+    document.getElementById('categoryName').value = category.name;
+    $("#categoryColor").spectrum("set", category.color);
+
+    // Store the category ID in the form for editing
+    document.getElementById('addCategoryForm').setAttribute('data-edit-id', categoryId);
+    document.querySelector('#addCategoryForm button[type="submit"]').textContent = 'Update Category';
+}
+
+function deleteCategory(categoryId) {
+    const confirmDelete = confirm('Are you sure you want to delete this category?');
+    if (!confirmDelete) return;
+
+    // Remove category from projectData
+    projectData.categories = projectData.categories.filter(cat => cat.id !== categoryId);
+
+    // Remove categoryId from tasks that used this category
+    projectData.tasks.forEach(task => {
+        if (task.categoryId === categoryId) {
+            delete task.categoryId;
+        }
+    });
+
+    renderCategoriesList();
+    updateCategoryOptions();
+    renderGanttChart(projectData);
+    saveProjectData(projectData, true);
 }
 
 function updateCategoryOptions() {
