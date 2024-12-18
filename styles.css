@@ -7,17 +7,16 @@ body {
 #ganttChart {
     margin-top: 20px;
     border: 1px solid #ccc;
-    min-height: 200px;
     position: relative;
-    padding-top: 30px;  /* Space for the time scale */
+    padding-top: 50px;  /* Space for the time scale */
     overflow-x: auto; /* Allow horizontal scrolling */
+    overflow-y: auto; /* Allow vertical scrolling if tasks exceed container height */
     white-space: nowrap; /* Prevent content from wrapping */
 }
 
 .task-bar {
     background-color: #4CAF50;
     height: 30px;
-    margin: 5px 0;
     position: absolute;
     display: flex;
     align-items: center;
@@ -37,8 +36,9 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 30px;
+    height: 50px;
     border-bottom: 1px solid #ccc;
+    background-color: #f9f9f9;
 }
 
 .date-label {

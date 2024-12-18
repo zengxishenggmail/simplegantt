@@ -2,6 +2,8 @@ let projectData = { tasks: [] };
 let fileHandle;
 
 const PIXELS_PER_DAY = 30; // Increase the value for better spacing
+const TASK_HEIGHT = 30; // Should match the height in your CSS .task-bar
+const TASK_SPACING = 5; // Space between task bars
 
 function displayProjectName(name) {
     document.getElementById('projectName').textContent = `Project: ${name}`;
@@ -161,6 +163,10 @@ function renderGanttChart(projectData) {
 
         taskElement.style.left = `${daysFromStart * PIXELS_PER_DAY}px`;
 
+        // Calculate the vertical position for the task bar
+        const taskTopPosition = index * (TASK_HEIGHT + TASK_SPACING);
+        taskElement.style.top = `${taskTopPosition}px`;
+
         taskElement.innerHTML = `
             ${task.name}
             <button class="edit-task" data-index="${index}">Edit</button>
@@ -169,6 +175,10 @@ function renderGanttChart(projectData) {
 
         ganttChart.appendChild(taskElement);
     });
+
+    // Set the height of the Gantt chart container
+    const ganttChartHeight = projectData.tasks.length * (TASK_HEIGHT + TASK_SPACING);
+    ganttChart.style.height = `${ganttChartHeight}px`;
 }
 
 // Remove the addTaskEventListeners function
