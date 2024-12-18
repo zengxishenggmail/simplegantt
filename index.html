@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gantt Chart Application</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+</head>
+<body>
+    <h1>Gantt Chart Application</h1>
+    <input type="file" id="loadProject" accept=".yaml, .yml">
+    <button id="newProject">New Project</button>
+    <form id="addTaskForm">
+        <input type="text" id="taskName" placeholder="Task Name" required>
+        <input type="date" id="taskStart" required>
+        <input type="number" id="taskDuration" placeholder="Duration in days" required>
+        <button type="submit">Add Task</button>
+    </form>
+    <div id="ganttChart"></div>
+    <script src="app.js"></script>
+</body>
+</html>
