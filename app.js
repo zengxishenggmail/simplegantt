@@ -251,9 +251,13 @@ document.getElementById('ganttChart').addEventListener('click', function(event) 
 });
 
 function editTask(event) {
-    const taskIndex =
- event.target.getAttribute('data-index');
+    const taskIndex = event.target.getAttribute('data-index');
     const task = projectData.tasks[taskIndex];
+
+    // Ensure dependencies is an array
+    if (!Array.isArray(task.dependencies)) {
+        task.dependencies = [];
+    }
 
     document.getElementById('taskName').value = task.name;
     document.getElementById('taskStart').value = task.start;
