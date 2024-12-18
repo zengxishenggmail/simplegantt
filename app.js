@@ -462,14 +462,24 @@ document.addEventListener('DOMContentLoaded', () => {
         showInput: true,
         showPalette: true,
         palette: [
-            ["#4CAF50", "#FF9800", "#2196F3", "#9C27B0", "#F44336", "#FFC107"]
+            ["#4CAF50", "#FF9800", "#2196F3", "#9C27B0", "#F44336", "#FFC107"],
+            ["#E91E63", "#00BCD4", "#8BC34A", "#CDDC39", "#FFC107", "#FF5722"],
+            ["#795548", "#9E9E9E", "#607D8B", "#000000", "#FFFFFF"]
         ]
     });
 
     // Attach event listener to the addCategoryForm
     document.getElementById('addCategoryForm').addEventListener('submit', function(event) {
         event.preventDefault();
-        const categoryName = document.getElementById('categoryName').value.trim();
+        const categoryNameInput = document.getElementById('categoryName');
+        const categoryName = categoryNameInput.value.trim();
+
+        if (!categoryName) {
+            // Display an error message or highlight the input
+            categoryNameInput.focus();
+            return;
+        }
+
         const categoryColor = document.getElementById('categoryColor').value;
         const editId = event.target.getAttribute('data-edit-id');
 
