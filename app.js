@@ -158,6 +158,28 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     event.preventDefault();
     const submitButton = event.target.querySelector('button[type="submit"]');
     const editIndex = submitButton.getAttribute('data-edit-index');
+    const formErrorMessage = document.getElementById('formErrorMessage');
+
+    // Collect form inputs
+    const taskName = document.getElementById('taskName').value.trim();
+    const taskStart = document.getElementById('taskStart').value;
+    const taskDurationValue = document.getElementById('taskDuration').value;
+
+    // Validate task start date
+    if (!taskStart) {
+        formErrorMessage.textContent = 'Please enter a valid start date for the task.';
+        return;
+    }
+
+    // Validate task duration
+    const taskDuration = parseInt(taskDurationValue, 10);
+    if (isNaN(taskDuration) || taskDuration < 1) {
+        formErrorMessage.textContent = 'Please enter a valid duration (number greater than 0) for the task.';
+        return;
+    }
+
+    // Clear the error message when validation passes
+    formErrorMessage.textContent = '';
 
     // Collect dependencies
     let dependencies = Array.from(document.querySelectorAll('input[name="taskDependencies"]:checked'))
@@ -170,9 +192,9 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     }
 
     const task = {
-        name: document.getElementById('taskName').value,
-        start: document.getElementById('taskStart').value,
-        duration: parseInt(document.getElementById('taskDuration').value),
+        name: taskName,
+        start: taskStart,
+        duration: taskDuration,
         dependencies: dependencies
     };
 
@@ -472,6 +494,7 @@ openTaskModalButton.addEventListener('click', () => {
 closeModalButton.addEventListener('click', () => {
     taskModal.style.display = 'none';
     document.getElementById('addTaskForm').reset();
+    document.getElementById('formErrorMessage').textContent = '';
 });
 
 window.addEventListener('click', (event) => {
