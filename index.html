@@ -29,6 +29,7 @@
     <main>
         <div class="project-header">
             <button id="openTaskModal"><i class="fas fa-plus"></i> Add Task</button>
+            <button id="manageCategoriesButton"><i class="fas fa-tags"></i> Manage Categories</button>
         </div>
         <div id="statusMessage"></div>
         <div id="ganttChart"></div>
@@ -56,8 +57,35 @@
                     <label for="taskDependencies">Dependencies:</label>
                     <select id="taskDependencies" multiple></select>
                 </div>
+                <div class="form-group">
+                    <label for="taskCategory">Category:</label>
+                    <select id="taskCategory" required>
+                        <!-- Categories will be populated dynamically -->
+                    </select>
+                </div>
                 <button type="submit">Add Task</button>
             </form>
+        </div>
+    </div>
+
+    <div id="categoriesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Manage Categories</h2>
+            <form id="addCategoryForm">
+                <div class="form-group">
+                    <label for="categoryName">Category Name:</label>
+                    <input type="text" id="categoryName" placeholder="Enter category name" required>
+                </div>
+                <div class="form-group">
+                    <label for="categoryColor">Category Color:</label>
+                    <input type="color" id="categoryColor" value="#4CAF50" required>
+                </div>
+                <button type="submit">Add Category</button>
+            </form>
+            <div id="categoriesList">
+                <!-- Existing categories will be listed here -->
+            </div>
         </div>
     </div>
 

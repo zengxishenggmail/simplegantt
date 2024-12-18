@@ -139,7 +139,7 @@ main {
 }
 
 .task-bar {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+    background-color: var(--primary-color);
     height: var(--task-height);
     position: absolute;
     display: flex;
@@ -155,6 +155,34 @@ main {
     min-width: 100px; /* Adjust this value as needed */
     overflow: visible; /* Allow content to overflow if necessary */
     padding-right: 5px; /* Space between content and buttons */
+}
+
+.category-heading {
+    position: absolute;
+    font-weight: bold;
+    font-size: 1.1em;
+    background-color: #f0f0f0;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Styles for category items in the modal */
+.category-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.category-item .color-indicator {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.category-item button {
+    margin-left: auto;
 }
 
 .task-bar:hover {

@@ -1,4 +1,5 @@
-let projectData = { projectName: 'Untitled Project', tasks: [] };
+let projectData = { projectName: 'Untitled Project', categories: [], tasks: [] };
+const CATEGORY_HEADING_HEIGHT = 30; // Adjust as needed
 let fileHandle;
 
 const projectNameDisplay = document.getElementById('projectNameDisplay');
@@ -192,11 +193,16 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
         dependencies = dependencies.filter(depIndex => depIndex !== currentIndex);
     }
 
+    // Collect selected category
+    const categorySelect = document.getElementById('taskCategory');
+    const categoryId = parseInt(categorySelect.value, 10);
+
     const task = {
         name: taskName,
         start: taskStart,
         duration: taskDuration,
-        dependencies: dependencies
+        dependencies: dependencies,
+        categoryId: categoryId
     };
 
     if (editIndex !== null) {
@@ -283,48 +289,80 @@ function renderGanttChart(projectData) {
     ganttChart.appendChild(timeScale);
 
     const fragment = document.createDocumentFragment();
+    let currentTop = GANTT_CHART_PADDING_TOP; // For positioning tasks
 
+    // Group tasks by categories
+    const tasksByCategory = {};
     projectData.tasks.forEach((task, index) => {
-        const taskElement = document.createElement('div');
-        taskElement.classList.add('task-bar');
-
-        taskElement.style.width = `${task.duration * PIXELS_PER_DAY}px`;
-
-        const taskStartDate = taskStartDates[index];
-        const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
-
-        taskElement.style.left = `${daysFromStart * PIXELS_PER_DAY}px`;
-
-        const taskTopPosition = GANTT_CHART_PADDING_TOP + index * (TASK_HEIGHT + TASK_SPACING);
-        taskElement.style.top = `${taskTopPosition}px`;
-
-        const tooltipContent = `
-            Name: ${task.name}
-            Start: ${taskStartDate.toISOString().split('T')[0]}
-            Duration: ${task.duration} days
-            Dependencies: ${task.dependencies.map(depIndex => projectData.tasks[depIndex]?.name).join(', ') || 'None'}
-        `;
-
-        taskElement.setAttribute('data-tooltip', tooltipContent);
-
-        taskElement.innerHTML = `
-            <span class="task-name">${task.name}</span>
-            <div class="task-buttons">
-                <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
-                <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
-            </div>
-        `;
-        taskElement.setAttribute('role', 'button');
-        taskElement.setAttribute('tabindex', '0');
-        taskElement.setAttribute('aria-label', `Task: ${task.name}`);
-
-        fragment.appendChild(taskElement);
+        const categoryId = task.categoryId || 'uncategorized';
+        if (!tasksByCategory[categoryId]) {
+            tasksByCategory[categoryId] = [];
+        }
+        tasksByCategory[categoryId].push({ task, index });
     });
+
+    // Render tasks grouped by categories
+    for (const categoryId in tasksByCategory) {
+        const categoryTasks = tasksByCategory[categoryId];
+        let category;
+
+        if (categoryId !== 'uncategorized') {
+            category = projectData.categories.find(cat => cat.id === parseInt(categoryId, 10));
+        }
+
+        // Render category headline
+        const categoryElement = document.createElement('div');
+        categoryElement.classList.add('category-heading');
+        categoryElement.style.top = `${currentTop}px`;
+        categoryElement.textContent = category ? category.name : 'Uncategorized';
+        fragment.appendChild(categoryElement);
+        currentTop += CATEGORY_HEADING_HEIGHT;
+
+        // Render tasks within this category
+        categoryTasks.forEach(({ task, index }) => {
+            const taskElement = document.createElement('div');
+            taskElement.classList.add('task-bar');
+
+            taskElement.style.width = `${task.duration * PIXELS_PER_DAY}px`;
+
+            const taskStartDate = taskStartDates[index];
+            const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
+
+            taskElement.style.left = `${daysFromStart * PIXELS_PER_DAY}px`;
+            taskElement.style.top = `${currentTop}px`;
+
+            // Set task color based on category
+            taskElement.style.backgroundColor = category ? category.color : '#999';
+
+            const tooltipContent = `
+                Name: ${task.name}
+                Start: ${taskStartDate.toISOString().split('T')[0]}
+                Duration: ${task.duration} days
+                Dependencies: ${task.dependencies.map(depIndex => projectData.tasks[depIndex]?.name).join(', ') || 'None'}
+            `;
+
+            taskElement.setAttribute('data-tooltip', tooltipContent);
+
+            taskElement.innerHTML = `
+                <span class="task-name">${task.name}</span>
+                <div class="task-buttons">
+                    <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
+                    <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            `;
+            taskElement.setAttribute('role', 'button');
+            taskElement.setAttribute('tabindex', '0');
+            taskElement.setAttribute('aria-label', `Task: ${task.name}`);
+
+            fragment.appendChild(taskElement);
+            currentTop += TASK_HEIGHT + TASK_SPACING;
+        });
+    }
 
     ganttChart.appendChild(fragment);
 
-    const ganttChartHeight = projectData.tasks.length * (TASK_HEIGHT + TASK_SPACING);
-    ganttChart.style.height = `${ganttChartHeight}px`;
+    // Update chart height
+    ganttChart.style.height = `${currentTop}px`;
 }
 
 document.getElementById('ganttChart').addEventListener('click', function(event) {
@@ -347,6 +385,7 @@ function editTask(buttonElement) {
     }
 
     updateDependenciesOptions(taskIndex);
+    updateCategoryOptions();
 
     document.getElementById('taskName').value = task.name;
     document.getElementById('taskStart').value = task.start;
@@ -354,6 +393,10 @@ function editTask(buttonElement) {
 
     // Pre-select dependencies using Choices.js
     choices.setChoiceByValue(task.dependencies.map(String));
+
+    // Set the selected category
+    const categorySelect = document.getElementById('taskCategory');
+    categorySelect.value = task.categoryId;
 
     const submitButton = document.querySelector('#addTaskForm button[type="submit"]');
     submitButton.textContent = 'Update Task';
@@ -481,6 +524,109 @@ const taskModal = document.getElementById('taskModal');
 const openTaskModalButton = document.getElementById('openTaskModal');
 const closeModalButton = taskModal.querySelector('.close-button');
 const modalTitle = document.getElementById('modalTitle');
+
+// Get references to the manage categories button and modal
+const manageCategoriesButton = document.getElementById('manageCategoriesButton');
+const categoriesModal = document.getElementById('categoriesModal');
+const closeCategoriesModalButton = categoriesModal.querySelector('.close-button');
+
+// Open the categories modal when the button is clicked
+manageCategoriesButton.addEventListener('click', () => {
+    categoriesModal.style.display = 'block';
+    renderCategoriesList();
+});
+
+// Close the modal when the close button is clicked
+closeCategoriesModalButton.addEventListener('click', () => {
+    categoriesModal.style.display = 'none';
+    document.getElementById('addCategoryForm').reset();
+});
+
+// Close the modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    if (event.target === categoriesModal) {
+        categoriesModal.style.display = 'none';
+        document.getElementById('addCategoryForm').reset();
+    }
+});
+
+// Handle category form submission
+document.getElementById('addCategoryForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const categoryName = document.getElementById('categoryName').value.trim();
+    const categoryColor = document.getElementById('categoryColor').value;
+
+    // Create a new category object
+    const category = {
+        id: Date.now(), // Simple unique ID
+        name: categoryName,
+        color: categoryColor
+    };
+
+    projectData.categories.push(category);
+
+    // Update the UI
+    renderCategoriesList();
+    updateCategoryOptions();
+
+    // Save project data
+    saveProjectData(projectData, true);
+
+    // Reset the form
+    event.target.reset();
+});
+
+function renderCategoriesList() {
+    const categoriesList = document.getElementById('categoriesList');
+    categoriesList.innerHTML = '';
+
+    projectData.categories.forEach((category) => {
+        const categoryItem = document.createElement('div');
+        categoryItem.classList.add('category-item');
+
+        const colorIndicator = document.createElement('div');
+        colorIndicator.classList.add('color-indicator');
+        colorIndicator.style.backgroundColor = category.color;
+
+        const categoryName = document.createElement('span');
+        categoryName.textContent = category.name;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => {
+            // Remove category from projectData
+            projectData.categories = projectData.categories.filter(cat => cat.id !== category.id);
+            // Remove categoryId from tasks that had this category
+            projectData.tasks.forEach(task => {
+                if (task.categoryId === category.id) {
+                    delete task.categoryId;
+                }
+            });
+            renderCategoriesList();
+            updateCategoryOptions();
+            renderGanttChart(projectData);
+            saveProjectData(projectData, true);
+        });
+
+        categoryItem.appendChild(colorIndicator);
+        categoryItem.appendChild(categoryName);
+        categoryItem.appendChild(deleteButton);
+
+        categoriesList.appendChild(categoryItem);
+    });
+}
+
+function updateCategoryOptions() {
+    const categorySelect = document.getElementById('taskCategory');
+    categorySelect.innerHTML = '';
+
+    projectData.categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.name;
+        categorySelect.appendChild(option);
+    });
+}
 
 openTaskModalButton.addEventListener('click', () => {
     modalTitle.textContent = 'Add Task';
