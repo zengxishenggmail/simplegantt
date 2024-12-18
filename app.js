@@ -17,13 +17,26 @@ document.getElementById('loadProject').addEventListener('change', async function
 
     try {
         const yamlText = await file.text();
-        projectData = jsyaml.load(yamlText);
+        console.log('Raw YAML content:', yamlText); // Log raw YAML content
 
-        if (!projectData || !Array.isArray(projectData.tasks)) {
-            throw new Error('Invalid project data format.');
+        try {
+            projectData = jsyaml.load(yamlText);
+        } catch (parseError) {
+            console.error('YAML Parsing Error:', parseError);
+            throw new Error('Failed to parse YAML: ' + parseError.message);
         }
 
-        console.log('Loaded projectData:', projectData);
+        console.log('Loaded projectData:', projectData); // Log parsed projectData
+
+        if (!projectData || typeof projectData !== 'object') {
+            throw new Error('Invalid project data: not an object');
+        }
+
+        if (!Array.isArray(projectData.tasks)) {
+            projectData.tasks = []; // Initialize as empty array if missing
+            console.warn('Project data did not contain tasks array. Initialized as empty.');
+        }
+
         renderGanttChart(projectData);
         displayProjectName(file.name);
         updateDependenciesOptions();
