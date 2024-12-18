@@ -11,25 +11,26 @@ function displayProjectName(name) {
 
 document.getElementById('loadProject').addEventListener('change', async function(event) {
     const file = event.target.files[0];
-    if (!file) return; // Exit if no file is selected
+    if (!file) return;
 
-    // Update fileHandle if possible
-    if ('showOpenFilePicker' in window) {
-        [fileHandle] = await window.showOpenFilePicker({
-            types: [{
-                description: 'YAML Files',
-                accept: {'text/yaml': ['.yaml', '.yml']},
-            }],
-        });
-    } else {
-        fileHandle = null; // Set to null if File System Access API is not supported
+    fileHandle = null; // Reset fileHandle since we're loading from the input
+
+    try {
+        const yamlText = await file.text();
+        projectData = jsyaml.load(yamlText);
+
+        if (!projectData || !Array.isArray(projectData.tasks)) {
+            throw new Error('Invalid project data format.');
+        }
+
+        console.log('Loaded projectData:', projectData);
+        renderGanttChart(projectData);
+        displayProjectName(file.name);
+        updateDependenciesOptions();
+    } catch (error) {
+        alert('Failed to load project: ' + error.message);
+        console.error('Error loading project:', error);
     }
-
-    const yamlText = await file.text();
-    projectData = jsyaml.load(yamlText);
-    renderGanttChart(projectData);
-    displayProjectName(file.name);
-    updateDependenciesOptions();
 });
 
 document.getElementById('newProject').addEventListener('click', async function() {
@@ -120,6 +121,11 @@ function renderTimeScale(projectStartDate, projectEndDate) {
 }
 
 function renderGanttChart(projectData) {
+    if (!projectData || !Array.isArray(projectData.tasks)) {
+        console.error('Invalid project data provided to renderGanttChart.');
+        return;
+    }
+
     const ganttChart = document.getElementById('ganttChart');
     ganttChart.innerHTML = '';
 
@@ -262,6 +268,7 @@ async function saveProjectData(projectData) {
         link.download = 'project.yaml';
         link.click();
         URL.revokeObjectURL(url);
+        alert('Project saved successfully.');
     }
 }
 
