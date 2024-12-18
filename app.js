@@ -115,10 +115,14 @@ document.getElementById('loadProject').addEventListener('click', async function(
                 }
             });
 
-            renderGanttChart(projectData);
-            projectData.projectName = fileHandle.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+            // Use filename as project name only if projectName is missing or empty
+            if (!projectData.projectName || projectData.projectName.trim() === '') {
+                projectData.projectName = fileHandle.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+            }
+
             updateProjectNameDisplay();
             updateDependenciesOptions();
+            renderGanttChart(projectData);
 
             // Save project data and file name to localStorage
             localStorage.setItem('projectData', JSON.stringify(projectData));
