@@ -359,7 +359,6 @@ function renderGanttChart(projectData) {
 
             taskElement.setAttribute('data-tooltip', tooltipContent);
 
-            const taskStartDate = taskStartDates[index];
             const taskEndDate = new Date(taskStartDate.getTime() + task.duration * 24 * 60 * 60 * 1000);
 
             let displayStatus = task.status;
