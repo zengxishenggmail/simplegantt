@@ -390,9 +390,30 @@ function renderGanttChart(projectData) {
                 statusIndicatorHTML = `<div class="status-indicator ${getStatusClass(displayStatus)}"></div>`;
             }
 
+            // Get the first assignee's name, if any
+            let firstAssigneeName = '';
+            if (Array.isArray(task.assignedPeople) && task.assignedPeople.length > 0) {
+                const firstPersonId = task.assignedPeople[0];
+                const firstPerson = projectData.people.find(p => p.id === firstPersonId);
+                if (firstPerson) {
+                    firstAssigneeName = firstPerson.name;
+                }
+            }
+
+            // Modify taskElement based on assignment
+            let assignmentDisplay = '';
+            if (!firstAssigneeName) {
+                // Task is unassigned
+                taskElement.style.border = '2px solid red';
+                assignmentDisplay = ' ❓';
+            } else {
+                // Task has an assignee, display the name
+                assignmentDisplay = `<span class="assignee-name">${firstAssigneeName}</span>`;
+            }
+
             taskElement.innerHTML = `
                 ${statusIndicatorHTML}
-                <span class="task-name">${task.name}</span>
+                <span class="task-name">${task.name}${assignmentDisplay}</span>
                 <div class="task-buttons">
                     <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
                     <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>

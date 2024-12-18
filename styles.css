@@ -439,6 +439,16 @@ button i {
     background-color: #e0e0e0;
 }
 
+.assignee-name {
+    font-size: 0.85em;
+    font-weight: normal;
+    margin-left: 5px;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
 /* ===== Form Styles ===== */
 #addTaskForm {
     display: grid;
