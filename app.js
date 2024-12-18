@@ -306,9 +306,11 @@ function renderGanttChart(projectData) {
         taskElement.setAttribute('data-tooltip', tooltipContent);
 
         taskElement.innerHTML = `
-            ${task.name}
-            <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
-            <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
+            <span class="task-name">${task.name}</span>
+            <div class="task-buttons">
+                <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
+                <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
+            </div>
         `;
         taskElement.setAttribute('role', 'button');
         taskElement.setAttribute('tabindex', '0');

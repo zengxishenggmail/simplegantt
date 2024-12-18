@@ -152,11 +152,28 @@ main {
     transition: transform 0.2s, box-shadow 0.2s;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     /* No z-index specified, so it stays below the time scale */
+    min-width: 100px; /* Adjust this value as needed */
+    overflow: visible; /* Allow content to overflow if necessary */
+    padding-right: 5px; /* Space between content and buttons */
 }
 
 .task-bar:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.task-name {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-right: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.task-buttons {
+    display: flex;
+    gap: 5px;
 }
 
 .task-bar button {
@@ -169,6 +186,7 @@ main {
     color: #fff;
     cursor: pointer;
     transition: background 0.2s;
+    flex-shrink: 0; /* Prevent buttons from shrinking */
 }
 
 .task-bar button:hover {
