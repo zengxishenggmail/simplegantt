@@ -14,7 +14,9 @@ document.getElementById('loadProject').addEventListener('change', function(event
 
 document.getElementById('newProject').addEventListener('click', function() {
     projectData = { tasks: [] };
+    fileHandle = null; // Reset the file handle
     renderGanttChart(projectData);
+    onProjectDataChange(projectData); // Notify that project data has changed
 });
 
 document.getElementById('addTaskForm').addEventListener('submit', function(event) {
