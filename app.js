@@ -39,9 +39,6 @@ const TASK_HEIGHT = 30;
 const TASK_SPACING = 5;
 const GANTT_CHART_PADDING_TOP = 60; // This should match the padding-top in styles.css
 
-function displayProjectName(name) {
-    document.getElementById('projectName').textContent = `Project: ${name}`;
-}
 
 function computeTaskStartDate(index, taskStartDates, projectData, visited = {}) {
     if (taskStartDates[index]) {
@@ -405,7 +402,7 @@ async function saveProjectData(projectData, autosave = false) {
                             accept: {'text/yaml': ['.yaml', '.yml']},
                         }],
                     });
-                    displayProjectName(fileHandle.name);
+                    // Project name is now only displayed in the header
                 } catch (err) {
                     console.error('Save cancelled:', err);
                     statusMessage.textContent = 'Save cancelled.';
