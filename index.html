@@ -74,6 +74,10 @@
                     <label for="taskDuration">Duration (days):</label>
                     <input type="number" id="taskDuration" placeholder="E.g., 5" min="1" required>
                 </div>
+                <div class="form-group">
+                    <label for="taskDescription">Task Description:</label>
+                    <textarea id="taskDescription" placeholder="Enter task description"></textarea>
+                </div>
                 <div id="formErrorMessage" style="color: red; margin-top: 10px;"></div>
                 <div class="form-group">
                     <label for="taskDependencies">Dependencies:</label>
@@ -118,6 +122,21 @@
                 <div id="categoriesList">
                     <!-- Existing categories will be listed here -->
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Task Details</h2>
+            <div class="task-details-content">
+                <p><strong>Name:</strong> <span id="detailTaskName"></span></p>
+                <p><strong>Start Date:</strong> <span id="detailTaskStart"></span></p>
+                <p><strong>Duration:</strong> <span id="detailTaskDuration"></span> days</p>
+                <p><strong>Dependencies:</strong> <span id="detailTaskDependencies"></span></p>
+                <p><strong>Description:</strong></p>
+                <p id="detailTaskDescription"></p>
             </div>
         </div>
     </div>

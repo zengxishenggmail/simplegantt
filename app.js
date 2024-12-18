@@ -189,6 +189,9 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     // Clear the error message when validation passes
     formErrorMessage.textContent = '';
 
+    // Collect task description
+    const taskDescription = document.getElementById('taskDescription').value.trim();
+
     // Collect dependencies
     const dependenciesSelect = document.getElementById('taskDependencies');
     let dependencies = Array.from(dependenciesSelect.selectedOptions)
@@ -209,7 +212,8 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
         start: taskStart,
         duration: taskDuration,
         dependencies: dependencies,
-        categoryId: categoryId
+        categoryId: categoryId,
+        description: taskDescription
     };
 
     if (editIndex !== null) {
@@ -362,6 +366,7 @@ function renderGanttChart(projectData) {
             taskElement.setAttribute('role', 'button');
             taskElement.setAttribute('tabindex', '0');
             taskElement.setAttribute('aria-label', `Task: ${task.name}`);
+            taskElement.setAttribute('data-index', index);
 
             fragment.appendChild(taskElement);
             currentTop += taskHeight + taskSpacing;
@@ -377,10 +382,45 @@ function renderGanttChart(projectData) {
 document.getElementById('ganttChart').addEventListener('click', function(event) {
     const editButton = event.target.closest('.edit-task');
     const deleteButton = event.target.closest('.delete-task');
+    const taskBar = event.target.closest('.task-bar');
+
     if (editButton) {
         editTask(editButton);
     } else if (deleteButton) {
         deleteTask(deleteButton);
+    } else if (taskBar) {
+        // Open the task details modal
+        const taskIndex = parseInt(taskBar.getAttribute('data-index'), 10);
+        showTaskDetails(taskIndex);
+    }
+});
+
+function showTaskDetails(taskIndex) {
+    const task = projectData.tasks[taskIndex];
+    document.getElementById('detailTaskName').textContent = task.name;
+    document.getElementById('detailTaskStart').textContent = task.start;
+    document.getElementById('detailTaskDuration').textContent = task.duration;
+    document.getElementById('detailTaskDependencies').textContent = task.dependencies
+        .map(depIndex => projectData.tasks[depIndex]?.name)
+        .join(', ') || 'None';
+    document.getElementById('detailTaskDescription').textContent = task.description || 'No description.';
+
+    // Show the modal
+    const taskDetailsModal = document.getElementById('taskDetailsModal');
+    taskDetailsModal.style.display = 'block';
+}
+
+// Add event listener to close the task details modal
+const taskDetailsModal = document.getElementById('taskDetailsModal');
+const closeTaskDetailsModalButton = taskDetailsModal.querySelector('.close-button');
+closeTaskDetailsModalButton.addEventListener('click', () => {
+    taskDetailsModal.style.display = 'none';
+});
+
+// Close the modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    if (event.target === taskDetailsModal) {
+        taskDetailsModal.style.display = 'none';
     }
 });
 
@@ -399,6 +439,7 @@ function editTask(buttonElement) {
     document.getElementById('taskName').value = task.name;
     document.getElementById('taskStart').value = task.start;
     document.getElementById('taskDuration').value = task.duration;
+    document.getElementById('taskDescription').value = task.description || '';
 
     // Pre-select dependencies using Choices.js
     choices.setChoiceByValue(task.dependencies.map(String));
