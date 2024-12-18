@@ -72,12 +72,12 @@ document.getElementById('newProject').addEventListener('click', async function()
 });
 
 document.getElementById('saveProject').addEventListener('click', async function() {
-    await saveProjectData(projectData);
+    await saveProjectData(projectData, false);
 });
 
 document.getElementById('saveAsProject').addEventListener('click', async function() {
     fileHandle = null;
-    await saveProjectData(projectData);
+    await saveProjectData(projectData, false);
 });
 
 document.getElementById('addTaskForm').addEventListener('submit', async function(event) {
@@ -106,7 +106,7 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     renderGanttChart(projectData);
     updateDependenciesOptions();
     
-    await saveProjectData(projectData);
+    await saveProjectData(projectData, true);
     
     event.target.reset();
     taskModal.style.display = 'none';
@@ -256,7 +256,7 @@ async function deleteTask(event) {
     renderGanttChart(projectData);
     updateDependenciesOptions();
     
-    await saveProjectData(projectData);
+    await saveProjectData(projectData, true);
 }
 
 function updateDependenciesOptions() {
@@ -282,47 +282,61 @@ function updateDependenciesOptions() {
     });
 }
 
-async function saveProjectData(projectData) {
+async function saveProjectData(projectData, autosave = false) {
     const statusMessage = document.getElementById('statusMessage');
     statusMessage.textContent = 'Saving...';
 
     if ('showSaveFilePicker' in window) {
         if (!fileHandle) {
-            try {
-                fileHandle = await window.showSaveFilePicker({
-                    suggestedName: 'project.yaml',
-                    types: [{
-                        description: 'YAML Files',
-                        accept: {'text/yaml': ['.yaml', '.yml']},
-                    }],
-                });
-                displayProjectName(fileHandle.name);
-            } catch (err) {
-                console.error('Save cancelled:', err);
-                statusMessage.textContent = 'Save cancelled.';
+            if (autosave) {
+                console.warn('Autosave skipped: no fileHandle available.');
+                statusMessage.textContent = 'Autosave skipped: save your project to enable autosave.';
+                setTimeout(() => {
+                    statusMessage.textContent = '';
+                }, 5000);
                 return;
+            } else {
+                try {
+                    fileHandle = await window.showSaveFilePicker({
+                        suggestedName: 'project.yaml',
+                        types: [{
+                            description: 'YAML Files',
+                            accept: {'text/yaml': ['.yaml', '.yml']},
+                        }],
+                    });
+                    displayProjectName(fileHandle.name);
+                } catch (err) {
+                    console.error('Save cancelled:', err);
+                    statusMessage.textContent = 'Save cancelled.';
+                    return;
+                }
             }
         }
         try {
             const writable = await fileHandle.createWritable();
             await writable.write(jsyaml.dump(projectData));
             await writable.close();
-            statusMessage.textContent = 'All changes saved.';
+            statusMessage.textContent = autosave ? 'Autosaved.' : 'Project saved successfully.';
         } catch (err) {
-            console.error('Error during auto-save:', err);
-            statusMessage.textContent = 'Error saving changes.';
+            console.error('Error during save:', err);
+            statusMessage.textContent = 'Error saving project.';
             statusMessage.style.color = 'red';
         }
     } else {
         const yamlData = jsyaml.dump(projectData);
         const blob = new Blob([yamlData], {type: 'text/yaml'});
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'project.yaml';
-        link.click();
-        URL.revokeObjectURL(url);
-        statusMessage.textContent = 'Project saved successfully (fallback method).';
+        if (!autosave) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'project.yaml';
+            link.click();
+            URL.revokeObjectURL(url);
+            statusMessage.textContent = 'Project saved successfully (fallback method).';
+        } else {
+            console.warn('Autosave skipped: unsupported in this browser.');
+            statusMessage.textContent = 'Autosave not supported in this browser.';
+        }
     }
 
     setTimeout(() => {
