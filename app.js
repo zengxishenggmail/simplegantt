@@ -9,64 +9,56 @@ function displayProjectName(name) {
     document.getElementById('projectName').textContent = `Project: ${name}`;
 }
 
-document.getElementById('loadProject').addEventListener('change', async function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    fileHandle = null;
-
-    try {
-        const yamlText = await file.text();
-        console.log('Raw YAML content:', yamlText);
-
+document.getElementById('loadProject').addEventListener('click', async function() {
+    if ('showOpenFilePicker' in window) {
         try {
-            projectData = jsyaml.load(yamlText);
-        } catch (parseError) {
-            console.error('YAML Parsing Error:', parseError);
-            throw new Error('Failed to parse YAML: ' + parseError.message);
-        }
-
-        console.log('Loaded projectData:', projectData);
-
-        if (!projectData || typeof projectData !== 'object') {
-            throw new Error('Invalid project data: not an object');
-        }
-
-        if (!Array.isArray(projectData.tasks)) {
-            projectData.tasks = [];
-            console.warn('Project data did not contain tasks array. Initialized as empty.');
-        }
-
-        renderGanttChart(projectData);
-        displayProjectName(file.name);
-        updateDependenciesOptions();
-    } catch (error) {
-        alert('Failed to load project: ' + error.message);
-        console.error('Error loading project:', error);
-    }
-});
-
-document.getElementById('newProject').addEventListener('click', async function() {
-    if ('showSaveFilePicker' in window) {
-        try {
-            fileHandle = await window.showSaveFilePicker({
-                suggestedName: 'project.yaml',
+            const [handle] = await window.showOpenFilePicker({
                 types: [{
                     description: 'YAML Files',
                     accept: {'text/yaml': ['.yaml', '.yml']},
                 }],
+                multiple: false,
             });
-        } catch (err) {
-            console.error('File selection cancelled:', err);
-            return;
+            fileHandle = handle;
+
+            const file = await fileHandle.getFile();
+            const yamlText = await file.text();
+            console.log('Raw YAML content:', yamlText);
+
+            try {
+                projectData = jsyaml.load(yamlText);
+            } catch (parseError) {
+                console.error('YAML Parsing Error:', parseError);
+                throw new Error('Failed to parse YAML: ' + parseError.message);
+            }
+
+            console.log('Loaded projectData:', projectData);
+
+            if (!projectData || typeof projectData !== 'object') {
+                throw new Error('Invalid project data: not an object');
+            }
+
+            if (!Array.isArray(projectData.tasks)) {
+                projectData.tasks = [];
+                console.warn('Project data did not contain tasks array. Initialized as empty.');
+            }
+
+            renderGanttChart(projectData);
+            displayProjectName(fileHandle.name);
+            updateDependenciesOptions();
+        } catch (error) {
+            alert('Failed to load project: ' + error.message);
+            console.error('Error loading project:', error);
         }
     } else {
         alert('Your browser does not support the File System Access API.');
-        return;
     }
+});
 
+document.getElementById('newProject').addEventListener('click', async function() {
     projectData = { tasks: [] };
-    displayProjectName(fileHandle.name);
+    fileHandle = null; // Reset the fileHandle
+    displayProjectName('Untitled Project');
     renderGanttChart(projectData);
     updateDependenciesOptions();
 });
