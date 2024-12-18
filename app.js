@@ -389,13 +389,15 @@ async function saveProjectData(projectData, autosave = false) {
     if ('showSaveFilePicker' in window) {
         if (!fileHandle) {
             if (autosave) {
-                console.warn('Autosave skipped: no fileHandle available.');
-                statusMessage.textContent = 'Autosave skipped: save your project to enable autosave.';
+                // Autosave to localStorage when fileHandle is not available
+                localStorage.setItem('projectData', JSON.stringify(projectData));
+                statusMessage.textContent = 'Autosaved to local storage.';
                 setTimeout(() => {
                     statusMessage.textContent = '';
                 }, 5000);
                 return;
             } else {
+                // Prompt the user to pick a file to save
                 try {
                     fileHandle = await window.showSaveFilePicker({
                         suggestedName: 'project.yaml',
@@ -404,7 +406,6 @@ async function saveProjectData(projectData, autosave = false) {
                             accept: {'text/yaml': ['.yaml', '.yml']},
                         }],
                     });
-                    // Project name is now only displayed in the header
                 } catch (err) {
                     console.error('Save cancelled:', err);
                     statusMessage.textContent = 'Save cancelled.';
@@ -412,23 +413,27 @@ async function saveProjectData(projectData, autosave = false) {
                 }
             }
         }
-        try {
-            const writable = await fileHandle.createWritable();
-            await writable.write(jsyaml.dump(projectData));
-            await writable.close();
-            statusMessage.textContent = autosave ? 'Autosaved.' : 'Project saved successfully.';
 
-            // Update localStorage with the latest project data and file name
-            localStorage.setItem('projectData', JSON.stringify(projectData));
-            if (fileHandle && fileHandle.name) {
-                localStorage.setItem('fileName', fileHandle.name);
+        if (fileHandle) {
+            try {
+                const writable = await fileHandle.createWritable();
+                await writable.write(jsyaml.dump(projectData));
+                await writable.close();
+                statusMessage.textContent = autosave ? 'Autosaved.' : 'Project saved successfully.';
+            } catch (err) {
+                console.error('Error during save:', err);
+                statusMessage.textContent = 'Error saving project.';
+                statusMessage.style.color = 'red';
             }
-        } catch (err) {
-            console.error('Error during save:', err);
-            statusMessage.textContent = 'Error saving project.';
-            statusMessage.style.color = 'red';
+        }
+
+        // Update localStorage with the latest project data
+        localStorage.setItem('projectData', JSON.stringify(projectData));
+        if (fileHandle && fileHandle.name) {
+            localStorage.setItem('fileName', fileHandle.name);
         }
     } else {
+        // Fallback for browsers that do not support the File System Access API
         const yamlData = jsyaml.dump(projectData);
         const blob = new Blob([yamlData], {type: 'text/yaml'});
         if (!autosave) {
@@ -485,6 +490,17 @@ if (savedProjectData) {
     projectData = JSON.parse(savedProjectData);
     updateProjectNameDisplay();
     const savedFileName = localStorage.getItem('fileName') || 'Last Project';
+
+    // Inform user that autosave to file is not enabled
+    const statusMessage = document.getElementById('statusMessage');
+    statusMessage.innerHTML = 'Autosave to file is not enabled. Please <a href="#" id="saveNowLink">save your project</a> to enable autosave to file.';
+    statusMessage.style.color = 'red';
+
+    // Add event listener to the link
+    document.getElementById('saveNowLink').addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById('saveProject').click();
+    });
 } else {
     // No saved project data; use default empty projectData
     projectData = { projectName: 'Untitled Project', tasks: [] };
