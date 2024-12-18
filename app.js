@@ -672,44 +672,46 @@ window.addEventListener('click', (event) => {
     }
 });
 
-flatpickr("#taskStart", {
-    dateFormat: "Y-m-d",
-});
+document.addEventListener('DOMContentLoaded', () => {
+    flatpickr("#taskStart", {
+        dateFormat: "Y-m-d",
+    });
 
-// Initial loading of project data from local storage
-const savedProjectData = localStorage.getItem('projectData');
-if (savedProjectData) {
-    projectData = JSON.parse(savedProjectData);
+    // Initial loading of project data from local storage
+    const savedProjectData = localStorage.getItem('projectData');
+    if (savedProjectData) {
+        projectData = JSON.parse(savedProjectData);
 
-    // Initialize `categories` if it's undefined
-    if (!Array.isArray(projectData.categories)) {
-        projectData.categories = [];
+        // Initialize `categories` if it's undefined
+        if (!Array.isArray(projectData.categories)) {
+            projectData.categories = [];
+        }
+
+        updateProjectNameDisplay();
+        updateCategoryOptions();
+        renderCategoriesList();
+
+        const savedFileName = localStorage.getItem('fileName') || 'Last Project';
+
+        // Inform user that autosave to file is not enabled
+        const statusMessage = document.getElementById('statusMessage');
+        statusMessage.innerHTML = 'Autosave to file is not enabled. Please <a href="#" id="saveNowLink">save your project</a> to enable autosave to file.';
+        statusMessage.style.color = 'red';
+
+        // Add event listener to the link
+        document.getElementById('saveNowLink').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('saveProject').click();
+        });
+    } else {
+        // No saved project data; use default empty projectData
+        projectData = { projectName: 'Untitled Project', tasks: [], categories: [] };
+        updateProjectNameDisplay();
+        updateCategoryOptions();
+        renderCategoriesList();
     }
 
-    updateProjectNameDisplay();
-    updateCategoryOptions();
-    renderCategoriesList();
-
-    const savedFileName = localStorage.getItem('fileName') || 'Last Project';
-
-    // Inform user that autosave to file is not enabled
-    const statusMessage = document.getElementById('statusMessage');
-    statusMessage.innerHTML = 'Autosave to file is not enabled. Please <a href="#" id="saveNowLink">save your project</a> to enable autosave to file.';
-    statusMessage.style.color = 'red';
-
-    // Add event listener to the link
-    document.getElementById('saveNowLink').addEventListener('click', function(event) {
-        event.preventDefault();
-        document.getElementById('saveProject').click();
-    });
-} else {
-    // No saved project data; use default empty projectData
-    projectData = { projectName: 'Untitled Project', tasks: [], categories: [] };
-    updateProjectNameDisplay();
-    updateCategoryOptions();
-    renderCategoriesList();
-}
-
-// Now render the chart and update dependencies
-renderGanttChart(projectData);
-updateDependenciesOptions();
+    // Now render the chart and update dependencies
+    renderGanttChart(projectData);
+    updateDependenciesOptions();
+});
