@@ -12,7 +12,11 @@
 </head>
 <body>
     <header>
-        <h1>Gantt Chart Application</h1>
+        <h1>
+            <span id="projectNameDisplay">Untitled Project</span>
+            <input type="text" id="projectNameInput" value="Untitled Project" style="display: none;">
+            <button id="editProjectNameButton"><i class="fas fa-edit"></i></button>
+        </h1>
         <nav>
             <button id="loadProject"><i class="fas fa-folder-open"></i> Load Project</button>
             <button id="newProject"><i class="fas fa-file"></i> New Project</button>

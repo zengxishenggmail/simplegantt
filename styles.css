@@ -28,8 +28,43 @@ header {
 }
 
 header h1 {
-    margin: 0;
+    display: flex;
+    align-items: center;
     font-size: 1.5em;
+    margin: 0;
+}
+
+/* Style for the project name display */
+#projectNameDisplay {
+    font-weight: bold;
+    color: white;
+}
+
+/* Style for the project name input field */
+#projectNameInput {
+    font-size: 1em;
+    padding: 5px;
+    margin-left: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Style for the edit button */
+#editProjectNameButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white;
+    margin-left: 10px;
+    font-size: 0.8em;
+}
+
+#editProjectNameButton i {
+    color: white;
+}
+
+#editProjectNameButton:hover i {
+    color: #ddd;
 }
 
 nav {

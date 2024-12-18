@@ -1,5 +1,38 @@
-let projectData = { tasks: [] };
+let projectData = { projectName: 'Untitled Project', tasks: [] };
 let fileHandle;
+
+const projectNameDisplay = document.getElementById('projectNameDisplay');
+const projectNameInput = document.getElementById('projectNameInput');
+const editProjectNameButton = document.getElementById('editProjectNameButton');
+
+function updateProjectNameDisplay() {
+    projectNameDisplay.textContent = projectData.projectName || 'Untitled Project';
+    projectNameInput.value = projectData.projectName || 'Untitled Project';
+}
+
+// When the edit button is clicked
+editProjectNameButton.addEventListener('click', () => {
+    projectNameDisplay.style.display = 'none';
+    projectNameInput.style.display = 'inline-block';
+    projectNameInput.focus();
+});
+
+// When the user finishes editing (input loses focus)
+projectNameInput.addEventListener('blur', () => {
+    projectData.projectName = projectNameInput.value.trim() || 'Untitled Project';
+    projectNameDisplay.style.display = 'inline';
+    projectNameInput.style.display = 'none';
+    updateProjectNameDisplay();
+    // Optionally save the project data to persist the name change
+    saveProjectData(projectData, true);
+});
+
+// Optional: Allow pressing Enter to finish editing
+projectNameInput.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+        projectNameInput.blur();
+    }
+});
 
 const PIXELS_PER_DAY = 30;
 const TASK_HEIGHT = 30;
@@ -83,7 +116,8 @@ document.getElementById('loadProject').addEventListener('click', async function(
             });
 
             renderGanttChart(projectData);
-            displayProjectName(fileHandle.name);
+            projectData.projectName = fileHandle.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+            updateProjectNameDisplay();
             updateDependenciesOptions();
 
             // Save project data and file name to localStorage
@@ -99,9 +133,9 @@ document.getElementById('loadProject').addEventListener('click', async function(
 });
 
 document.getElementById('newProject').addEventListener('click', async function() {
-    projectData = { tasks: [] };
+    projectData = { projectName: 'Untitled Project', tasks: [] };
     fileHandle = null; // Reset the fileHandle
-    displayProjectName('Untitled Project');
+    updateProjectNameDisplay();
     renderGanttChart(projectData);
     updateDependenciesOptions();
 
@@ -431,12 +465,12 @@ flatpickr("#taskStart", {
 const savedProjectData = localStorage.getItem('projectData');
 if (savedProjectData) {
     projectData = JSON.parse(savedProjectData);
+    updateProjectNameDisplay();
     const savedFileName = localStorage.getItem('fileName') || 'Last Project';
-    displayProjectName(savedFileName);
 } else {
     // No saved project data; use default empty projectData
-    projectData = { tasks: [] };
-    displayProjectName('No project loaded');
+    projectData = { projectName: 'Untitled Project', tasks: [] };
+    updateProjectNameDisplay();
 }
 
 // Now render the chart and update dependencies
