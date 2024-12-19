@@ -592,7 +592,7 @@ function renderGanttChart(projectData) {
     });
 }
 
-document.getElementById('ganttChart').addEventListener('click', function(event) {
+document.getElementById('ganttChart').addEventListener('click', async function(event) {
     const editButton = event.target.closest('.edit-task');
     const deleteButton = event.target.closest('.delete-task');
     const taskBar = event.target.closest('.task-bar');
