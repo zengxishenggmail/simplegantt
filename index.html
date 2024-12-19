@@ -62,6 +62,7 @@
     <main>
       <div class="project-header">
         <button id="openTaskModal"><i class="fas fa-plus"></i> Add Task</button>
+        <button id="openMilestoneModal"><i class="fas fa-flag"></i> Add Milestone</button>
         <button id="manageCategoriesButton">
           <i class="fas fa-tags"></i> Manage Categories
         </button>
@@ -320,6 +321,56 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Milestone Modal -->
+    <div id="milestoneModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="milestoneModalTitle" class="modal-title">Add Milestone</h2>
+            <form id="addMilestoneForm">
+                <div class="form-group">
+                    <label for="milestoneName">Milestone Name:</label>
+                    <input type="text" id="milestoneName" placeholder="Enter milestone name" required />
+                </div>
+                <div class="form-group">
+                    <label for="milestoneDate">Date:</label>
+                    <input type="date" id="milestoneDate" required />
+                </div>
+                <div class="form-group">
+                    <label for="milestoneCategory">Category:</label>
+                    <select id="milestoneCategory">
+                        <!-- Categories will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="milestoneDescription">Description:</label>
+                    <textarea id="milestoneDescription" placeholder="Enter milestone description"></textarea>
+                </div>
+                <!-- Error Message and Submit Button -->
+                <div id="milestoneFormErrorMessage" style="color: red; margin-top: 10px"></div>
+                <button type="submit">Add Milestone</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Milestone Details Modal -->
+    <div id="milestoneDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Milestone Details</h2>
+            <div class="milestone-details-content">
+                <h3 id="detailMilestoneName">Milestone Name</h3>
+                <p id="detailMilestoneDescription">Milestone description goes here.</p>
+                <dl>
+                    <dt>Date:</dt>
+                    <dd id="detailMilestoneDate"></dd>
+
+                    <dt>Category:</dt>
+                    <dd id="detailMilestoneCategory"></dd>
+                </dl>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

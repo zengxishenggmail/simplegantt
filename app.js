@@ -1,7 +1,7 @@
 // NOTE: When displaying, creating, or updating items, always handle missing properties gracefully.
 // This ensures backward compatibility with files created in previous versions of the app.
 
-let projectData = { projectName: 'Untitled Project', categories: [], tasks: [], people: [] };
+let projectData = { projectName: 'Untitled Project', categories: [], tasks: [], people: [], milestones: [] };
 const CATEGORY_HEADING_HEIGHT = 30; // Adjust as needed
 let fileHandle;
 
@@ -369,7 +369,7 @@ function renderGanttChart(projectData) {
     const ganttChart = document.getElementById('ganttChart');
     ganttChart.innerHTML = '';
 
-    if (projectData.tasks.length === 0) return;
+    if (projectData.tasks.length === 0 && projectData.milestones.length === 0) return;
 
     const taskStartDates = {};
     projectData.tasks.forEach((task, index) => {
@@ -382,8 +382,23 @@ function renderGanttChart(projectData) {
         return new Date(startDate.getTime() + task.duration * 24 * 60 * 60 * 1000);
     });
 
-    const projectStartDate = new Date(Math.min(...startDates));
-    const projectEndDate = new Date(Math.max(...endDates));
+    // Collect milestone dates
+    const milestoneDates = projectData.milestones.map(milestone => new Date(milestone.date + 'T00:00:00Z'));
+
+    let projectStartDate = new Date(Math.min(...startDates));
+    let projectEndDate = new Date(Math.max(...endDates));
+
+    if (milestoneDates.length > 0) {
+        const earliestMilestoneDate = new Date(Math.min(...milestoneDates));
+        const latestMilestoneDate = new Date(Math.max(...milestoneDates));
+
+        if (earliestMilestoneDate < projectStartDate) {
+            projectStartDate = earliestMilestoneDate;
+        }
+        if (latestMilestoneDate > projectEndDate) {
+            projectEndDate = latestMilestoneDate;
+        }
+    }
 
     // Add the current day indicator
     const currentDate = new Date(new Date().toISOString().split('T')[0] + 'T00:00:00Z');
@@ -534,6 +549,41 @@ function renderGanttChart(projectData) {
     }
 
     ganttChart.appendChild(fragment);
+
+    // Render milestones
+    projectData.milestones.forEach((milestone) => {
+        const milestoneDate = new Date(milestone.date + 'T00:00:00Z');
+        const daysFromStart = (milestoneDate - projectStartDate) / (1000 * 60 * 60 * 24);
+
+        const milestoneElement = document.createElement('div');
+        milestoneElement.classList.add('milestone');
+        milestoneElement.style.left = `${daysFromStart * pixelsPerDay}px`;
+        milestoneElement.style.top = '0'; // Adjust vertical position as needed
+
+        // Set milestone color based on category
+        let category;
+        if (milestone.categoryId !== null) {
+            category = projectData.categories.find(cat => cat.id === milestone.categoryId);
+        }
+        milestoneElement.style.color = category ? category.color : '#000';
+
+        // Set milestone icon or emoji
+        milestoneElement.innerHTML = '&#x1F3C1;'; // Example: using the checkered flag emoji
+
+        // Tooltip content
+        const tooltipContent = `
+            Milestone: ${milestone.name}
+            Date: ${milestone.date}
+        `;
+        milestoneElement.setAttribute('data-tooltip', tooltipContent);
+
+        // Add event listener to show milestone details
+        milestoneElement.addEventListener('click', () => {
+            showMilestoneDetails(milestone.id);
+        });
+
+        ganttChart.appendChild(milestoneElement);
+    });
 
     // Append the time scale last
     const timeScale = renderTimeScale(projectStartDate, projectEndDate);
@@ -996,6 +1046,12 @@ const managePeopleButton = document.getElementById('managePeopleButton');
 const peopleModal = document.getElementById('peopleModal');
 const closePeopleModalButton = peopleModal.querySelector('.close-button');
 
+// Get references to the milestone modal elements
+const milestoneModal = document.getElementById('milestoneModal');
+const openMilestoneModalButton = document.getElementById('openMilestoneModal');
+const closeMilestoneModalButton = milestoneModal.querySelector('.close-button');
+const milestoneModalTitle = document.getElementById('milestoneModalTitle');
+
 // Open the categories modal when the button is clicked
 manageCategoriesButton.addEventListener('click', () => {
     categoriesModal.style.display = 'block';
@@ -1033,6 +1089,29 @@ window.addEventListener('click', (event) => {
     if (event.target === peopleModal) {
         peopleModal.style.display = 'none';
         document.getElementById('addPersonForm').reset();
+    }
+});
+
+// Open the milestone modal when the button is clicked
+openMilestoneModalButton.addEventListener('click', () => {
+    milestoneModalTitle.textContent = 'Add Milestone';
+    updateMilestoneCategoryOptions();
+    milestoneModal.style.display = 'block';
+});
+
+// Close the milestone modal when the close button is clicked
+closeMilestoneModalButton.addEventListener('click', () => {
+    milestoneModal.style.display = 'none';
+    document.getElementById('addMilestoneForm').reset();
+    document.getElementById('milestoneFormErrorMessage').textContent = '';
+});
+
+// Close the milestone modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    if (event.target === milestoneModal) {
+        milestoneModal.style.display = 'none';
+        document.getElementById('addMilestoneForm').reset();
+        document.getElementById('milestoneFormErrorMessage').textContent = '';
     }
 });
 
@@ -1167,6 +1246,10 @@ document.addEventListener('DOMContentLoaded', () => {
         dateFormat: "Y-m-d",
     });
 
+    flatpickr("#milestoneDate", {
+        dateFormat: "Y-m-d",
+    });
+
     // Initial loading of project data from local storage
     const savedProjectData = localStorage.getItem('projectData');
     if (savedProjectData) {
@@ -1180,6 +1263,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize `people` if it's undefined
         if (!Array.isArray(projectData.people)) {
             projectData.people = [];
+        }
+        if (!Array.isArray(projectData.milestones)) {
+            projectData.milestones = [];
         }
 
         updateProjectNameDisplay();
@@ -1357,3 +1443,99 @@ document.getElementById('addPersonForm').addEventListener('submit', function(eve
     // Reset the form
     event.target.reset();
 });
+document.getElementById('addMilestoneForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const formErrorMessage = document.getElementById('milestoneFormErrorMessage');
+
+    const milestoneName = document.getElementById('milestoneName').value.trim();
+    const milestoneDate = document.getElementById('milestoneDate').value;
+    const milestoneCategoryId = parseInt(document.getElementById('milestoneCategory').value, 10) || null;
+    const milestoneDescription = document.getElementById('milestoneDescription').value.trim();
+
+    // Basic validation
+    if (!milestoneName || !milestoneDate) {
+        formErrorMessage.textContent = 'Please fill in all required fields.';
+        return;
+    }
+
+    // Clear error message
+    formErrorMessage.textContent = '';
+
+    const milestone = {
+        id: Date.now(),
+        name: milestoneName,
+        date: milestoneDate,
+        categoryId: milestoneCategoryId,
+        description: milestoneDescription
+    };
+
+    projectData.milestones.push(milestone);
+
+    // Update the chart
+    renderGanttChart(projectData);
+    await saveProjectData(projectData, true);
+
+    // Reset form and close modal
+    event.target.reset();
+    milestoneModal.style.display = 'none';
+});
+
+function showMilestoneDetails(milestoneId) {
+    const milestone = projectData.milestones.find(m => m.id === milestoneId);
+    if (!milestone) return;
+
+    document.getElementById('detailMilestoneName').textContent = milestone.name || 'Unnamed Milestone';
+
+    // Handle missing description
+    const rawDescription = marked.parse(milestone.description || 'No description.');
+    const sanitizedDescription = DOMPurify.sanitize(rawDescription);
+    document.getElementById('detailMilestoneDescription').innerHTML = sanitizedDescription;
+
+    document.getElementById('detailMilestoneDate').textContent = milestone.date || 'Unknown Date';
+
+    // Get category name
+    let categoryName = 'Uncategorized';
+    if (milestone.categoryId !== null) {
+        const category = projectData.categories.find(cat => cat.id === milestone.categoryId);
+        if (category) {
+            categoryName = category.name;
+        }
+    }
+    document.getElementById('detailMilestoneCategory').textContent = categoryName;
+
+    // Show the modal
+    const milestoneDetailsModal = document.getElementById('milestoneDetailsModal');
+    milestoneDetailsModal.style.display = 'block';
+}
+
+// Add event listener to close the milestone details modal
+const milestoneDetailsModal = document.getElementById('milestoneDetailsModal');
+const closeMilestoneDetailsModalButton = milestoneDetailsModal.querySelector('.close-button');
+closeMilestoneDetailsModalButton.addEventListener('click', () => {
+    milestoneDetailsModal.style.display = 'none';
+});
+
+// Close the modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    if (event.target === milestoneDetailsModal) {
+        milestoneDetailsModal.style.display = 'none';
+    }
+});
+
+function updateMilestoneCategoryOptions() {
+    const categorySelect = document.getElementById('milestoneCategory');
+    categorySelect.innerHTML = '';
+
+    // Add an option for no category
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Uncategorized';
+    categorySelect.appendChild(defaultOption);
+
+    projectData.categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.name;
+        categorySelect.appendChild(option);
+    });
+}

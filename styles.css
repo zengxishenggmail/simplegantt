@@ -1044,3 +1044,38 @@ legend {
 .modal {
     overflow-y: auto;
 }
+/* Milestone styles */
+.milestone {
+    position: absolute;
+    top: 0; /* Adjust as needed */
+    transform: translateX(-50%); /* Center the milestone over its date */
+    font-size: 24px; /* Adjust size as needed */
+    cursor: pointer;
+    z-index: 2;
+}
+
+.milestone[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 10px);
+    transform: translateX(-50%);
+    background-color: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-size: 0.8em;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.milestone[data-tooltip]:hover::after {
+    opacity: 1;
+}
+
+/* Milestone Modal Specific Styles */
+#milestoneModal .modal-content {
+    /* Add any specific styles if needed */
+}
