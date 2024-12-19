@@ -1102,7 +1102,54 @@ legend {
     /* Add any specific styles if needed */
 }
 
-.milestone-details-content button {
+/* Milestone Details Modal Styles */
+.milestone-details-content {
+    padding: 20px;
+}
+
+.milestone-details-content h3 {
+    margin-top: 0;
+    font-size: 1.8em;
+    color: var(--secondary-color);
+}
+
+.milestone-details-content p {
+    font-size: 1em;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+.milestone-details-content dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: max-content auto;
+    row-gap: 10px;
+    column-gap: 20px;
+}
+
+.milestone-details-content dt {
+    font-weight: bold;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+}
+
+.milestone-details-content dt i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+.milestone-details-content dd {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.milestone-details-buttons {
+    margin-top: 20px;
+}
+
+.milestone-details-buttons button {
     background-color: var(--secondary-color);
     color: #fff;
     border: none;
@@ -1113,6 +1160,57 @@ legend {
     transition: background-color 0.2s;
 }
 
-.milestone-details-content button:hover {
+.milestone-details-buttons button:hover {
     background-color: var(--secondary-color-dark);
+}
+
+.milestone-details-buttons button i {
+    margin-right: 5px;
+}
+
+/* Responsive Styles for Milestone Details Modal */
+@media (max-width: 768px) {
+    .milestone-details-content dl {
+        grid-template-columns: 1fr;
+    }
+
+    .milestone-details-content dt {
+        margin-top: 10px;
+    }
+
+    .milestone-details-buttons {
+        display: flex;
+        flex-direction: column;
+        margin-top: 15px;
+    }
+
+    .milestone-details-buttons button {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+.close-button {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 1.8em;
+    color: var(--secondary-color);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: var(--secondary-color-dark);
+}
+
+/* Modal Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content {
+    animation: fadeIn 0.3s ease-out;
 }
