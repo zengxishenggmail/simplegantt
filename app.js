@@ -789,7 +789,8 @@ function renderGanttChart(projectData) {
         milestoneElement.style.color = category ? category.color : '#000';
 
         // Set milestone icon or emoji
-        milestoneElement.innerHTML = '&#x1F3C1;'; // Example: using the checkered flag emoji
+        const milestoneIcon = milestone.emoji || '🚩'; // Use custom emoji or default
+        milestoneElement.innerHTML = milestoneIcon;
 
         // Tooltip content
         const tooltipContent = `
@@ -797,6 +798,9 @@ function renderGanttChart(projectData) {
             Date: ${milestone.date}
         `;
         milestoneElement.setAttribute('data-tooltip', tooltipContent);
+
+        // Optional: Adjust styling if needed
+        milestoneElement.style.fontSize = '24px'; // Ensure emoji is visible
 
         // Add event listener to show milestone details
         milestoneElement.addEventListener('click', () => {
@@ -1731,6 +1735,7 @@ document.getElementById('addMilestoneForm').addEventListener('submit', async fun
     const milestoneDate = document.getElementById('milestoneDate').value;
     const milestoneCategoryId = parseInt(document.getElementById('milestoneCategory').value, 10) || null;
     const milestoneDescription = document.getElementById('milestoneDescription').value.trim();
+    const milestoneEmoji = document.getElementById('milestoneEmoji').value.trim() || '🚩'; // Default emoji if not provided
 
     // Basic validation
     if (!milestoneName || !milestoneDate) {
@@ -1751,6 +1756,7 @@ document.getElementById('addMilestoneForm').addEventListener('submit', async fun
             milestone.date = milestoneDate;
             milestone.categoryId = milestoneCategoryId;
             milestone.description = milestoneDescription;
+            milestone.emoji = milestoneEmoji;
         }
         // Reset form state
         event.target.removeAttribute('data-edit-id');
@@ -1762,7 +1768,8 @@ document.getElementById('addMilestoneForm').addEventListener('submit', async fun
             name: milestoneName,
             date: milestoneDate,
             categoryId: milestoneCategoryId,
-            description: milestoneDescription
+            description: milestoneDescription,
+            emoji: milestoneEmoji
         };
         projectData.milestones.push(milestone);
     }
@@ -1799,6 +1806,9 @@ function showMilestoneDetails(milestoneId) {
         }
     }
     document.getElementById('detailMilestoneCategory').textContent = categoryName;
+
+    // Display the emoji
+    document.getElementById('detailMilestoneEmoji').textContent = milestone.emoji || '';
 
     // Show the modal
     const milestoneDetailsModal = document.getElementById('milestoneDetailsModal');
@@ -1850,6 +1860,7 @@ function editMilestone(milestoneId) {
     document.getElementById('milestoneName').value = milestone.name;
     document.getElementById('milestoneDate').value = milestone.date;
     document.getElementById('milestoneDescription').value = milestone.description || '';
+    document.getElementById('milestoneEmoji').value = milestone.emoji || '';
 
     // Set the selected category
     document.getElementById('milestoneCategory').value = milestone.categoryId || '';

@@ -351,6 +351,10 @@
                     <label for="milestoneDescription">Description:</label>
                     <textarea id="milestoneDescription" placeholder="Enter milestone description"></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="milestoneEmoji">Emoji:</label>
+                    <input type="text" id="milestoneEmoji" placeholder="E.g., 🎉">
+                </div>
                 <!-- Error Message and Submit Button -->
                 <div id="milestoneFormErrorMessage" style="color: red; margin-top: 10px"></div>
                 <button type="submit">Add Milestone</button>
@@ -372,6 +376,8 @@
 
                     <dt><i class="fas fa-tag"></i> Category:</dt>
                     <dd id="detailMilestoneCategory"></dd>
+                    <dt><i class="fas fa-smile"></i> Emoji:</dt>
+                    <dd id="detailMilestoneEmoji"></dd>
                 </dl>
                 <div class="milestone-details-buttons">
                     <button id="editMilestoneButton"><i class="fas fa-edit"></i> Edit Milestone</button>

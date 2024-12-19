@@ -1073,6 +1073,12 @@ legend {
     cursor: pointer;
     z-index: 15; /* Ensure it's above other elements if necessary */
     top: 30px; /* Set this to position within the time scale */
+    line-height: 1;
+}
+
+/* Style the emoji display in the milestone details */
+#detailMilestoneEmoji {
+    font-size: 24px;
 }
 
 .milestone[data-tooltip]:hover::after {
