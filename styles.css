@@ -1056,9 +1056,9 @@ legend {
     content: attr(data-tooltip);
     position: absolute;
     left: 50%;
-    bottom: calc(100% + 10px);
+    top: calc(100% + 10px); /* Position tooltip below the icon */
     transform: translateX(-50%);
-    background-color: rgba(0,0,0,0.75);
+    background-color: rgba(0, 0, 0, 0.75);
     color: #fff;
     padding: 5px 10px;
     border-radius: 4px;
