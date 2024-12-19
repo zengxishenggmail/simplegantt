@@ -6,8 +6,6 @@ const CATEGORY_HEADING_HEIGHT = 30; // Adjust as needed
 let fileHandle;
 let currentMilestoneId = null;
 let currentTaskIndex = null;
-let projectStartDate;
-let projectEndDate;
 
 const projectNameDisplay = document.getElementById('projectNameDisplay');
 const projectNameInput = document.getElementById('projectNameInput');
@@ -515,20 +513,23 @@ function renderGanttChart(projectData) {
     // Collect milestone dates
     const milestoneDates = projectData.milestones.map(milestone => new Date(milestone.date + 'T00:00:00Z'));
 
-    projectStartDate = new Date(Math.min(...startDates));
-    projectEndDate = new Date(Math.max(...endDates));
+    let startDate = new Date(Math.min(...startDates));
+    let endDate = new Date(Math.max(...endDates));
 
     if (milestoneDates.length > 0) {
         const earliestMilestoneDate = new Date(Math.min(...milestoneDates));
         const latestMilestoneDate = new Date(Math.max(...milestoneDates));
 
-        if (earliestMilestoneDate < projectStartDate) {
-            projectStartDate = earliestMilestoneDate;
+        if (earliestMilestoneDate < startDate) {
+            startDate = earliestMilestoneDate;
         }
-        if (latestMilestoneDate > projectEndDate) {
-            projectEndDate = latestMilestoneDate;
+        if (latestMilestoneDate > endDate) {
+            endDate = latestMilestoneDate;
         }
     }
+
+    projectStartDate = startDate;
+    projectEndDate = endDate;
 
     // Remove the current day vertical line indicator
     // const currentDate = new Date(new Date().toISOString().split('T')[0] + 'T00:00:00Z');
