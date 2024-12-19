@@ -591,8 +591,25 @@ input[type="color"] {
     box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
 
+/* General styles for textareas in the modal */
 .modal .form-group textarea {
-    resize: vertical;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    resize: vertical; /* Allows users to resize vertically */
+}
+
+/* Set default height for the Status Explanation textarea */
+#statusExplanation {
+    height: 170px;
+}
+
+/* Set default height for the Task Description textarea */
+#taskDescription {
+    height: 250px;
 }
 
 .modal .form-group input:focus,
