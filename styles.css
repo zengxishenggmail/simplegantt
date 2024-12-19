@@ -459,15 +459,52 @@ button i {
 /* ===== Form Styles ===== */
 #addTaskForm {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    max-width: 600px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+        "task-name task-name"
+        "task-details task-details"
+        "assignment assignment";
+    gap: 20px;
+    max-width: 700px;
     margin-bottom: 20px;
+}
+
+/* Assign grid areas to fieldsets */
+.task-name-section {
+    grid-area: task-name;
+}
+
+.task-details-section {
+    grid-area: task-details;
+}
+
+.assignment-section {
+    grid-area: assignment;
+}
+
+/* Grid layout for form groups within fieldsets */
+.task-details-section,
+.assignment-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
+}
+
+/* Ensure full-width inputs in single-column sections */
+.task-name-section .form-group input {
+    width: 100%;
+}
+
+/* Inputs inside form groups */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
 }
 
 #addTaskForm button[type="submit"] {

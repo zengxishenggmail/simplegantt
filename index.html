@@ -63,13 +63,18 @@
             <span class="close-button">&times;</span>
             <h2 id="modalTitle" class="modal-title">Add Task</h2>
             <form id="addTaskForm">
-                <!-- Task Details Section -->
-                <fieldset>
-                    <legend>Task Details</legend>
+                <!-- Task Name Section -->
+                <fieldset class="task-name-section">
+                    <legend>Task Name</legend>
                     <div class="form-group">
                         <label for="taskName"><i class="fas fa-tasks"></i> Task Name:</label>
                         <input type="text" id="taskName" placeholder="Enter task name" required>
                     </div>
+                </fieldset>
+
+                <!-- Task Details Section -->
+                <fieldset class="task-details-section">
+                    <legend>Task Details</legend>
                     <div class="form-group">
                         <label for="taskStart"><i class="fas fa-calendar-alt"></i> Start Date:</label>
                         <input type="date" id="taskStart" required>
