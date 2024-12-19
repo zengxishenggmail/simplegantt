@@ -590,6 +590,12 @@ function renderGanttChart(projectData) {
     // Append the time scale last
     const timeScale = renderTimeScale(projectStartDate, projectEndDate);
     ganttChart.appendChild(timeScale);
+
+    // Position milestones above the time scale
+    const milestones = ganttChart.querySelectorAll('.milestone');
+    milestones.forEach(milestone => {
+        milestone.style.top = `${TIME_SCALE_HEIGHT / 2 - 12}px`;
+    });
 }
 
 document.getElementById('ganttChart').addEventListener('click', function(event) {
