@@ -6,6 +6,8 @@ const CATEGORY_HEADING_HEIGHT = 30; // Adjust as needed
 let fileHandle;
 let currentMilestoneId = null;
 let currentTaskIndex = null;
+let projectStartDate;
+let projectEndDate;
 
 const projectNameDisplay = document.getElementById('projectNameDisplay');
 const projectNameInput = document.getElementById('projectNameInput');
@@ -513,8 +515,8 @@ function renderGanttChart(projectData) {
     // Collect milestone dates
     const milestoneDates = projectData.milestones.map(milestone => new Date(milestone.date + 'T00:00:00Z'));
 
-    let projectStartDate = new Date(Math.min(...startDates));
-    let projectEndDate = new Date(Math.max(...endDates));
+    projectStartDate = new Date(Math.min(...startDates));
+    projectEndDate = new Date(Math.max(...endDates));
 
     if (milestoneDates.length > 0) {
         const earliestMilestoneDate = new Date(Math.min(...milestoneDates));
