@@ -208,13 +208,14 @@ main {
 
 /* ===== Gantt Chart Styles ===== */
 #ganttChart {
-    position: relative;  /* Establish a containing block for sticky positioning */
+    position: relative;
     margin-top: 20px;
     border: 1px solid #ccc;
     overflow-x: auto;
     overflow-y: auto;
     white-space: nowrap;
     cursor: grab;
+    max-height: calc(100vh - 200px); /* Limit height to viewport height minus 200px */
 }
 
 #ganttChart.grabbing {
@@ -417,15 +418,15 @@ button i {
 }
 
 .time-scale {
-    position: sticky;     /* Make the time scale sticky */
-    top: 0;               /* Stick to the top of the container */
-    z-index: 10;          /* Ensure it stays above other elements */
+    position: sticky;
+    top: 0;
+    z-index: 10;
     left: 0;
     right: 0;
     height: 60px;
     background-color: var(--background-color);
     border-bottom: 1px solid #ccc;
-    box-sizing: border-box; /* Include padding and border in height */
+    box-sizing: border-box;
 }
 
 .date-label {
