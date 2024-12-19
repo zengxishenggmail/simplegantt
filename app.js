@@ -629,16 +629,35 @@ function editTask(buttonElement) {
 }
 
 async function deleteTask(buttonElement) {
-    const taskIndex = buttonElement.getAttribute('data-index');
+    const taskIndex = parseInt(buttonElement.getAttribute('data-index'), 10);
     const taskName = projectData.tasks[taskIndex].name;
+
+    // Check for inbound dependencies
+    const inboundDependencies = projectData.tasks.filter((task, idx) => {
+        return task.dependencies && task.dependencies.includes(taskIndex);
+    });
+
+    if (inboundDependencies.length > 0) {
+        const dependentTaskNames = inboundDependencies.map(task => `\n- ${task.name || 'Untitled Task'}`).join('');
+        alert(`Cannot delete "${taskName}" because the following tasks depend on it:${dependentTaskNames}`);
+        return;
+    }
 
     const confirmDelete = confirm(`Are you sure you want to delete the task "${taskName}"?`);
     if (!confirmDelete) return;
 
     projectData.tasks.splice(taskIndex, 1);
+
+    // Update dependencies of other tasks
+    projectData.tasks.forEach(task => {
+        if (task.dependencies) {
+            task.dependencies = task.dependencies.map(depIndex => (depIndex > taskIndex ? depIndex - 1 : depIndex));
+        }
+    });
+
     renderGanttChart(projectData);
     updateDependenciesOptions();
-    
+
     await saveProjectData(projectData, true);
 }
 
