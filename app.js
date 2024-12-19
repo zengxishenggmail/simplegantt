@@ -379,6 +379,20 @@ function renderGanttChart(projectData) {
     const projectStartDate = new Date(Math.min(...startDates));
     const projectEndDate = new Date(Math.max(...endDates));
 
+    // Add the current day indicator
+    const currentDate = new Date(new Date().toISOString().split('T')[0] + 'T00:00:00Z');
+
+    if (currentDate >= projectStartDate && currentDate <= projectEndDate) {
+        const daysFromStartToCurrent = (currentDate - projectStartDate) / (1000 * 60 * 60 * 24);
+        const currentIndicatorPosition = daysFromStartToCurrent * pixelsPerDay;
+
+        const currentDayIndicator = document.createElement('div');
+        currentDayIndicator.classList.add('current-day-indicator');
+        currentDayIndicator.style.left = `${currentIndicatorPosition}px`;
+
+        ganttChart.appendChild(currentDayIndicator);
+    }
+
     const timeScale = renderTimeScale(projectStartDate, projectEndDate);
     ganttChart.appendChild(timeScale);
 

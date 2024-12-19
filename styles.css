@@ -806,6 +806,16 @@ input[type="color"] {
     display: flex;
     align-items: center;
 }
+
+/* Current Day Indicator Styles */
+.current-day-indicator {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px; /* Adjust thickness as needed */
+    background-color: red; /* Color for the current day indicator */
+    z-index: 2; /* Ensure it appears above other elements */
+}
 /* Person Items Styles */
 .person-item {
     display: flex;
