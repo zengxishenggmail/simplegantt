@@ -352,8 +352,12 @@
                     <textarea id="milestoneDescription" placeholder="Enter milestone description"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="milestoneEmoji">Emoji:</label>
-                    <input type="text" id="milestoneEmoji" placeholder="E.g., 🎉">
+                    <label for="milestoneEmojiGrid">Select Emoji:</label>
+                    <div id="milestoneEmojiGrid" class="emoji-grid">
+                        <!-- Emojis will be populated here -->
+                    </div>
+                    <!-- Hidden input to store the selected emoji -->
+                    <input type="hidden" id="milestoneEmoji" value="🚩">
                 </div>
                 <!-- Error Message and Submit Button -->
                 <div id="milestoneFormErrorMessage" style="color: red; margin-top: 10px"></div>

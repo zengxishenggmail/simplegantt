@@ -1131,6 +1131,33 @@ legend {
     /* Add any specific styles if needed */
 }
 
+/* Emoji grid container */
+.emoji-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Emoji buttons */
+.emoji-button {
+    font-size: 24px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.emoji-button:hover {
+    background-color: #f0f0f0;
+}
+
+.emoji-button.selected {
+    border-color: var(--primary-color);
+    background-color: #e0ffe0;
+}
+
 /* Milestone Details Modal Styles */
 .milestone-details-content {
     padding: 20px;

@@ -2,6 +2,35 @@
 // This ensures backward compatibility with files created in previous versions of the app.
 
 let projectData = { projectName: 'Untitled Project', categories: [], tasks: [], people: [], milestones: [] };
+const emojiList = ['🚀', '🎉', '📅', '✅', '❗', '⭐', '🔥', '🛠️', '📈', '💡', '⚠️', '❌', '🏁', '⏰'];
+
+function populateEmojiGrid(selectedEmoji) {
+    const emojiGrid = document.getElementById('milestoneEmojiGrid');
+    emojiGrid.innerHTML = ''; // Clear existing emojis
+
+    emojiList.forEach(emoji => {
+        const emojiButton = document.createElement('button');
+        emojiButton.type = 'button'; // Ensure it doesn't submit the form
+        emojiButton.classList.add('emoji-button');
+        emojiButton.textContent = emoji;
+
+        // Highlight the selected emoji
+        if (emoji === selectedEmoji) {
+            emojiButton.classList.add('selected');
+        }
+
+        emojiButton.addEventListener('click', () => {
+            // Remove 'selected' class from all buttons
+            document.querySelectorAll('.emoji-button').forEach(btn => btn.classList.remove('selected'));
+            // Add 'selected' class to the clicked button
+            emojiButton.classList.add('selected');
+            // Update the hidden input value
+            document.getElementById('milestoneEmoji').value = emoji;
+        });
+
+        emojiGrid.appendChild(emojiButton);
+    });
+}
 const CATEGORY_HEADING_HEIGHT = 30; // Adjust as needed
 let fileHandle;
 let currentMilestoneId = null;
@@ -1353,6 +1382,10 @@ window.addEventListener('click', (event) => {
 openMilestoneModalButton.addEventListener('click', () => {
     milestoneModalTitle.textContent = 'Add Milestone';
     updateMilestoneCategoryOptions();
+    // Set default emoji
+    const defaultEmoji = '🚩';
+    document.getElementById('milestoneEmoji').value = defaultEmoji;
+    populateEmojiGrid(defaultEmoji);
     milestoneModal.style.display = 'block';
 });
 
@@ -1735,7 +1768,7 @@ document.getElementById('addMilestoneForm').addEventListener('submit', async fun
     const milestoneDate = document.getElementById('milestoneDate').value;
     const milestoneCategoryId = parseInt(document.getElementById('milestoneCategory').value, 10) || null;
     const milestoneDescription = document.getElementById('milestoneDescription').value.trim();
-    const milestoneEmoji = document.getElementById('milestoneEmoji').value.trim() || '🚩'; // Default emoji if not provided
+    const milestoneEmoji = document.getElementById('milestoneEmoji').value.trim() || '🚩'; // Use default if not provided
 
     // Basic validation
     if (!milestoneName || !milestoneDate) {
@@ -1860,13 +1893,17 @@ function editMilestone(milestoneId) {
     document.getElementById('milestoneName').value = milestone.name;
     document.getElementById('milestoneDate').value = milestone.date;
     document.getElementById('milestoneDescription').value = milestone.description || '';
-    document.getElementById('milestoneEmoji').value = milestone.emoji || '';
 
     // Set the selected category
     document.getElementById('milestoneCategory').value = milestone.categoryId || '';
 
     // Set a data attribute to indicate edit mode
     document.getElementById('addMilestoneForm').setAttribute('data-edit-id', milestoneId);
+
+    // Set the selected emoji
+    const selectedEmoji = milestone.emoji || '🚩'; // Use default if not set
+    document.getElementById('milestoneEmoji').value = selectedEmoji;
+    populateEmojiGrid(selectedEmoji);
 
     // Open the milestone modal
     milestoneModal.style.display = 'block';
