@@ -462,9 +462,10 @@ button i {
     grid-template-columns: repeat(2, 1fr);
     grid-template-areas:
         "task-name task-name"
+        "description description"
         "task-details task-details"
-        "assignment assignment";
-    gap: 20px;
+        "assignment status";
+    gap: 5px;
     max-width: 700px;
     margin-bottom: 20px;
 }
@@ -480,6 +481,14 @@ button i {
 
 .assignment-section {
     grid-area: assignment;
+}
+
+.status-section {
+    grid-area: status;
+}
+
+.description-section {
+    grid-area: description;
 }
 
 /* Grid layout for form groups within fieldsets */
@@ -998,10 +1007,6 @@ legend {
 
 .form-group label {
     margin-bottom: 5px;
-}
-
-.modal fieldset {
-    margin-bottom: 30px;
 }
 
 .modal-content {

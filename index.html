@@ -1,236 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gantt Chart Application</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"
+    />
     <!-- Spectrum CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css"
+    />
     <!-- Your custom styles -->
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <header>
-        <h1>
-            <span id="projectNameDisplay">Untitled Project</span>
-            <input type="text" id="projectNameInput" value="Untitled Project" style="display: none;">
-            <button id="editProjectNameButton"><i class="fas fa-edit"></i></button>
-        </h1>
-        <nav>
-            <div class="nav-left">
-                <button id="saveProject"><i class="fas fa-save"></i> Save</button>
-                <button id="saveAsProject"><i class="fas fa-save"></i> Save As</button>
-            </div>
-            <div class="nav-right">
-                <button id="loadProject"><i class="fas fa-folder-open"></i> Load Project</button>
-                <button id="newProject"><i class="fas fa-file"></i> New Project</button>
-            </div>
-        </nav>
+      <h1>
+        <span id="projectNameDisplay">Untitled Project</span>
+        <input
+          type="text"
+          id="projectNameInput"
+          value="Untitled Project"
+          style="display: none"
+        />
+        <button id="editProjectNameButton"><i class="fas fa-edit"></i></button>
+      </h1>
+      <nav>
+        <div class="nav-left">
+          <button id="saveProject"><i class="fas fa-save"></i> Save</button>
+          <button id="saveAsProject">
+            <i class="fas fa-save"></i> Save As
+          </button>
+        </div>
+        <div class="nav-right">
+          <button id="loadProject">
+            <i class="fas fa-folder-open"></i> Load Project
+          </button>
+          <button id="newProject">
+            <i class="fas fa-file"></i> New Project
+          </button>
+        </div>
+      </nav>
     </header>
 
     <main>
-        <div class="project-header">
-            <button id="openTaskModal"><i class="fas fa-plus"></i> Add Task</button>
-            <button id="manageCategoriesButton"><i class="fas fa-tags"></i> Manage Categories</button>
-            <button id="managePeopleButton"><i class="fas fa-users"></i> Manage People</button>
+      <div class="project-header">
+        <button id="openTaskModal"><i class="fas fa-plus"></i> Add Task</button>
+        <button id="manageCategoriesButton">
+          <i class="fas fa-tags"></i> Manage Categories
+        </button>
+        <button id="managePeopleButton">
+          <i class="fas fa-users"></i> Manage People
+        </button>
+      </div>
+      <!-- Zoom Controls moved here -->
+      <div class="zoom-controls">
+        <!-- Horizontal Zoom Controls -->
+        <div class="zoom-group">
+          <label for="horizontalZoom">Horizontal Zoom:</label>
+          <input
+            type="range"
+            id="horizontalZoom"
+            min="10"
+            max="100"
+            value="30"
+            step="5"
+          />
+          <span id="horizontalZoomValue">30</span>
         </div>
-        <!-- Zoom Controls moved here -->
-        <div class="zoom-controls">
-            <!-- Horizontal Zoom Controls -->
-            <div class="zoom-group">
-                <label for="horizontalZoom">Horizontal Zoom:</label>
-                <input type="range" id="horizontalZoom" min="10" max="100" value="30" step="5">
-                <span id="horizontalZoomValue">30</span>
-            </div>
-            <!-- Vertical Zoom Controls -->
-            <div class="zoom-group">
-                <label for="verticalZoom">Vertical Zoom:</label>
-                <input type="range" id="verticalZoom" min="10" max="60" value="30" step="5">
-                <span id="verticalZoomValue">30</span>
-            </div>
+        <!-- Vertical Zoom Controls -->
+        <div class="zoom-group">
+          <label for="verticalZoom">Vertical Zoom:</label>
+          <input
+            type="range"
+            id="verticalZoom"
+            min="10"
+            max="60"
+            value="30"
+            step="5"
+          />
+          <span id="verticalZoomValue">30</span>
         </div>
-        <div id="statusMessage"></div>
-        <div id="ganttChart"></div>
+      </div>
+      <div id="statusMessage"></div>
+      <div id="ganttChart"></div>
     </main>
 
     <div id="taskModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="modalTitle" class="modal-title">Add Task</h2>
-            <form id="addTaskForm">
-                <!-- Task Name Section -->
-                <fieldset class="task-name-section">
-                    <legend>Task Name</legend>
-                    <div class="form-group">
-                        <label for="taskName"><i class="fas fa-tasks"></i> Task Name:</label>
-                        <input type="text" id="taskName" placeholder="Enter task name" required>
-                    </div>
-                </fieldset>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2 id="modalTitle" class="modal-title">Add Task</h2>
+        <form id="addTaskForm">
+          <!-- Task Name Section -->
+          <fieldset class="task-name-section">
+            <legend>Task Name</legend>
+            <div class="form-group">
+              <input
+                type="text"
+                id="taskName"
+                placeholder="Enter task name"
+                required
+              />
+            </div>
+          </fieldset>
 
-                <!-- Task Details Section -->
-                <fieldset class="task-details-section">
-                    <legend>Task Details</legend>
-                    <div class="form-group">
-                        <label for="taskStart"><i class="fas fa-calendar-alt"></i> Start Date:</label>
-                        <input type="date" id="taskStart" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="taskDuration"><i class="fas fa-hourglass-half"></i> Duration (days):</label>
-                        <input type="number" id="taskDuration" placeholder="E.g., 5" min="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="taskCategory"><i class="fas fa-tag"></i> Category:</label>
-                        <select id="taskCategory" required>
-                            <!-- Categories will be populated dynamically -->
-                        </select>
-                    </div>
-                </fieldset>
+          <!-- Description Section -->
+          <fieldset class="description-section">
+            <legend>Description</legend>
+            <div class="form-group">
+              <textarea
+                id="taskDescription"
+                placeholder="Enter task description"
+              ></textarea>
+            </div>
+          </fieldset>
 
-                <!-- Assignment Section -->
-                <fieldset>
-                    <legend>Assignment</legend>
-                    <div class="form-group">
-                        <label for="taskPeople"><i class="fas fa-users"></i> Assigned People:</label>
-                        <select id="taskPeople" multiple></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="taskDependencies"><i class="fas fa-link"></i> Dependencies:</label>
-                        <select id="taskDependencies" multiple></select>
-                        <small>Select tasks that must be completed before this task can start.</small>
-                    </div>
-                </fieldset>
+          <!-- Task Details Section -->
+          <fieldset class="task-details-section">
+            <legend>Task Details</legend>
+            <div class="form-group">
+              <label for="taskStart"
+                ><i class="fas fa-calendar-alt"></i> Start Date:</label
+              >
+              <input type="date" id="taskStart" required />
+            </div>
+            <div class="form-group">
+              <label for="taskDuration"
+                ><i class="fas fa-hourglass-half"></i> Duration (days):</label
+              >
+              <input
+                type="number"
+                id="taskDuration"
+                placeholder="E.g., 5"
+                min="1"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="taskCategory"
+                ><i class="fas fa-tag"></i> Category:</label
+              >
+              <select id="taskCategory" required>
+                <!-- Categories will be populated dynamically -->
+              </select>
+            </div>
+          </fieldset>
 
-                <!-- Status Section -->
-                <fieldset>
-                    <legend>Status</legend>
-                    <div class="form-group">
-                        <label for="taskStatus"><i class="fas fa-info-circle"></i> Task Status:</label>
-                        <select id="taskStatus">
-                            <option value="on-track">On-track</option>
-                            <option value="some risk">Some risk of delay</option>
-                            <option value="high risk">High risk of delay</option>
-                            <option value="scrapped">Scrapped</option>
-                            <option value="finished">Finished</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="statusExplanation"><i class="fas fa-comment-dots"></i> Status Explanation (Optional):</label>
-                        <textarea id="statusExplanation" placeholder="Add any comments about the status"></textarea>
-                    </div>
-                </fieldset>
+          <!-- Assignment Section -->
+          <fieldset>
+            <legend>Assignment</legend>
+            <div class="form-group">
+              <label for="taskPeople"
+                ><i class="fas fa-users"></i> Assigned People:</label
+              >
+              <select id="taskPeople" multiple></select>
+            </div>
+            <div class="form-group">
+              <label for="taskDependencies"
+                ><i class="fas fa-link"></i> Dependencies:</label
+              >
+              <select id="taskDependencies" multiple></select>
+              <small
+                >Select tasks that must be completed before this task can
+                start.</small
+              >
+            </div>
+          </fieldset>
 
-                <!-- Description Section -->
-                <fieldset>
-                    <legend>Description</legend>
-                    <div class="form-group">
-                        <label for="taskDescription"><i class="fas fa-align-left"></i> Task Description (Optional):</label>
-                        <textarea id="taskDescription" placeholder="Enter task description"></textarea>
-                    </div>
-                </fieldset>
+          <!-- Status Section -->
+          <fieldset class="status-section">
+            <legend>Status</legend>
+            <div class="form-group">
+              <label for="taskStatus"
+                ><i class="fas fa-info-circle"></i> Task Status:</label
+              >
+              <select id="taskStatus">
+                <option value="on-track">On-track</option>
+                <option value="some risk">Some risk of delay</option>
+                <option value="high risk">High risk of delay</option>
+                <option value="scrapped">Scrapped</option>
+                <option value="finished">Finished</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="statusExplanation"
+                ><i class="fas fa-comment-dots"></i> Status Explanation
+                (Optional):</label
+              >
+              <textarea
+                id="statusExplanation"
+                placeholder="Add any comments about the status"
+              ></textarea>
+            </div>
+          </fieldset>
 
-                <!-- Error Message and Submit Button -->
-                <div id="formErrorMessage" style="color: red; margin-top: 10px;"></div>
-                <button type="submit">Add Task</button>
-            </form>
-        </div>
+          <!-- Error Message and Submit Button -->
+          <div id="formErrorMessage" style="color: red; margin-top: 10px"></div>
+          <button type="submit">Add Task</button>
+        </form>
+      </div>
     </div>
 
     <div id="categoriesModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Manage Categories</h2>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Manage Categories</h2>
 
-            <div class="tabs">
-                <button class="tab-button active" data-tab="add">Add Category</button>
-                <button class="tab-button" data-tab="list">View Categories</button>
-            </div>
-
-            <div class="tab-content active" id="addTab">
-                <form id="addCategoryForm">
-                    <div class="form-group">
-                        <label for="categoryName">Category Name:</label>
-                        <input type="text" id="categoryName" placeholder="Enter category name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="categoryColor">Category Color:</label>
-                        <input type="text" id="categoryColor" value="#4CAF50" required>
-                    </div>
-                    <button type="submit">Add Category</button>
-                </form>
-            </div>
-
-            <div class="tab-content" id="listTab">
-                <div id="categoriesList">
-                    <!-- Existing categories will be listed here -->
-                </div>
-            </div>
+        <div class="tabs">
+          <button class="tab-button active" data-tab="add">Add Category</button>
+          <button class="tab-button" data-tab="list">View Categories</button>
         </div>
+
+        <div class="tab-content active" id="addTab">
+          <form id="addCategoryForm">
+            <div class="form-group">
+              <label for="categoryName">Category Name:</label>
+              <input
+                type="text"
+                id="categoryName"
+                placeholder="Enter category name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="categoryColor">Category Color:</label>
+              <input type="text" id="categoryColor" value="#4CAF50" required />
+            </div>
+            <button type="submit">Add Category</button>
+          </form>
+        </div>
+
+        <div class="tab-content" id="listTab">
+          <div id="categoriesList">
+            <!-- Existing categories will be listed here -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="taskDetailsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Task Details</h2>
-            <div class="task-details-content">
-                <h3 id="detailTaskName">Task Name</h3>
-                <p id="detailTaskDescription">Task description goes here.</p>
-                <dl>
-                    <dt><i class="fas fa-calendar-alt"></i> Start Date:</dt>
-                    <dd id="detailTaskStart"></dd>
-                    
-                    <dt><i class="fas fa-hourglass-start"></i> Duration:</dt>
-                    <dd id="detailTaskDuration"></dd>
-                    
-                    <dt><i class="fas fa-link"></i> Dependencies:</dt>
-                    <dd id="detailTaskDependencies"></dd>
-                    
-                    <dt><i class="fas fa-project-diagram"></i> Dependent Tasks:</dt>
-                    <dd id="detailInboundDependencies"></dd>
-                    
-                    <dt><i class="fas fa-info-circle"></i> Status:</dt>
-                    <dd id="detailTaskStatus"></dd>
-                    
-                    <dt><i class="fas fa-comment-dots"></i> Status Explanation:</dt>
-                    <dd id="detailStatusExplanation"></dd>
-                    
-                    <dt><i class="fas fa-user"></i> Assigned People:</dt>
-                    <dd id="detailAssignedPeople"></dd>
-                </dl>
-            </div>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Task Details</h2>
+        <div class="task-details-content">
+          <h3 id="detailTaskName">Task Name</h3>
+          <p id="detailTaskDescription">Task description goes here.</p>
+          <dl>
+            <dt><i class="fas fa-calendar-alt"></i> Start Date:</dt>
+            <dd id="detailTaskStart"></dd>
+
+            <dt><i class="fas fa-hourglass-start"></i> Duration:</dt>
+            <dd id="detailTaskDuration"></dd>
+
+            <dt><i class="fas fa-link"></i> Dependencies:</dt>
+            <dd id="detailTaskDependencies"></dd>
+
+            <dt><i class="fas fa-project-diagram"></i> Dependent Tasks:</dt>
+            <dd id="detailInboundDependencies"></dd>
+
+            <dt><i class="fas fa-info-circle"></i> Status:</dt>
+            <dd id="detailTaskStatus"></dd>
+
+            <dt><i class="fas fa-comment-dots"></i> Status Explanation:</dt>
+            <dd id="detailStatusExplanation"></dd>
+
+            <dt><i class="fas fa-user"></i> Assigned People:</dt>
+            <dd id="detailAssignedPeople"></dd>
+          </dl>
         </div>
+      </div>
     </div>
 
     <div id="peopleModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Manage People</h2>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Manage People</h2>
 
-            <div class="tabs">
-                <button class="tab-button active" data-tab="add-person">Add Person</button>
-                <button class="tab-button" data-tab="list-people">View People</button>
-            </div>
-
-            <div class="tab-content active" id="add-personTab">
-                <form id="addPersonForm">
-                    <div class="form-group">
-                        <label for="personName">Person Name:</label>
-                        <input type="text" id="personName" placeholder="Enter person's name" required>
-                    </div>
-                    <button type="submit">Add Person</button>
-                </form>
-            </div>
-
-            <div class="tab-content" id="list-peopleTab">
-                <div id="peopleList">
-                    <!-- Existing people will be listed here -->
-                </div>
-            </div>
+        <div class="tabs">
+          <button class="tab-button active" data-tab="add-person">
+            Add Person
+          </button>
+          <button class="tab-button" data-tab="list-people">View People</button>
         </div>
+
+        <div class="tab-content active" id="add-personTab">
+          <form id="addPersonForm">
+            <div class="form-group">
+              <label for="personName">Person Name:</label>
+              <input
+                type="text"
+                id="personName"
+                placeholder="Enter person's name"
+                required
+              />
+            </div>
+            <button type="submit">Add Person</button>
+          </form>
+        </div>
+
+        <div class="tab-content" id="list-peopleTab">
+          <div id="peopleList">
+            <!-- Existing people will be listed here -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -245,5 +334,5 @@
     <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.10/dist/purify.min.js"></script>
     <!-- Your custom scripts -->
     <script src="app.js"></script>
-</body>
+  </body>
 </html>
