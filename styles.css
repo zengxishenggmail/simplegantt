@@ -1045,10 +1045,11 @@ legend {
 /* Milestone styles */
 .milestone {
     position: absolute;
-    transform: translateX(-50%); /* Center the milestone over its date */
-    font-size: 24px; /* Adjust size as needed */
+    transform: translateX(-50%);
+    font-size: 24px;
     cursor: pointer;
-    z-index: 20; /* Increase z-index to be above the time scale */
+    z-index: 15; /* Ensure it's above other elements if necessary */
+    top: 30px; /* Set this to position within the time scale */
 }
 
 .milestone[data-tooltip]:hover::after {

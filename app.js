@@ -550,7 +550,11 @@ function renderGanttChart(projectData) {
 
     ganttChart.appendChild(fragment);
 
-    // Render milestones
+    // Append the time scale first
+    const timeScale = renderTimeScale(projectStartDate, projectEndDate);
+    ganttChart.appendChild(timeScale);
+
+    // Render milestones and append them to the timeScale
     projectData.milestones.forEach((milestone) => {
         const milestoneDate = new Date(milestone.date + 'T00:00:00Z');
         const daysFromStart = (milestoneDate - projectStartDate) / (1000 * 60 * 60 * 24);
@@ -558,9 +562,7 @@ function renderGanttChart(projectData) {
         const milestoneElement = document.createElement('div');
         milestoneElement.classList.add('milestone');
         milestoneElement.style.left = `${daysFromStart * pixelsPerDay}px`;
-        // Position the milestone below the time scale
-        const milestoneTop = TIME_SCALE_HEIGHT / 2 - 12; // Adjust based on icon size
-        milestoneElement.style.top = `${milestoneTop}px`;
+        milestoneElement.style.top = '30px'; // Position within time scale
 
         // Set milestone color based on category
         let category;
@@ -584,17 +586,7 @@ function renderGanttChart(projectData) {
             showMilestoneDetails(milestone.id);
         });
 
-        ganttChart.appendChild(milestoneElement);
-    });
-
-    // Append the time scale last
-    const timeScale = renderTimeScale(projectStartDate, projectEndDate);
-    ganttChart.appendChild(timeScale);
-
-    // Position milestones above the time scale
-    const milestones = ganttChart.querySelectorAll('.milestone');
-    milestones.forEach(milestone => {
-        milestone.style.top = `${TIME_SCALE_HEIGHT / 2 - 12}px`;
+        timeScale.appendChild(milestoneElement);
     });
 }
 
