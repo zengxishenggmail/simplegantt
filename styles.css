@@ -301,7 +301,11 @@ body.shift-key-down .task-bar[data-tooltip]:hover::after {
 
 /* ===== Category Items Styles ===== */
 /* Categories list container */
+/* Remove default list styling */
 #categoriesList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
     max-height: 300px;
     overflow-y: auto;
     border: 1px solid #ddd;
@@ -309,12 +313,17 @@ body.shift-key-down .task-bar[data-tooltip]:hover::after {
     margin-top: 10px;
 }
 
-/* Category item styles */
+/* Update category-item to work with li elements */
 .category-item {
     display: flex;
     align-items: center;
     padding: 10px;
     border-bottom: 1px solid #eee;
+    cursor: move; /* Add cursor to indicate draggable */
+}
+
+.category-item.dragging {
+    opacity: 0.5;
 }
 
 .category-item:last-child {
