@@ -535,58 +535,75 @@ input[type="color"] {
     margin: 5% auto;
     padding: 20px 30px;
     border: none;
-    width: 80%;
-    max-width: 600px;
+    width: 90%;
+    max-width: 700px;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 /* Modal headings */
-.modal-content h2 {
-    margin-top: 0;
-    font-size: 1.5em;
-    font-weight: 500;
-    color: var(--text-color);
+.modal-title {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
 }
 
 /* Form styles within modal */
-.modal .form-group label {
-    font-weight: 500;
-    margin-bottom: 5px;
+.modal .form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 15px;
 }
 
-.modal .form-group input[type="text"],
-.modal .form-group input[type="color"],
-.modal .form-group input[type="date"],
-.modal .form-group input[type="number"],
-.modal .form-group select {
-    width: 100%;
+.modal .form-group label {
+    flex: 0 0 150px;
+    margin-right: 10px;
+    font-weight: 500;
+}
+
+.modal .form-group input,
+.modal .form-group select,
+.modal .form-group textarea {
+    flex: 1;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.modal .form-group input[type="text"]:focus,
-.modal .form-group input[type="color"]:focus,
-.modal .form-group input[type="date"]:focus,
-.modal .form-group input[type="number"]:focus,
-.modal .form-group select:focus {
+.modal .form-group textarea {
+    resize: vertical;
+}
+
+.modal .form-group input:focus,
+.modal .form-group select:focus,
+.modal .form-group textarea:focus {
     border-color: var(--primary-color);
     outline: none;
 }
 
+.modal .form-group input:hover,
+.modal .form-group select:hover,
+.modal .form-group textarea:hover {
+    border-color: var(--primary-color-light);
+}
+
 .modal button[type="submit"] {
-    padding: 10px 15px;
-    background-color: var(--primary-color);
+    padding: 12px 20px;
+    background-color: var(--secondary-color);
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 1em;
     transition: background-color 0.2s;
 }
 
 .modal button[type="submit"]:hover {
-    background-color: var(--primary-color-light);
+    background-color: var(--secondary-color-dark);
 }
 
 /* Modal close button */
@@ -604,6 +621,39 @@ input[type="color"] {
 .close-button:focus {
     color: #000;
     text-decoration: none;
+}
+
+/* Form Section Styles */
+fieldset {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+legend {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--secondary-color);
+    padding: 0 10px;
+}
+
+.form-group label i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .form-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-group label {
+        margin-bottom: 5px;
+        flex: unset;
+    }
 }
 
 /* ===== Tooltip Styles ===== */
