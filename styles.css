@@ -1073,6 +1073,30 @@ legend {
     opacity: 1;
 }
 
+/* Task Details Modal Buttons */
+.task-details-content button {
+    background-color: var(--secondary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin-right: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.task-details-content button:hover {
+    background-color: var(--secondary-color-dark);
+}
+
+.task-details-buttons {
+    margin-top: 20px;
+}
+
+.task-details-buttons button {
+    margin-right: 10px;
+}
+
 /* Milestone Modal Specific Styles */
 #milestoneModal .modal-content {
     /* Add any specific styles if needed */

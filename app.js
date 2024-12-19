@@ -5,6 +5,7 @@ let projectData = { projectName: 'Untitled Project', categories: [], tasks: [], 
 const CATEGORY_HEADING_HEIGHT = 30; // Adjust as needed
 let fileHandle;
 let currentMilestoneId = null;
+let currentTaskIndex = null;
 
 const projectNameDisplay = document.getElementById('projectNameDisplay');
 const projectNameInput = document.getElementById('projectNameInput');
@@ -597,9 +598,11 @@ document.getElementById('ganttChart').addEventListener('click', function(event) 
     const taskBar = event.target.closest('.task-bar');
 
     if (editButton) {
-        editTask(editButton);
+        const taskIndex = parseInt(editButton.getAttribute('data-index'), 10);
+        editTask(taskIndex);
     } else if (deleteButton) {
-        deleteTask(deleteButton);
+        const taskIndex = parseInt(deleteButton.getAttribute('data-index'), 10);
+        await deleteTask(taskIndex);
     } else if (taskBar) {
         // Open the task details modal
         const taskIndex = parseInt(taskBar.getAttribute('data-index'), 10);
@@ -608,6 +611,7 @@ document.getElementById('ganttChart').addEventListener('click', function(event) 
 });
 
 function showTaskDetails(taskIndex) {
+    currentTaskIndex = taskIndex; // Store the current task index
     const task = projectData.tasks[taskIndex];
     document.getElementById('detailTaskName').textContent = task.name || 'Untitled Task';
     
@@ -667,8 +671,27 @@ window.addEventListener('click', (event) => {
     }
 });
 
-function editTask(buttonElement) {
-    const taskIndex = parseInt(buttonElement.getAttribute('data-index'), 10);
+// Get references to the edit and delete buttons
+const editTaskButton = document.getElementById('editTaskButton');
+const deleteTaskButton = document.getElementById('deleteTaskButton');
+
+// Event listener for the Edit button
+editTaskButton.addEventListener('click', () => {
+    if (currentTaskIndex !== null) {
+        editTask(currentTaskIndex);
+        taskDetailsModal.style.display = 'none';
+    }
+});
+
+// Event listener for the Delete button
+deleteTaskButton.addEventListener('click', async () => {
+    if (currentTaskIndex !== null) {
+        await deleteTask(currentTaskIndex);
+        taskDetailsModal.style.display = 'none';
+    }
+});
+
+function editTask(taskIndex) {
     const task = projectData.tasks[taskIndex];
 
     // Ensure dependencies is an array
@@ -706,8 +729,7 @@ function editTask(buttonElement) {
     taskModal.style.display = 'block';
 }
 
-async function deleteTask(buttonElement) {
-    const taskIndex = parseInt(buttonElement.getAttribute('data-index'), 10);
+async function deleteTask(taskIndex) {
     const taskName = projectData.tasks[taskIndex].name;
 
     // Check for inbound dependencies
