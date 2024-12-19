@@ -1214,6 +1214,9 @@ function deletePerson(personId) {
         }
     });
 
+    // Update the Gantt chart to reflect the removal
+    renderGanttChart(projectData);
+
     renderPeopleList();
     updatePeopleOptions();
     saveProjectData(projectData, true);
