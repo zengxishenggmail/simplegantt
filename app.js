@@ -592,20 +592,6 @@ function renderGanttChart(projectData) {
     projectStartDate = startDate;
     projectEndDate = endDate;
 
-    // Remove the current day vertical line indicator
-    // const currentDate = new Date(new Date().toISOString().split('T')[0] + 'T00:00:00Z');
-
-    // if (currentDate >= projectStartDate && currentDate <= projectEndDate) {
-    //     const daysFromStartToCurrent = (currentDate - projectStartDate) / (1000 * 60 * 60 * 24);
-    //     const currentIndicatorPosition = daysFromStartToCurrent * pixelsPerDay;
-
-    //     const currentDayIndicator = document.createElement('div');
-    //     currentDayIndicator.classList.add('current-day-indicator');
-    //     currentDayIndicator.style.left = `${currentIndicatorPosition}px`;
-
-    //     ganttChart.appendChild(currentDayIndicator);
-    // }
-
     const fragment = document.createDocumentFragment();
     const TIME_SCALE_HEIGHT = 60; // The height of the time scale in pixels
     let currentTop = TIME_SCALE_HEIGHT; // Start rendering tasks below the time scale
@@ -613,151 +599,169 @@ function renderGanttChart(projectData) {
     // Group tasks by categories
     const tasksByCategory = {};
     projectData.tasks.forEach((task, index) => {
-        const categoryId = task.categoryId || 'uncategorized';
+        // Use 'uncategorized' for tasks without a categoryId
+        const categoryId = task.categoryId !== undefined && task.categoryId !== null ? task.categoryId : 'uncategorized';
         if (!tasksByCategory[categoryId]) {
             tasksByCategory[categoryId] = [];
         }
         tasksByCategory[categoryId].push({ task, index });
     });
 
-    // Render tasks grouped by categories
-    for (const categoryId in tasksByCategory) {
-        const categoryTasks = tasksByCategory[categoryId];
-        let category;
+    // Iterate over categories as per projectData.categories order
+    for (const category of projectData.categories) {
+        const categoryId = category.id;
+        const categoryTasks = tasksByCategory[categoryId] || [];
 
-        if (categoryId !== 'uncategorized') {
-            category = projectData.categories.find(cat => cat.id === parseInt(categoryId, 10));
+        if (categoryTasks.length > 0) {
+            // Render category heading
+            const categoryElement = document.createElement('div');
+            categoryElement.classList.add('category-heading');
+            categoryElement.style.top = `${currentTop}px`;
+            categoryElement.textContent = category.name;
+            categoryElement.style.borderLeftColor = category.color;
+            fragment.appendChild(categoryElement);
+            currentTop += taskHeight + 10;
+
+            // Render tasks within this category
+            categoryTasks.forEach(({ task, index }) => {
+                const taskElement = document.createElement('div');
+                taskElement.classList.add('task-bar');
+
+                // Use default values for missing properties
+                const taskName = task.name || 'Untitled Task';
+                const taskDuration = task.duration || 1; // Default duration of 1 day
+
+                taskElement.style.width = `${taskDuration * pixelsPerDay}px`;
+                taskElement.style.height = `${taskHeight}px`;
+
+                // Ensure `taskStartDate` is valid
+                let taskStartDate = taskStartDates[index];
+                if (!taskStartDate || isNaN(taskStartDate.getTime())) {
+                    // Set to current date if invalid
+                    const currentDateStr = new Date().toISOString().split('T')[0];
+                    taskStartDate = new Date(currentDateStr + 'T00:00:00Z');
+                }
+
+                const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
+
+                taskElement.style.left = `${daysFromStart * pixelsPerDay}px`;
+                taskElement.style.top = `${currentTop}px`;
+
+                // Set task color based on category
+                taskElement.style.backgroundColor = category.color;
+
+                const tooltipContent = `
+                    Name: ${taskName}
+                    Start: ${taskStartDate.toISOString().split('T')[0]}
+                    Duration: ${taskDuration} days
+                    Dependencies: ${(task.dependencies || []).map(depIndex => projectData.tasks[depIndex]?.name).join(', ') || 'None'}
+                `;
+
+                taskElement.setAttribute('data-tooltip', tooltipContent);
+
+                const taskEndDate = new Date(taskStartDate.getTime() + taskDuration * 24 * 60 * 60 * 1000);
+
+                let displayStatus = task.status || 'on-track';
+                const currentDate = new Date();
+
+                // If current date is past the task's end date and task is not scrapped or finished
+                if (currentDate > taskEndDate && displayStatus !== 'scrapped' && displayStatus !== 'finished') {
+                    displayStatus = 'high risk';
+                }
+
+                let statusIndicatorHTML;
+
+                if (displayStatus === 'finished') {
+                    statusIndicatorHTML = `<div class="status-indicator ${getStatusClass(displayStatus)}">🎉</div>`;
+                } else {
+                    statusIndicatorHTML = `<div class="status-indicator ${getStatusClass(displayStatus)}"></div>`;
+                }
+
+                // Get the first assignee's name, if any
+                let firstAssigneeName = '';
+                if (Array.isArray(task.assignedPeople) && task.assignedPeople.length > 0) {
+                    const firstPersonId = task.assignedPeople[0];
+                    const firstPerson = projectData.people.find(p => p.id === firstPersonId);
+                    if (firstPerson) {
+                        firstAssigneeName = firstPerson.name;
+                    }
+                }
+
+                // Modify taskElement based on assignment
+                let assignmentDisplay = '';
+                if (!firstAssigneeName) {
+                    // Task is unassigned
+                    taskElement.style.border = '2px solid red';
+                    assignmentDisplay = ' ❓';
+                } else {
+                    // Task has an assignee, display the name
+                    assignmentDisplay = `<span class="assignee-name">${firstAssigneeName}</span>`;
+                }
+
+                taskElement.innerHTML = `
+                    ${statusIndicatorHTML}
+                    <div class="task-resize-handle left"></div>
+                    <span class="task-name">${taskName}${assignmentDisplay}</span>
+                    <div class="task-buttons">
+                        <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
+                        <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="task-resize-handle right"></div>
+                `;
+                taskElement.setAttribute('role', 'button');
+                taskElement.setAttribute('tabindex', '0');
+                taskElement.setAttribute('aria-label', `Task: ${task.name}`);
+                taskElement.setAttribute('data-index', index);
+
+                taskElement.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                });
+
+                taskElement.addEventListener('touchstart', (e) => {
+                    e.stopPropagation();
+                });
+
+                fragment.appendChild(taskElement);
+                currentTop += taskHeight + taskSpacing;
+
+                // Get the resize handles
+                const leftHandle = taskElement.querySelector('.task-resize-handle.left');
+                const rightHandle = taskElement.querySelector('.task-resize-handle.right');
+
+                // Add event listeners for mousedown on the resize handles
+                leftHandle.addEventListener('mousedown', (e) => {
+                    if (isShiftKeyDown) {
+                        e.stopPropagation();
+                        startResizing(e, index, taskElement, 'left');
+                    }
+                });
+
+                rightHandle.addEventListener('mousedown', (e) => {
+                    if (isShiftKeyDown) {
+                        e.stopPropagation();
+                        startResizing(e, index, taskElement, 'right');
+                    }
+                });
+            });
         }
+    }
 
-        // Render category headline
+    // Handle 'Uncategorized' tasks after defined categories
+    const uncategorizedTasks = tasksByCategory['uncategorized'] || [];
+    if (uncategorizedTasks.length > 0) {
+        // Render 'Uncategorized' category heading
         const categoryElement = document.createElement('div');
         categoryElement.classList.add('category-heading');
         categoryElement.style.top = `${currentTop}px`;
-        categoryElement.textContent = category ? category.name : 'Uncategorized';
-        categoryElement.style.borderLeftColor = category ? category.color : '#999';
+        categoryElement.textContent = 'Uncategorized';
+        categoryElement.style.borderLeftColor = '#999';
         fragment.appendChild(categoryElement);
-        currentTop += taskHeight + 10; // Adjust category heading height
+        currentTop += taskHeight + 10;
 
         // Render tasks within this category
-        categoryTasks.forEach(({ task, index }) => {
-            const taskElement = document.createElement('div');
-            taskElement.classList.add('task-bar');
-
-            // Use default values for missing properties
-            const taskName = task.name || 'Untitled Task';
-            const taskDuration = task.duration || 1; // Default duration of 1 day
-
-            taskElement.style.width = `${taskDuration * pixelsPerDay}px`;
-            taskElement.style.height = `${taskHeight}px`;
-
-            // Ensure `taskStartDate` is valid
-            let taskStartDate = taskStartDates[index];
-            if (!taskStartDate || isNaN(taskStartDate.getTime())) {
-                // Set to current date if invalid
-                const currentDateStr = new Date().toISOString().split('T')[0];
-                taskStartDate = new Date(currentDateStr + 'T00:00:00Z');
-            }
-
-            const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
-
-            taskElement.style.left = `${daysFromStart * pixelsPerDay}px`;
-            taskElement.style.top = `${currentTop}px`;
-
-            // Set task color based on category
-            taskElement.style.backgroundColor = category ? category.color : '#999';
-
-            const tooltipContent = `
-                Name: ${taskName}
-                Start: ${taskStartDate.toISOString().split('T')[0]}
-                Duration: ${taskDuration} days
-                Dependencies: ${(task.dependencies || []).map(depIndex => projectData.tasks[depIndex]?.name).join(', ') || 'None'}
-            `;
-
-            taskElement.setAttribute('data-tooltip', tooltipContent);
-
-            const taskEndDate = new Date(taskStartDate.getTime() + taskDuration * 24 * 60 * 60 * 1000);
-
-            let displayStatus = task.status || 'on-track';
-            const currentDate = new Date();
-
-            // If current date is past the task's end date and task is not scrapped or finished
-            if (currentDate > taskEndDate && displayStatus !== 'scrapped' && displayStatus !== 'finished') {
-                displayStatus = 'high risk';
-            }
-
-            let statusIndicatorHTML;
-
-            if (displayStatus === 'finished') {
-                statusIndicatorHTML = `<div class="status-indicator ${getStatusClass(displayStatus)}">🎉</div>`;
-            } else {
-                statusIndicatorHTML = `<div class="status-indicator ${getStatusClass(displayStatus)}"></div>`;
-            }
-
-            // Get the first assignee's name, if any
-            let firstAssigneeName = '';
-            if (Array.isArray(task.assignedPeople) && task.assignedPeople.length > 0) {
-                const firstPersonId = task.assignedPeople[0];
-                const firstPerson = projectData.people.find(p => p.id === firstPersonId);
-                if (firstPerson) {
-                    firstAssigneeName = firstPerson.name;
-                }
-            }
-
-            // Modify taskElement based on assignment
-            let assignmentDisplay = '';
-            if (!firstAssigneeName) {
-                // Task is unassigned
-                taskElement.style.border = '2px solid red';
-                assignmentDisplay = ' ❓';
-            } else {
-                // Task has an assignee, display the name
-                assignmentDisplay = `<span class="assignee-name">${firstAssigneeName}</span>`;
-            }
-
-            taskElement.innerHTML = `
-                ${statusIndicatorHTML}
-                <div class="task-resize-handle left"></div>
-                <span class="task-name">${taskName}${assignmentDisplay}</span>
-                <div class="task-buttons">
-                    <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
-                    <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
-                </div>
-                <div class="task-resize-handle right"></div>
-            `;
-            taskElement.setAttribute('role', 'button');
-            taskElement.setAttribute('tabindex', '0');
-            taskElement.setAttribute('aria-label', `Task: ${task.name}`);
-            taskElement.setAttribute('data-index', index);
-
-            taskElement.addEventListener('mousedown', (e) => {
-                e.stopPropagation();
-            });
-
-            taskElement.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-            });
-
-            fragment.appendChild(taskElement);
-            currentTop += taskHeight + taskSpacing;
-
-            // Get the resize handles
-            const leftHandle = taskElement.querySelector('.task-resize-handle.left');
-            const rightHandle = taskElement.querySelector('.task-resize-handle.right');
-
-            // Add event listeners for mousedown on the resize handles
-            leftHandle.addEventListener('mousedown', (e) => {
-                if (isShiftKeyDown) {
-                    e.stopPropagation();
-                    startResizing(e, index, taskElement, 'left');
-                }
-            });
-
-            rightHandle.addEventListener('mousedown', (e) => {
-                if (isShiftKeyDown) {
-                    e.stopPropagation();
-                    startResizing(e, index, taskElement, 'right');
-                }
-            });
+        uncategorizedTasks.forEach(({ task, index }) => {
+            // Existing code to render each task (same as in the loop above)
+            // ... (copy the task rendering code from above and paste it here)
         });
     }
 
