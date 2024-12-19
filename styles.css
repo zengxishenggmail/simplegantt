@@ -535,8 +535,9 @@ input[type="color"] {
     margin: 5% auto;
     padding: 20px 30px;
     border: none;
-    width: 90%;
+    width: 80%;
     max-width: 700px;
+    min-width: 300px;
     max-height: 80vh;
     overflow-y: auto;
     border-radius: 8px;
@@ -556,21 +557,20 @@ input[type="color"] {
 /* Form styles within modal */
 .modal .form-group {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
     margin-bottom: 15px;
 }
 
 .modal .form-group label {
-    flex: 0 0 150px;
-    margin-right: 10px;
+    margin-bottom: 5px;
     font-weight: 500;
 }
 
 .modal .form-group input,
 .modal .form-group select,
 .modal .form-group textarea {
-    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -651,6 +651,7 @@ fieldset {
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 5px;
+    overflow: hidden;
 }
 
 legend {
@@ -667,14 +668,16 @@ legend {
 
 /* Responsive styles */
 @media (max-width: 768px) {
-    .form-group {
+    .modal .form-group {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .form-group label {
-        margin-bottom: 5px;
-        flex: unset;
+    .modal .form-group label,
+    .modal .form-group input,
+    .modal .form-group select,
+    .modal .form-group textarea {
+        width: 100%;
     }
 }
 
@@ -974,4 +977,11 @@ legend {
     display: block;
     margin-top: 5px;
     color: #666;
+}
+* {
+    box-sizing: border-box;
+}
+
+.modal {
+    overflow-y: auto;
 }
