@@ -399,11 +399,9 @@ function renderGanttChart(projectData) {
         ganttChart.appendChild(currentDayIndicator);
     }
 
-    const timeScale = renderTimeScale(projectStartDate, projectEndDate);
-    ganttChart.appendChild(timeScale);
-
     const fragment = document.createDocumentFragment();
-    let currentTop = GANTT_CHART_PADDING_TOP; // For positioning tasks
+    const TIME_SCALE_HEIGHT = 60; // The height of the time scale in pixels
+    let currentTop = TIME_SCALE_HEIGHT; // Start rendering tasks below the time scale
 
     // Group tasks by categories
     const tasksByCategory = {};
@@ -539,6 +537,10 @@ function renderGanttChart(projectData) {
 
     // Update chart height
     ganttChart.style.height = `${currentTop}px`;
+
+    // Append the time scale last
+    const timeScale = renderTimeScale(projectStartDate, projectEndDate);
+    ganttChart.appendChild(timeScale);
 }
 
 document.getElementById('ganttChart').addEventListener('click', function(event) {
