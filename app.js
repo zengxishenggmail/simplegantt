@@ -61,12 +61,14 @@ function computeTaskStartDate(index, taskStartDates, projectData, visited = {}) 
     if (task.start) {
         taskStartDate = new Date(task.start + 'T00:00:00Z');
         if (isNaN(taskStartDate.getTime())) {
-            // Invalid date, set to default
-            taskStartDate = new Date('1970-01-01T00:00:00Z');
+            // Invalid date, set to current date
+            const currentDateStr = new Date().toISOString().split('T')[0];
+            taskStartDate = new Date(currentDateStr + 'T00:00:00Z');
         }
     } else {
-        // Default start date if missing
-        taskStartDate = new Date('1970-01-01T00:00:00Z');
+        // Default start date if missing is current date
+        const currentDateStr = new Date().toISOString().split('T')[0];
+        taskStartDate = new Date(currentDateStr + 'T00:00:00Z');
     }
 
     if (task.dependencies && task.dependencies.length > 0) {
@@ -127,7 +129,9 @@ document.getElementById('loadProject').addEventListener('click', async function(
                         task.name = 'Untitled Task';
                     }
                     if (!task.start) {
-                        task.start = '1970-01-01'; // Default start date
+                        // Update to use the current date as default start date
+                        const currentDateStr = new Date().toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+                        task.start = currentDateStr;
                     }
                     if (!task.duration || isNaN(parseInt(task.duration, 10))) {
                         task.duration = 1; // Default duration
@@ -233,7 +237,12 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
 
     // Collect form inputs
     const taskName = document.getElementById('taskName').value.trim();
-    const taskStart = document.getElementById('taskStart').value;
+    let taskStart = document.getElementById('taskStart').value;
+    
+    // If taskStart is empty, use current date
+    if (!taskStart) {
+        taskStart = new Date().toISOString().split('T')[0];
+    }
     const taskDurationValue = document.getElementById('taskDuration').value;
 
     // Validate task start date
@@ -417,10 +426,11 @@ function renderGanttChart(projectData) {
             taskElement.style.height = `${taskHeight}px`;
 
             // Ensure `taskStartDate` is valid
-            const taskStartDate = taskStartDates[index];
+            let taskStartDate = taskStartDates[index];
             if (!taskStartDate || isNaN(taskStartDate.getTime())) {
-                // Set to default date if invalid
-                taskStartDate = new Date('1970-01-01T00:00:00Z');
+                // Set to current date if invalid
+                const currentDateStr = new Date().toISOString().split('T')[0];
+                taskStartDate = new Date(currentDateStr + 'T00:00:00Z');
             }
 
             const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
@@ -580,7 +590,7 @@ function editTask(buttonElement) {
 
     // Ensure defaults for missing properties
     document.getElementById('taskName').value = task.name || '';
-    document.getElementById('taskStart').value = task.start || '';
+    document.getElementById('taskStart').value = task.start || new Date().toISOString().split('T')[0];
     document.getElementById('taskDuration').value = task.duration || 1;
     document.getElementById('taskDescription').value = task.description || '';
     document.getElementById('taskStatus').value = task.status || 'on-track';
