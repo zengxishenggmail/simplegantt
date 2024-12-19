@@ -621,51 +621,73 @@ input[type="color"] {
     opacity: 1;
 }
 
-/* Style for the task details content */
-.modal .task-details-content p {
-    margin-bottom: 10px;
+/* Task Details Modal Styles */
+.task-details-content {
+    padding: 20px;
 }
 
-.modal .task-details-content p strong {
-    display: inline-block;
-    width: 120px;
+.task-details-content h3 {
+    margin-top: 0;
+    font-size: 1.8em;
+    color: var(--secondary-color);
 }
 
-/* ===== Responsive Styles ===== */
-@media (max-width: 600px) {
-    nav {
-        flex-wrap: wrap;
-        gap: 5px;
-    }
-
-    #addTaskForm {
-        grid-template-columns: 1fr;
-    }
-
-    .modal-content {
-        width: 90%;
-        padding: 15px;
-    }
-
-    .modal .tabs {
-        flex-direction: column;
-    }
-
-    .modal .tab-button {
-        margin-bottom: 5px;
-    }
+.task-details-content p {
+    font-size: 1em;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin-bottom: 20px;
 }
 
-/* Style for the status explanation in the task details modal */
-.modal .task-details-content p {
-    margin-bottom: 10px;
+.task-details-content dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: max-content auto;
+    row-gap: 10px;
+    column-gap: 20px;
+}
+
+.task-details-content dt {
+    font-weight: bold;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+}
+
+.task-details-content dt i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+.task-details-content dd {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.task-details-content dd#detailStatusExplanation {
+    margin-bottom: 20px;
+}
+
+.modal-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+.modal .close-button {
+    color: #aaa;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.modal .close-button:hover,
+.modal .close-button:focus {
+    color: black;
+    cursor: pointer;
 }
 
 /* Styles for rendered markdown content */
-.task-details-content p {
-    margin-bottom: 10px;
-}
-
 .task-details-content h1,
 .task-details-content h2,
 .task-details-content h3,
@@ -699,6 +721,33 @@ input[type="color"] {
     display: block;
     padding: 10px;
     overflow-x: auto;
+}
+
+/* Adjust modal dimensions and responsiveness */
+.modal-content {
+    width: 80%;
+    max-width: 700px;
+    padding: 30px;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .task-details-content dl {
+        grid-template-columns: 1fr;
+    }
+
+    .task-details-content dt {
+        margin-top: 10px;
+    }
+}
+
+/* Darker overlay for modal background */
+.modal {
+    background-color: rgba(0, 0, 0, 0.8);
 }
 /* Status indicator styles */
 .status-indicator {

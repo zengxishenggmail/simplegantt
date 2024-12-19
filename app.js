@@ -532,8 +532,14 @@ document.getElementById('ganttChart').addEventListener('click', function(event) 
 function showTaskDetails(taskIndex) {
     const task = projectData.tasks[taskIndex];
     document.getElementById('detailTaskName').textContent = task.name || 'Untitled Task';
+    
+    // Handle missing description
+    const rawDescription = marked.parse(task.description || 'No description.');
+    const sanitizedDescription = DOMPurify.sanitize(rawDescription);
+    document.getElementById('detailTaskDescription').innerHTML = sanitizedDescription;
+
     document.getElementById('detailTaskStart').textContent = task.start || 'Unknown Start Date';
-    document.getElementById('detailTaskDuration').textContent = task.duration || 1;
+    document.getElementById('detailTaskDuration').textContent = (task.duration || 1) + ' days';
     document.getElementById('detailTaskDependencies').textContent = (task.dependencies || [])
         .map(depIndex => projectData.tasks[depIndex]?.name)
         .join(', ') || 'None';
@@ -550,11 +556,6 @@ function showTaskDetails(taskIndex) {
 
     // Display inbound dependencies
     document.getElementById('detailInboundDependencies').textContent = inboundDependencies.join(', ') || 'None';
-
-    // Handle missing description
-    const rawDescription = marked.parse(task.description || 'No description.');
-    const sanitizedDescription = DOMPurify.sanitize(rawDescription);
-    document.getElementById('detailTaskDescription').innerHTML = sanitizedDescription;
 
     // Handle missing status
     document.getElementById('detailTaskStatus').textContent = task.status || 'on-track';
