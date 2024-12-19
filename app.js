@@ -558,7 +558,9 @@ function renderGanttChart(projectData) {
         const milestoneElement = document.createElement('div');
         milestoneElement.classList.add('milestone');
         milestoneElement.style.left = `${daysFromStart * pixelsPerDay}px`;
-        milestoneElement.style.top = '0'; // Adjust vertical position as needed
+        // Position the milestone below the time scale
+        const milestoneTop = TIME_SCALE_HEIGHT / 2 - 12; // Adjust based on icon size
+        milestoneElement.style.top = `${milestoneTop}px`;
 
         // Set milestone color based on category
         let category;
