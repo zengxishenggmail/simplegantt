@@ -340,6 +340,11 @@ function renderTimeScale(projectStartDate, projectEndDate) {
     timeScale.classList.add('time-scale');
 
     const days = (projectEndDate - projectStartDate) / (1000 * 60 * 60 * 24);
+
+    // Calculate the total width of the timescale
+    const totalWidth = (days + 1) * pixelsPerDay;
+    timeScale.style.width = `${totalWidth}px`;
+
     for (let i = 0; i <= days; i++) {
         const date = new Date(projectStartDate.getTime() + i * 24 * 60 * 60 * 1000);
 
