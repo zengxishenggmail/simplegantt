@@ -538,6 +538,19 @@ function showTaskDetails(taskIndex) {
         .map(depIndex => projectData.tasks[depIndex]?.name)
         .join(', ') || 'None';
 
+    // Compute inbound dependencies (tasks that depend on this task)
+    const inboundDependencies = projectData.tasks
+        .map((otherTask, idx) => {
+            if (Array.isArray(otherTask.dependencies) && otherTask.dependencies.includes(taskIndex)) {
+                return otherTask.name || 'Untitled Task';
+            }
+            return null;
+        })
+        .filter(taskName => taskName !== null);
+
+    // Display inbound dependencies
+    document.getElementById('detailInboundDependencies').textContent = inboundDependencies.join(', ') || 'None';
+
     // Handle missing description
     const rawDescription = marked.parse(task.description || 'No description.');
     const sanitizedDescription = DOMPurify.sanitize(rawDescription);
