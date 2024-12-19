@@ -7,6 +7,35 @@ let fileHandle;
 let currentMilestoneId = null;
 let currentTaskIndex = null;
 
+// Helper function to detect circular dependencies
+function hasCircularDependency(tasks, currentTaskIndex, visited = new Set()) {
+    if (visited.has(currentTaskIndex)) {
+        return true; // Cycle detected
+    }
+    visited.add(currentTaskIndex);
+
+    const task = tasks[currentTaskIndex];
+    if (!task || !Array.isArray(task.dependencies)) {
+        visited.delete(currentTaskIndex);
+        return false;
+    }
+
+    for (const depIndex of task.dependencies) {
+        if (depIndex === currentTaskIndex) {
+            // Task depends on itself
+            visited.delete(currentTaskIndex);
+            return true;
+        }
+        if (hasCircularDependency(tasks, depIndex, visited)) {
+            visited.delete(currentTaskIndex);
+            return true;
+        }
+    }
+
+    visited.delete(currentTaskIndex);
+    return false;
+}
+
 const projectNameDisplay = document.getElementById('projectNameDisplay');
 const projectNameInput = document.getElementById('projectNameInput');
 const editProjectNameButton = document.getElementById('editProjectNameButton');
@@ -408,8 +437,30 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
         assignedPeople: assignedPeople || []
     };
 
+    // Create a temporary copy of tasks
+    let tempTasks = projectData.tasks.slice(); // Shallow copy of the array
+
+    let currentTaskIndex;
     if (editIndex !== null) {
-        projectData.tasks[parseInt(editIndex, 10)] = task;
+        currentTaskIndex = parseInt(editIndex, 10);
+        // Update the task in tempTasks
+        tempTasks[currentTaskIndex] = task;
+    } else {
+        // Set the index for the new task
+        currentTaskIndex = tempTasks.length;
+        // Add new task to tempTasks
+        tempTasks.push(task);
+    }
+
+    // Check for circular dependencies
+    if (hasCircularDependency(tempTasks, currentTaskIndex)) {
+        formErrorMessage.textContent = 'Circular dependency detected. Please resolve the dependencies.';
+        return; // Terminate the submission
+    }
+
+    // If no circular dependency is detected, proceed to add or update the task
+    if (editIndex !== null) {
+        projectData.tasks[currentTaskIndex] = task;
         submitButton.textContent = 'Add Task';
         submitButton.removeAttribute('data-edit-index');
     } else {
