@@ -364,6 +364,26 @@ function renderTimeScale(projectStartDate, projectEndDate) {
         }
     }
 
+    // Add current date symbol to the time scale
+    const currentDate = new Date(new Date().toISOString().split('T')[0] + 'T00:00:00Z');
+
+    if (currentDate >= projectStartDate && currentDate <= projectEndDate) {
+        const daysFromStartToCurrent = (currentDate - projectStartDate) / (1000 * 60 * 60 * 24);
+        const currentDatePosition = daysFromStartToCurrent * pixelsPerDay;
+
+        const currentDateSymbol = document.createElement('div');
+        currentDateSymbol.classList.add('current-date-symbol');
+        currentDateSymbol.style.left = `${currentDatePosition}px`;
+
+        // Use a symbol or emoji to represent the current date
+        currentDateSymbol.innerHTML = '&#x1F539;'; // Small blue diamond symbol
+
+        currentDateSymbol.style.position = 'absolute';
+        currentDateSymbol.style.top = '0'; // Adjust vertical position as needed
+
+        timeScale.appendChild(currentDateSymbol);
+    }
+
     return timeScale;
 }
 
@@ -407,19 +427,19 @@ function renderGanttChart(projectData) {
         }
     }
 
-    // Add the current day indicator
-    const currentDate = new Date(new Date().toISOString().split('T')[0] + 'T00:00:00Z');
+    // Remove the current day vertical line indicator
+    // const currentDate = new Date(new Date().toISOString().split('T')[0] + 'T00:00:00Z');
 
-    if (currentDate >= projectStartDate && currentDate <= projectEndDate) {
-        const daysFromStartToCurrent = (currentDate - projectStartDate) / (1000 * 60 * 60 * 24);
-        const currentIndicatorPosition = daysFromStartToCurrent * pixelsPerDay;
+    // if (currentDate >= projectStartDate && currentDate <= projectEndDate) {
+    //     const daysFromStartToCurrent = (currentDate - projectStartDate) / (1000 * 60 * 60 * 24);
+    //     const currentIndicatorPosition = daysFromStartToCurrent * pixelsPerDay;
 
-        const currentDayIndicator = document.createElement('div');
-        currentDayIndicator.classList.add('current-day-indicator');
-        currentDayIndicator.style.left = `${currentIndicatorPosition}px`;
+    //     const currentDayIndicator = document.createElement('div');
+    //     currentDayIndicator.classList.add('current-day-indicator');
+    //     currentDayIndicator.style.left = `${currentIndicatorPosition}px`;
 
-        ganttChart.appendChild(currentDayIndicator);
-    }
+    //     ganttChart.appendChild(currentDayIndicator);
+    // }
 
     const fragment = document.createDocumentFragment();
     const TIME_SCALE_HEIGHT = 60; // The height of the time scale in pixels

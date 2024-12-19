@@ -959,6 +959,15 @@ legend {
     border-left: 2px dashed lightgreen;
     z-index: 2; /* Ensure it appears above other elements */
 }
+
+.current-date-symbol {
+    position: absolute;
+    top: 10px; /* Adjust to position the symbol vertically within the time scale */
+    transform: translateX(-50%);
+    font-size: 16px; /* Adjust size as needed */
+    z-index: 10; /* Ensure it appears above other elements */
+    pointer-events: none; /* Allows clicks to pass through to underlying elements if needed */
+}
 /* Person Items Styles */
 .person-item {
     display: flex;
