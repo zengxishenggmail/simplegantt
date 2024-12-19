@@ -535,9 +535,6 @@ function renderGanttChart(projectData) {
 
     ganttChart.appendChild(fragment);
 
-    // Update chart height
-    ganttChart.style.height = `${currentTop}px`;
-
     // Append the time scale last
     const timeScale = renderTimeScale(projectStartDate, projectEndDate);
     ganttChart.appendChild(timeScale);

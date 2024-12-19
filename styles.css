@@ -215,7 +215,7 @@ main {
     overflow-y: auto;
     white-space: nowrap;
     cursor: grab;
-    max-height: calc(100vh - 200px); /* Limit height to viewport height minus 200px */
+    height: calc(100vh - 200px); /* Set height to viewport height minus 200px */
 }
 
 #ganttChart.grabbing {
