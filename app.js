@@ -2,7 +2,12 @@
 // This ensures backward compatibility with files created in previous versions of the app.
 
 let projectData = { projectName: 'Untitled Project', categories: [], tasks: [], people: [], milestones: [] };
-const emojiList = ['🚀', '🎉', '📅', '✅', '❗', '⭐', '🔥', '🛠️', '📈', '💡', '⚠️', '❌', '🏁', '⏰'];
+const emojiList = [
+    '🚀', '🎉', '📅', '✅', '❗', '⭐', '🔥', '🛠️', '📈', '💡', '⚠️', '❌',
+    '🏁', '⏰', '🎁', '🔔', '💯', '📌', '🚩', '🎯', '🏆', '🧩', '📚', '📖',
+    '🔑', '🔒', '🧭', '🌟', '💎', '🗺️', '⛳', '🏠', '🚦', '📣', '📝', '✏️',
+    '📂', '📊', '🗃️', '💻', '📱', '🖥️', '🧮', '⚙️', '🔧', '🔨', '🛡️'
+];
 
 function populateEmojiGrid(selectedEmoji) {
     const emojiGrid = document.getElementById('milestoneEmojiGrid');
