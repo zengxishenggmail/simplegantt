@@ -1077,3 +1077,18 @@ legend {
 #milestoneModal .modal-content {
     /* Add any specific styles if needed */
 }
+
+.milestone-details-content button {
+    background-color: var(--secondary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin-right: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.milestone-details-content button:hover {
+    background-color: var(--secondary-color-dark);
+}

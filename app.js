@@ -4,6 +4,7 @@
 let projectData = { projectName: 'Untitled Project', categories: [], tasks: [], people: [], milestones: [] };
 const CATEGORY_HEADING_HEIGHT = 30; // Adjust as needed
 let fileHandle;
+let currentMilestoneId = null;
 
 const projectNameDisplay = document.getElementById('projectNameDisplay');
 const projectNameInput = document.getElementById('projectNameInput');
@@ -1461,15 +1462,31 @@ document.getElementById('addMilestoneForm').addEventListener('submit', async fun
     // Clear error message
     formErrorMessage.textContent = '';
 
-    const milestone = {
-        id: Date.now(),
-        name: milestoneName,
-        date: milestoneDate,
-        categoryId: milestoneCategoryId,
-        description: milestoneDescription
-    };
+    const editId = event.target.getAttribute('data-edit-id');
 
-    projectData.milestones.push(milestone);
+    if (editId) {
+        // Update existing milestone
+        const milestone = projectData.milestones.find(m => m.id === parseInt(editId, 10));
+        if (milestone) {
+            milestone.name = milestoneName;
+            milestone.date = milestoneDate;
+            milestone.categoryId = milestoneCategoryId;
+            milestone.description = milestoneDescription;
+        }
+        // Reset form state
+        event.target.removeAttribute('data-edit-id');
+        milestoneModalTitle.textContent = 'Add Milestone';
+    } else {
+        // Add new milestone
+        const milestone = {
+            id: Date.now(),
+            name: milestoneName,
+            date: milestoneDate,
+            categoryId: milestoneCategoryId,
+            description: milestoneDescription
+        };
+        projectData.milestones.push(milestone);
+    }
 
     // Update the chart
     renderGanttChart(projectData);
@@ -1481,6 +1498,7 @@ document.getElementById('addMilestoneForm').addEventListener('submit', async fun
 });
 
 function showMilestoneDetails(milestoneId) {
+    currentMilestoneId = milestoneId; // Store the current milestone ID
     const milestone = projectData.milestones.find(m => m.id === milestoneId);
     if (!milestone) return;
 
@@ -1521,6 +1539,61 @@ window.addEventListener('click', (event) => {
         milestoneDetailsModal.style.display = 'none';
     }
 });
+
+// Get references to the edit and delete buttons
+const editMilestoneButton = document.getElementById('editMilestoneButton');
+const deleteMilestoneButton = document.getElementById('deleteMilestoneButton');
+
+// Event listener for the Edit button
+editMilestoneButton.addEventListener('click', () => {
+    if (currentMilestoneId !== null) {
+        editMilestone(currentMilestoneId);
+        milestoneDetailsModal.style.display = 'none';
+    }
+});
+
+// Event listener for the Delete button
+deleteMilestoneButton.addEventListener('click', async () => {
+    if (currentMilestoneId !== null) {
+        await deleteMilestone(currentMilestoneId);
+        milestoneDetailsModal.style.display = 'none';
+    }
+});
+
+function editMilestone(milestoneId) {
+    const milestone = projectData.milestones.find(m => m.id === milestoneId);
+    if (!milestone) return;
+
+    // Switch modal title to 'Edit Milestone'
+    milestoneModalTitle.textContent = 'Edit Milestone';
+
+    // Populate the form with existing milestone data
+    document.getElementById('milestoneName').value = milestone.name;
+    document.getElementById('milestoneDate').value = milestone.date;
+    document.getElementById('milestoneDescription').value = milestone.description || '';
+
+    // Set the selected category
+    document.getElementById('milestoneCategory').value = milestone.categoryId || '';
+
+    // Set a data attribute to indicate edit mode
+    document.getElementById('addMilestoneForm').setAttribute('data-edit-id', milestoneId);
+
+    // Open the milestone modal
+    milestoneModal.style.display = 'block';
+}
+
+async function deleteMilestone(milestoneId) {
+    const confirmDelete = confirm('Are you sure you want to delete this milestone?');
+    if (!confirmDelete) return;
+
+    // Remove milestone from projectData
+    projectData.milestones = projectData.milestones.filter(m => m.id !== milestoneId);
+
+    // Update the Gantt chart
+    renderGanttChart(projectData);
+
+    await saveProjectData(projectData, true);
+}
 
 function updateMilestoneCategoryOptions() {
     const categorySelect = document.getElementById('milestoneCategory');
