@@ -16,6 +16,82 @@ function updateProjectNameDisplay() {
     projectNameInput.value = projectData.projectName || 'Untitled Project';
 }
 
+function startResizing(e, taskIndex, taskElem, direction) {
+    isResizing = true;
+    resizeTaskIndex = taskIndex;
+    resizeTaskElement = taskElem;
+    resizeDirection = direction;
+    initialMouseX = e.clientX;
+    const task = projectData.tasks[taskIndex];
+    initialTaskStart = new Date(task.start + 'T00:00:00Z');
+    initialTaskDuration = task.duration;
+
+    // Prevent text selection
+    document.body.style.userSelect = 'none';
+    ganttChart.classList.add('resizing');
+}
+
+function resizeTask(e) {
+    const deltaX = e.clientX - initialMouseX;
+    const deltaDays = Math.round(deltaX / pixelsPerDay);
+
+    const task = projectData.tasks[resizeTaskIndex];
+
+    // Check for dependency constraints
+    let isValid = true;
+
+    if (resizeDirection === 'left') {
+        // Adjust start date and duration
+        const newStartDate = new Date(initialTaskStart.getTime() + deltaDays * 24 * 60 * 60 * 1000);
+        const newDuration = initialTaskDuration - deltaDays;
+
+        if (newDuration >= 1) {
+            // For adjusting start date
+            const dependencies = task.dependencies || [];
+            dependencies.forEach(depIndex => {
+                const depTask = projectData.tasks[depIndex];
+                const depEndDate = new Date(depTask.start + 'T00:00:00Z');
+                depEndDate.setDate(depEndDate.getDate() + depTask.duration);
+                if (newStartDate < depEndDate) {
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                task.start = newStartDate.toISOString().split('T')[0];
+                task.duration = newDuration;
+
+                // Update the task element position and width
+                resizeTaskElement.style.left = `${(newStartDate - projectStartDate) / (1000 * 60 * 60 * 24) * pixelsPerDay}px`;
+                resizeTaskElement.style.width = `${task.duration * pixelsPerDay}px`;
+            }
+        }
+    } else if (resizeDirection === 'right') {
+        // Adjust duration
+        const newDuration = initialTaskDuration + deltaDays;
+        if (newDuration >= 1) {
+            task.duration = newDuration;
+
+            // Update the task element width
+            resizeTaskElement.style.width = `${task.duration * pixelsPerDay}px`;
+        }
+    }
+}
+
+function stopResizing(e) {
+    isResizing = false;
+    resizeTaskIndex = null;
+    resizeTaskElement = null;
+    resizeDirection = null;
+    document.body.style.userSelect = '';
+    ganttChart.classList.remove('resizing');
+
+    // Re-render the chart to adjust dependencies and positions
+    renderGanttChart(projectData);
+    // Save project data
+    saveProjectData(projectData, true);
+}
+
 // When the edit button is clicked
 editProjectNameButton.addEventListener('click', () => {
     projectNameDisplay.style.display = 'none';
@@ -50,6 +126,31 @@ let startX = 0;
 let startY = 0;
 let scrollLeft = 0;
 let scrollTop = 0;
+
+let isShiftKeyDown = false;
+let isResizing = false;
+let resizeTaskIndex = null;
+let resizeTaskElement = null;
+let resizeDirection = null; // 'left' or 'right'
+let initialMouseX = 0;
+let initialTaskStart = null;
+let initialTaskDuration = 0;
+let projectStartDate;
+
+// Add these event listeners to track the Shift key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Shift') {
+        isShiftKeyDown = true;
+        document.body.classList.add('shift-key-down');
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    if (e.key === 'Shift') {
+        isShiftKeyDown = false;
+        document.body.classList.remove('shift-key-down');
+    }
+});
 
 
 function computeTaskStartDate(index, taskStartDates, projectData, visited = {}) {
@@ -551,11 +652,13 @@ function renderGanttChart(projectData) {
 
             taskElement.innerHTML = `
                 ${statusIndicatorHTML}
+                <div class="task-resize-handle left"></div>
                 <span class="task-name">${taskName}${assignmentDisplay}</span>
                 <div class="task-buttons">
                     <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
                     <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
                 </div>
+                <div class="task-resize-handle right"></div>
             `;
             taskElement.setAttribute('role', 'button');
             taskElement.setAttribute('tabindex', '0');
@@ -572,6 +675,25 @@ function renderGanttChart(projectData) {
 
             fragment.appendChild(taskElement);
             currentTop += taskHeight + taskSpacing;
+
+            // Get the resize handles
+            const leftHandle = taskElement.querySelector('.task-resize-handle.left');
+            const rightHandle = taskElement.querySelector('.task-resize-handle.right');
+
+            // Add event listeners for mousedown on the resize handles
+            leftHandle.addEventListener('mousedown', (e) => {
+                if (isShiftKeyDown) {
+                    e.stopPropagation();
+                    startResizing(e, index, taskElement, 'left');
+                }
+            });
+
+            rightHandle.addEventListener('mousedown', (e) => {
+                if (isShiftKeyDown) {
+                    e.stopPropagation();
+                    startResizing(e, index, taskElement, 'right');
+                }
+            });
         });
     }
 
@@ -808,6 +930,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mouse events
     ganttChart.addEventListener('mousedown', (e) => {
+        if (isResizing || isShiftKeyDown) return; // Do not initiate panning if resizing or Shift is down
         if (e.target !== ganttChart) return; // Only initiate panning when clicking on empty space
         isPanning = true;
         startX = e.pageX - ganttChart.offsetLeft;
@@ -840,6 +963,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Touch events for mobile devices
     ganttChart.addEventListener('touchstart', (e) => {
+        if (isResizing || isShiftKeyDown) return; // Do not initiate panning if resizing or Shift is down
         if (e.target !== ganttChart) return;
         isPanning = true;
         startX = e.touches[0].pageX - ganttChart.offsetLeft;
@@ -862,6 +986,19 @@ document.addEventListener('DOMContentLoaded', () => {
     ganttChart.addEventListener('touchend', () => {
         isPanning = false;
         ganttChart.classList.remove('grabbing');
+    });
+
+    // Add event listeners for resizing
+    document.addEventListener('mousemove', (e) => {
+        if (isResizing) {
+            resizeTask(e);
+        }
+    });
+
+    document.addEventListener('mouseup', (e) => {
+        if (isResizing) {
+            stopResizing(e);
+        }
     });
 
     // Get references to the zoom controls

@@ -240,6 +240,44 @@ main {
     padding-right: 5px; /* Space between content and buttons */
 }
 
+.task-resize-handle {
+    position: absolute;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    cursor: ew-resize;
+    z-index: 2;
+    display: none; /* Hidden by default */
+    background-color: transparent; /* Optional: make handles transparent */
+}
+
+.task-resize-handle.left {
+    left: 0;
+}
+
+.task-resize-handle.right {
+    right: 0;
+}
+
+/* Show resize handles when Shift key is held down */
+body.shift-key-down .task-resize-handle {
+    display: block;
+}
+
+/* Change cursor when hovering over resize handles */
+body.shift-key-down .task-resize-handle:hover {
+    cursor: ew-resize;
+}
+
+/* Change cursor to 'default' when Shift is held down */
+body.shift-key-down #ganttChart {
+    cursor: default;
+}
+
+#ganttChart.resizing {
+    cursor: ew-resize !important;
+}
+
 .category-heading {
     position: absolute;
     font-weight: 500;
