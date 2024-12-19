@@ -1642,35 +1642,32 @@ function renderCategoriesList() {
     categoriesList.appendChild(categoryItem);
   });
 
-  // Check if Sortable instance already exists
-  if (!window.categorySortableInstance) {
-    window.categorySortableInstance = new Sortable(
-      document.getElementById("categoriesList"),
-      {
-        animation: 150,
-        onEnd: () => {
-          // Get the new order of category IDs
-          const newOrder = Array.from(
-            document.querySelectorAll("#categoriesList .category-item")
-          ).map((item) => parseInt(item.getAttribute("data-category-id"), 10));
-
-          // Reorder projectData.categories based on the new order
-          projectData.categories.sort((a, b) => {
-            return newOrder.indexOf(a.id) - newOrder.indexOf(b.id);
-          });
-
-          // Save the updated projectData
-          saveProjectData(projectData, true);
-
-          // Re-render the Gantt chart to reflect the new category order
-          renderGanttChart(projectData);
-        },
-      }
-    );
-  } else {
-    // If already initialized, just reload the list
-    window.categorySortableInstance.reload();
+  // Destroy existing Sortable instance if it exists
+  if (window.categorySortableInstance) {
+    window.categorySortableInstance.destroy();
   }
+
+  // Initialize a new Sortable instance
+  window.categorySortableInstance = new Sortable(categoriesList, {
+    animation: 150,
+    onEnd: () => {
+      // Get the new order of category IDs
+      const newOrder = Array.from(
+        document.querySelectorAll("#categoriesList .category-item")
+      ).map((item) => parseInt(item.getAttribute("data-category-id"), 10));
+
+      // Reorder projectData.categories based on the new order
+      projectData.categories.sort((a, b) => {
+        return newOrder.indexOf(a.id) - newOrder.indexOf(b.id);
+      });
+
+      // Save the updated projectData
+      saveProjectData(projectData, true);
+
+      // Re-render the Gantt chart to reflect the new category order
+      renderGanttChart(projectData);
+    },
+  });
 }
 
 function editCategory(categoryId) {
