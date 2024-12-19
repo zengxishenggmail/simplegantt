@@ -812,8 +812,8 @@ input[type="color"] {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 2px; /* Adjust thickness as needed */
-    background-color: red; /* Color for the current day indicator */
+    width: 0;
+    border-left: 2px dashed lightgreen;
     z-index: 2; /* Ensure it appears above other elements */
 }
 /* Person Items Styles */
