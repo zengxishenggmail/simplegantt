@@ -283,9 +283,9 @@ body.shift-key-down .task-bar .task-buttons {
     display: none;
 }
 
-/* Hide tooltips when Shift key is held down */
+/* Completely hide tooltips when Shift key is held down */
 body.shift-key-down .task-bar[data-tooltip]:hover::after {
-    content: '';
+    content: none;
 }
 
 .category-heading {
