@@ -1,3 +1,6 @@
+// NOTE: When displaying, creating, or updating items, always handle missing properties gracefully.
+// This ensures backward compatibility with files created in previous versions of the app.
+
 let projectData = { projectName: 'Untitled Project', categories: [], tasks: [], people: [] };
 const CATEGORY_HEADING_HEIGHT = 30; // Adjust as needed
 let fileHandle;
@@ -52,7 +55,19 @@ function computeTaskStartDate(index, taskStartDates, projectData, visited = {}) 
     visited[index] = true;
 
     const task = projectData.tasks[index];
-    let taskStartDate = new Date(task.start + 'T00:00:00Z');
+
+    // Ensure `task.start` exists and is valid
+    let taskStartDate;
+    if (task.start) {
+        taskStartDate = new Date(task.start + 'T00:00:00Z');
+        if (isNaN(taskStartDate.getTime())) {
+            // Invalid date, set to default
+            taskStartDate = new Date('1970-01-01T00:00:00Z');
+        }
+    } else {
+        // Default start date if missing
+        taskStartDate = new Date('1970-01-01T00:00:00Z');
+    }
 
     if (task.dependencies && task.dependencies.length > 0) {
         const latestDependencyEnd = task.dependencies.reduce((latestDate, depIndex) => {
@@ -90,6 +105,49 @@ document.getElementById('loadProject').addEventListener('click', async function(
 
             try {
                 projectData = jsyaml.load(yamlText);
+
+                // Initialize `projectName` if it's undefined or empty
+                if (!projectData.projectName || projectData.projectName.trim() === '') {
+                    projectData.projectName = 'Untitled Project';
+                }
+
+                // Initialize tasks array if it's not an array
+                if (!Array.isArray(projectData.tasks)) {
+                    projectData.tasks = [];
+                    console.warn('Project data did not contain tasks array. Initialized as empty.');
+                }
+
+                // Initialize properties for each task
+                projectData.tasks.forEach(task => {
+                    if (!Array.isArray(task.dependencies)) {
+                        task.dependencies = [];
+                    }
+                    // Initialize missing task properties for backward compatibility
+                    if (!task.name) {
+                        task.name = 'Untitled Task';
+                    }
+                    if (!task.start) {
+                        task.start = '1970-01-01'; // Default start date
+                    }
+                    if (!task.duration || isNaN(parseInt(task.duration, 10))) {
+                        task.duration = 1; // Default duration
+                    }
+                    if (!task.categoryId) {
+                        task.categoryId = null;
+                    }
+                    if (!task.description) {
+                        task.description = '';
+                    }
+                    if (!task.status) {
+                        task.status = 'on-track';
+                    }
+                    if (!task.statusExplanation) {
+                        task.statusExplanation = '';
+                    }
+                    if (!Array.isArray(task.assignedPeople)) {
+                        task.assignedPeople = [];
+                    }
+                });
             } catch (parseError) {
                 console.error('YAML Parsing Error:', parseError);
                 throw new Error('Failed to parse YAML: ' + parseError.message);
@@ -224,12 +282,12 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
         name: taskName,
         start: taskStart,
         duration: taskDuration,
-        dependencies: dependencies,
-        categoryId: categoryId,
-        description: taskDescription,
-        status: taskStatus,
-        statusExplanation: statusExplanation,
-        assignedPeople: assignedPeople
+        dependencies: dependencies || [],
+        categoryId: categoryId || null,
+        description: taskDescription || '',
+        status: taskStatus || 'on-track',
+        statusExplanation: statusExplanation || '',
+        assignedPeople: assignedPeople || []
     };
 
     if (editIndex !== null) {
@@ -351,10 +409,20 @@ function renderGanttChart(projectData) {
             const taskElement = document.createElement('div');
             taskElement.classList.add('task-bar');
 
-            taskElement.style.width = `${task.duration * pixelsPerDay}px`;
+            // Use default values for missing properties
+            const taskName = task.name || 'Untitled Task';
+            const taskDuration = task.duration || 1; // Default duration of 1 day
+
+            taskElement.style.width = `${taskDuration * pixelsPerDay}px`;
             taskElement.style.height = `${taskHeight}px`;
 
+            // Ensure `taskStartDate` is valid
             const taskStartDate = taskStartDates[index];
+            if (!taskStartDate || isNaN(taskStartDate.getTime())) {
+                // Set to default date if invalid
+                taskStartDate = new Date('1970-01-01T00:00:00Z');
+            }
+
             const daysFromStart = (taskStartDate - projectStartDate) / (1000 * 60 * 60 * 24);
 
             taskElement.style.left = `${daysFromStart * pixelsPerDay}px`;
@@ -364,21 +432,21 @@ function renderGanttChart(projectData) {
             taskElement.style.backgroundColor = category ? category.color : '#999';
 
             const tooltipContent = `
-                Name: ${task.name}
+                Name: ${taskName}
                 Start: ${taskStartDate.toISOString().split('T')[0]}
-                Duration: ${task.duration} days
-                Dependencies: ${task.dependencies.map(depIndex => projectData.tasks[depIndex]?.name).join(', ') || 'None'}
+                Duration: ${taskDuration} days
+                Dependencies: ${(task.dependencies || []).map(depIndex => projectData.tasks[depIndex]?.name).join(', ') || 'None'}
             `;
 
             taskElement.setAttribute('data-tooltip', tooltipContent);
 
-            const taskEndDate = new Date(taskStartDate.getTime() + task.duration * 24 * 60 * 60 * 1000);
+            const taskEndDate = new Date(taskStartDate.getTime() + taskDuration * 24 * 60 * 60 * 1000);
 
-            let displayStatus = task.status;
+            let displayStatus = task.status || 'on-track';
             const currentDate = new Date();
 
             // If current date is past the task's end date and task is not scrapped or finished
-            if (currentDate > taskEndDate && task.status !== 'scrapped' && task.status !== 'finished') {
+            if (currentDate > taskEndDate && displayStatus !== 'scrapped' && displayStatus !== 'finished') {
                 displayStatus = 'high risk';
             }
 
@@ -413,7 +481,7 @@ function renderGanttChart(projectData) {
 
             taskElement.innerHTML = `
                 ${statusIndicatorHTML}
-                <span class="task-name">${task.name}${assignmentDisplay}</span>
+                <span class="task-name">${taskName}${assignmentDisplay}</span>
                 <div class="task-buttons">
                     <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
                     <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
@@ -453,26 +521,28 @@ document.getElementById('ganttChart').addEventListener('click', function(event) 
 
 function showTaskDetails(taskIndex) {
     const task = projectData.tasks[taskIndex];
-    document.getElementById('detailTaskName').textContent = task.name;
-    document.getElementById('detailTaskStart').textContent = task.start;
-    document.getElementById('detailTaskDuration').textContent = task.duration;
-    document.getElementById('detailTaskDependencies').textContent = task.dependencies
+    document.getElementById('detailTaskName').textContent = task.name || 'Untitled Task';
+    document.getElementById('detailTaskStart').textContent = task.start || 'Unknown Start Date';
+    document.getElementById('detailTaskDuration').textContent = task.duration || 1;
+    document.getElementById('detailTaskDependencies').textContent = (task.dependencies || [])
         .map(depIndex => projectData.tasks[depIndex]?.name)
         .join(', ') || 'None';
-    // Parse and sanitize the task description
+
+    // Handle missing description
     const rawDescription = marked.parse(task.description || 'No description.');
     const sanitizedDescription = DOMPurify.sanitize(rawDescription);
     document.getElementById('detailTaskDescription').innerHTML = sanitizedDescription;
 
-    document.getElementById('detailTaskStatus').textContent = task.status;
+    // Handle missing status
+    document.getElementById('detailTaskStatus').textContent = task.status || 'on-track';
 
-    // Parse and sanitize the status explanation
+    // Handle missing status explanation
     const rawStatusExplanation = marked.parse(task.statusExplanation || 'No status explanation.');
     const sanitizedStatusExplanation = DOMPurify.sanitize(rawStatusExplanation);
     document.getElementById('detailStatusExplanation').innerHTML = sanitizedStatusExplanation;
 
     // Display assigned people
-    document.getElementById('detailAssignedPeople').textContent = task.assignedPeople
+    document.getElementById('detailAssignedPeople').textContent = (task.assignedPeople || [])
         .map(personId => projectData.people.find(p => p.id === personId)?.name)
         .join(', ') || 'None';
 
@@ -508,22 +578,23 @@ function editTask(buttonElement) {
     updateCategoryOptions();
     updatePeopleOptions();
 
-    document.getElementById('taskName').value = task.name;
-    document.getElementById('taskStart').value = task.start;
-    document.getElementById('taskDuration').value = task.duration;
+    // Ensure defaults for missing properties
+    document.getElementById('taskName').value = task.name || '';
+    document.getElementById('taskStart').value = task.start || '';
+    document.getElementById('taskDuration').value = task.duration || 1;
     document.getElementById('taskDescription').value = task.description || '';
     document.getElementById('taskStatus').value = task.status || 'on-track';
     document.getElementById('statusExplanation').value = task.statusExplanation || '';
 
-    // Pre-select dependencies using Choices.js
-    choices.setChoiceByValue(task.dependencies.map(String));
+    // Pre-select dependencies
+    choices.setChoiceByValue((task.dependencies || []).map(String));
 
-    // Pre-select assigned people using Choices.js
-    peopleChoices.setChoiceByValue(task.assignedPeople.map(String));
+    // Pre-select assigned people
+    peopleChoices.setChoiceByValue((task.assignedPeople || []).map(String));
 
     // Set the selected category
     const categorySelect = document.getElementById('taskCategory');
-    categorySelect.value = task.categoryId;
+    categorySelect.value = task.categoryId || '';
 
     const submitButton = document.querySelector('#addTaskForm button[type="submit"]');
     submitButton.textContent = 'Update Task';
@@ -868,7 +939,7 @@ function renderCategoriesList() {
         colorIndicator.style.backgroundColor = category.color;
 
         const categoryName = document.createElement('span');
-        categoryName.textContent = category.name;
+        categoryName.textContent = category.name || 'Unnamed Category';
 
         const editButton = document.createElement('button');
         editButton.innerHTML = '<i class="fas fa-edit"></i>';
@@ -1034,7 +1105,7 @@ function renderPeopleList() {
         personItem.classList.add('person-item');
 
         const personName = document.createElement('span');
-        personName.textContent = person.name;
+        personName.textContent = person.name || 'Unnamed Person';
 
         const editButton = document.createElement('button');
         editButton.innerHTML = '<i class="fas fa-edit"></i>';
