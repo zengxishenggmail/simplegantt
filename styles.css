@@ -208,9 +208,9 @@ main {
 
 /* ===== Gantt Chart Styles ===== */
 #ganttChart {
+    position: relative;  /* Establish a containing block for sticky positioning */
     margin-top: 20px;
     border: 1px solid #ccc;
-    position: relative;
     padding-top: 60px;  /* Space for the time scale */
     overflow-x: auto;
     overflow-y: auto;
@@ -417,12 +417,12 @@ button i {
 }
 
 .time-scale {
-    position: absolute;
-    top: 0;
+    position: sticky;    /* Make the time scale sticky */
+    top: 0;              /* Stick it to the top of its container */
+    z-index: 2;          /* Ensure it stays above other elements */
     left: 0;
     right: 0;
     height: 60px;
-    z-index: 1;
     background-color: var(--background-color);
     border-bottom: 1px solid #ccc;
 }
