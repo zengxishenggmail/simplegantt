@@ -43,6 +43,12 @@ let taskHeight = 30;   // For vertical zoom
 let taskSpacing = 5;
 const GANTT_CHART_PADDING_TOP = 60; // This should match the padding-top in styles.css
 
+let isPanning = false;
+let startX = 0;
+let startY = 0;
+let scrollLeft = 0;
+let scrollTop = 0;
+
 
 function computeTaskStartDate(index, taskStartDates, projectData, visited = {}) {
     if (taskStartDates[index]) {
@@ -516,6 +522,14 @@ function renderGanttChart(projectData) {
             taskElement.setAttribute('aria-label', `Task: ${task.name}`);
             taskElement.setAttribute('data-index', index);
 
+            taskElement.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+            });
+
+            taskElement.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+            });
+
             fragment.appendChild(taskElement);
             currentTop += taskHeight + taskSpacing;
         });
@@ -691,6 +705,66 @@ document.addEventListener('DOMContentLoaded', () => {
         shouldSort: false,
         searchResultLimit: 10,
         placeholderValue: 'Assign people...',
+    });
+
+    const ganttChart = document.getElementById('ganttChart');
+
+    // Mouse events
+    ganttChart.addEventListener('mousedown', (e) => {
+        if (e.target !== ganttChart) return; // Only initiate panning when clicking on empty space
+        isPanning = true;
+        startX = e.pageX - ganttChart.offsetLeft;
+        startY = e.pageY - ganttChart.offsetTop;
+        scrollLeft = ganttChart.scrollLeft;
+        scrollTop = ganttChart.scrollTop;
+        ganttChart.classList.add('grabbing');
+    });
+
+    ganttChart.addEventListener('mousemove', (e) => {
+        if (!isPanning) return;
+        e.preventDefault();
+        const x = e.pageX - ganttChart.offsetLeft;
+        const y = e.pageY - ganttChart.offsetTop;
+        const walkX = (x - startX);
+        const walkY = (y - startY);
+        ganttChart.scrollLeft = scrollLeft - walkX;
+        ganttChart.scrollTop = scrollTop - walkY;
+    });
+
+    ganttChart.addEventListener('mouseup', () => {
+        isPanning = false;
+        ganttChart.classList.remove('grabbing');
+    });
+
+    ganttChart.addEventListener('mouseleave', () => {
+        isPanning = false;
+        ganttChart.classList.remove('grabbing');
+    });
+
+    // Touch events for mobile devices
+    ganttChart.addEventListener('touchstart', (e) => {
+        if (e.target !== ganttChart) return;
+        isPanning = true;
+        startX = e.touches[0].pageX - ganttChart.offsetLeft;
+        startY = e.touches[0].pageY - ganttChart.offsetTop;
+        scrollLeft = ganttChart.scrollLeft;
+        scrollTop = ganttChart.scrollTop;
+        ganttChart.classList.add('grabbing');
+    });
+
+    ganttChart.addEventListener('touchmove', (e) => {
+        if (!isPanning) return;
+        const x = e.touches[0].pageX - ganttChart.offsetLeft;
+        const y = e.touches[0].pageY - ganttChart.offsetTop;
+        const walkX = (x - startX);
+        const walkY = (y - startY);
+        ganttChart.scrollLeft = scrollLeft - walkX;
+        ganttChart.scrollTop = scrollTop - walkY;
+    });
+
+    ganttChart.addEventListener('touchend', () => {
+        isPanning = false;
+        ganttChart.classList.remove('grabbing');
     });
 
     // Get references to the zoom controls

@@ -215,6 +215,11 @@ main {
     overflow-x: auto;
     overflow-y: auto;
     white-space: nowrap;
+    cursor: grab;
+}
+
+#ganttChart.grabbing {
+    cursor: grabbing;
 }
 
 .task-bar {
