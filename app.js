@@ -1186,8 +1186,23 @@ function editPerson(personId) {
 }
 
 function deletePerson(personId) {
-    const confirmDelete = confirm('Are you sure you want to delete this person?');
-    if (!confirmDelete) return;
+    // Check if the person is assigned to any tasks
+    const assignedTasks = projectData.tasks.filter(task => {
+        return Array.isArray(task.assignedPeople) && task.assignedPeople.includes(personId);
+    });
+
+    if (assignedTasks.length > 0) {
+        // List assigned tasks
+        const taskNames = assignedTasks.map(task => `\n- ${task.name || 'Untitled Task'}`).join('');
+        const confirmDelete = confirm(
+            `This person is assigned to the following tasks:${taskNames}\n\n` +
+            'Are you sure you want to delete this person? Their assignments will be removed from these tasks.'
+        );
+        if (!confirmDelete) return;
+    } else {
+        const confirmDelete = confirm('Are you sure you want to delete this person?');
+        if (!confirmDelete) return;
+    }
 
     // Remove person from projectData
     projectData.people = projectData.people.filter(p => p.id !== personId);
