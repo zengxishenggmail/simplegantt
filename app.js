@@ -305,6 +305,11 @@ document.getElementById('loadProject').addEventListener('click', async function(
                 projectData.people = [];
             }
 
+            // Initialize `milestones` if it's undefined (for backward compatibility with older project files)
+            if (!Array.isArray(projectData.milestones)) {
+                projectData.milestones = [];
+            }
+
             console.log('Loaded projectData:', projectData);
 
             if (!projectData || typeof projectData !== 'object') {
@@ -543,6 +548,11 @@ function renderGanttChart(projectData) {
     if (!projectData || !Array.isArray(projectData.tasks)) {
         console.error('Invalid project data provided to renderGanttChart.');
         return;
+    }
+
+    // Ensure `projectData.milestones` is an array
+    if (!Array.isArray(projectData.milestones)) {
+        projectData.milestones = [];
     }
 
     const ganttChart = document.getElementById('ganttChart');
@@ -1525,7 +1535,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else {
         // No saved project data; use default empty projectData
-        projectData = { projectName: 'Untitled Project', tasks: [], categories: [], people: [] };
+        projectData = { projectName: 'Untitled Project', tasks: [], categories: [], people: [], milestones: [] };
         updateProjectNameDisplay();
         updateCategoryOptions();
         renderCategoriesList();
