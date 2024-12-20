@@ -616,11 +616,13 @@ document
     // If no circular dependency is detected, proceed to add or update the task
     if (editIndex !== null) {
       projectData.tasks[currentTaskIndex] = task;
-      submitButton.textContent = "Add Task";
-      submitButton.removeAttribute("data-edit-index");
     } else {
       projectData.tasks.push(task);
     }
+
+    // Reset the submit button for future use
+    submitButton.textContent = "Add Task";
+    submitButton.removeAttribute("data-edit-index");
 
     renderGanttChart(projectData);
     updateDependenciesOptions();
@@ -1154,9 +1156,7 @@ function editTask(taskIndex) {
   const categorySelect = document.getElementById("taskCategory");
   categorySelect.value = task.categoryId || "";
 
-  const submitButton = document.querySelector(
-    '#addTaskForm button[type="submit"]'
-  );
+  const submitButton = document.querySelector('#addTaskForm button[type="submit"]');
   submitButton.textContent = "Update Task";
   submitButton.setAttribute("data-edit-index", taskIndex);
 
@@ -1778,6 +1778,10 @@ function updateCategoryOptions() {
 
 openTaskModalButton.addEventListener("click", () => {
   modalTitle.textContent = "Add Task";
+  // Reset submit button text to 'Add Task'
+  document.querySelector('#addTaskForm button[type="submit"]').textContent = 'Add Task';
+  // Ensure data-edit-index attribute is removed
+  document.querySelector('#addTaskForm button[type="submit"]').removeAttribute('data-edit-index');
   // Include all tasks as potential dependencies
   updateDependenciesOptions();
   updateCategoryOptions();
