@@ -70,6 +70,9 @@
           <button id="managePeopleButton" class="header-button">
             <i class="fas fa-users"></i> Manage People
           </button>
+          <button id="openSettingsModal" class="header-button">
+            <i class="fas fa-cog"></i> Settings
+          </button>
         </div>
         <!-- Zoom Controls moved here -->
         <div class="zoom-controls">
@@ -394,6 +397,25 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Settings</h2>
+        <form id="settingsForm">
+          <div class="form-group">
+            <label for="timeScaleUnit">Time Scale Unit:</label>
+            <select id="timeScaleUnit" required>
+              <option value="days">Days</option>
+              <option value="weeks">Weeks</option>
+              <option value="months">Months</option>
+            </select>
+            <small>Select how the time scale is displayed in the chart.</small>
+          </div>
+          <button type="submit">Save Settings</button>
+        </form>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

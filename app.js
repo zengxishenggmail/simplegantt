@@ -251,6 +251,7 @@ let initialMouseX = 0;
 let initialTaskStart = null;
 let initialTaskDuration = 0;
 let projectStartDate;
+let timeScaleUnit = 'days'; // Default unit for time scale display: 'days', 'weeks', or 'months'
 
 // Add these event listeners to track the Shift key
 document.addEventListener("keydown", (e) => {
@@ -653,23 +654,27 @@ function renderTimeScale(projectStartDate, projectEndDate) {
   const timeScale = document.createElement("div");
   timeScale.classList.add("time-scale");
 
-  const days = (projectEndDate - projectStartDate) / (1000 * 60 * 60 * 24);
+  const days = Math.ceil((projectEndDate - projectStartDate) / (1000 * 60 * 60 * 24));
 
   // Calculate the total width of the timescale
   const totalWidth = (days + 1) * pixelsPerDay;
   timeScale.style.width = `${totalWidth}px`;
 
-  for (let i = 0; i <= days; i++) {
-    const date = new Date(projectStartDate.getTime() + i * 24 * 60 * 60 * 1000);
+  // Clear any existing grid lines and labels
+  // (Assuming this function is called fresh each time)
 
-    // Create vertical grid lines
-    const daySeparator = document.createElement("div");
-    daySeparator.classList.add("day-separator");
-    daySeparator.style.left = `${i * pixelsPerDay}px`;
-    timeScale.appendChild(daySeparator);
+  if (timeScaleUnit === 'days') {
+    // Render days
+    for (let i = 0; i <= days; i++) {
+      const date = new Date(projectStartDate.getTime() + i * 24 * 60 * 60 * 1000);
 
-    // Add date labels at intervals
-    if (i % 7 === 0 || i === 0 || i === days) {
+      // Create vertical grid lines
+      const daySeparator = document.createElement("div");
+      daySeparator.classList.add("day-separator");
+      daySeparator.style.left = `${i * pixelsPerDay}px`;
+      timeScale.appendChild(daySeparator);
+
+      // Add date labels at every day
       const dateLabel = document.createElement("div");
       dateLabel.classList.add("date-label");
       dateLabel.style.left = `${i * pixelsPerDay}px`;
@@ -678,6 +683,62 @@ function renderTimeScale(projectStartDate, projectEndDate) {
         day: "numeric",
       });
       timeScale.appendChild(dateLabel);
+    }
+  } else if (timeScaleUnit === 'weeks') {
+    // Render weeks
+    // Find the Sunday before or equal to projectStartDate
+    const startDate = new Date(projectStartDate);
+    startDate.setDate(startDate.getDate() - startDate.getDay()); // Set to Sunday (week start)
+
+    let date = new Date(startDate);
+    while (date <= projectEndDate) {
+      const daysFromStart = (date - projectStartDate) / (1000 * 60 * 60 * 24);
+      const position = daysFromStart * pixelsPerDay;
+
+      // Create vertical grid lines
+      const weekSeparator = document.createElement("div");
+      weekSeparator.classList.add("day-separator");
+      weekSeparator.style.left = `${position}px`;
+      timeScale.appendChild(weekSeparator);
+
+      // Add week label
+      const dateLabel = document.createElement("div");
+      dateLabel.classList.add("date-label");
+      dateLabel.style.left = `${position}px`;
+      dateLabel.textContent = `Week of ${date.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      })}`;
+      timeScale.appendChild(dateLabel);
+
+      // Advance to next week
+      date.setDate(date.getDate() + 7);
+    }
+  } else if (timeScaleUnit === 'months') {
+    // Render months
+    const currentDate = new Date(projectStartDate.getFullYear(), projectStartDate.getMonth(), 1);
+    while (currentDate <= projectEndDate) {
+      const daysFromStart = (currentDate - projectStartDate) / (1000 * 60 * 60 * 24);
+      const position = daysFromStart * pixelsPerDay;
+
+      // Create vertical grid lines
+      const monthSeparator = document.createElement("div");
+      monthSeparator.classList.add("day-separator");
+      monthSeparator.style.left = `${position}px`;
+      timeScale.appendChild(monthSeparator);
+
+      // Add month label
+      const dateLabel = document.createElement("div");
+      dateLabel.classList.add("date-label");
+      dateLabel.style.left = `${position}px`;
+      dateLabel.textContent = currentDate.toLocaleDateString(undefined, {
+        month: "long",
+        year: "numeric",
+      });
+      timeScale.appendChild(dateLabel);
+
+      // Advance to next month
+      currentDate.setMonth(currentDate.getMonth() + 1);
     }
   }
 
@@ -2235,6 +2296,40 @@ const closeMilestoneDetailsModalButton =
   milestoneDetailsModal.querySelector(".close-button");
 closeMilestoneDetailsModalButton.addEventListener("click", () => {
   milestoneDetailsModal.style.display = "none";
+});
+
+// Get references to the settings modal elements
+const settingsModal = document.getElementById("settingsModal");
+const openSettingsModalButton = document.getElementById("openSettingsModal");
+const closeSettingsModalButton = settingsModal.querySelector(".close-button");
+
+// Open the settings modal when the button is clicked
+openSettingsModalButton.addEventListener("click", () => {
+  // Set the current value in the select input
+  document.getElementById("timeScaleUnit").value = timeScaleUnit;
+  settingsModal.style.display = "block";
+});
+
+// Close the settings modal when the close button is clicked
+closeSettingsModalButton.addEventListener("click", () => {
+  settingsModal.style.display = "none";
+});
+
+// Close the settings modal when clicking outside of it
+window.addEventListener("click", (event) => {
+  if (event.target === settingsModal) {
+    settingsModal.style.display = "none";
+  }
+});
+
+document.getElementById("settingsForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const selectedUnit = document.getElementById("timeScaleUnit").value;
+  timeScaleUnit = selectedUnit;
+  // Close the modal
+  settingsModal.style.display = "none";
+  // Re-render the chart with the new time scale unit
+  renderGanttChart(projectData);
 });
 
 // Close the modal when clicking outside of it
