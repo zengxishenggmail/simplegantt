@@ -33,8 +33,8 @@ const emojiList = [
   "📝",
 ];
 
-const filePathDisplay = document.getElementById("filePathDisplay");
-const lastEditedDisplay = document.getElementById("lastEditedDisplay");
+let filePathDisplay;
+let lastEditedDisplay;
 
 function updateStatusBar(lastEdited = null) {
   if (fileHandle && fileHandle.name) {
@@ -1208,6 +1208,10 @@ let choices;
 let peopleChoices;
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Assign DOM elements after the content has loaded
+  filePathDisplay = document.getElementById("filePathDisplay");
+  lastEditedDisplay = document.getElementById("lastEditedDisplay");
+
   choices = new Choices("#taskDependencies", {
     removeItemButton: true,
     shouldSort: false,
@@ -1861,6 +1865,9 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStatusBar();
   }
 });
+
+// Ensure updateStatusBar is accessible outside DOMContentLoaded if needed
+window.updateStatusBar = updateStatusBar;
 function getStatusClass(status) {
   switch (status) {
     case "on-track":
