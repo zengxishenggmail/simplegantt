@@ -723,6 +723,10 @@ function updateCategoryFilterOptions() {
 
   categoryFilterChoices.clearChoices();
   categoryFilterChoices.setChoices(choicesList, 'value', 'label', false);
+
+  // Ensure all categories are selected
+  const allValues = choicesList.map(choice => choice.value);
+  categoryFilterChoices.setValue(allValues);
 }
 
 function renderGanttChart(projectData) {
@@ -1290,6 +1294,11 @@ document.addEventListener("DOMContentLoaded", () => {
     searchResultLimit: 10,
   });
 
+  // Add event listener to re-render the chart when the category selection changes
+  categoryFilterChoices.passedElement.element.addEventListener('change', () => {
+    renderGanttChart(projectData);
+  });
+
   const ganttChart = document.getElementById("ganttChart");
 
   // Mouse events
@@ -1479,8 +1488,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Update UI and save data
       renderCategoriesList();
       updateCategoryOptions();
+      updateCategoryFilterOptions(); // Refresh the category filter dropdown
       renderGanttChart(projectData);
-      updateCategoryFilterOptions();
       saveProjectData(projectData, true);
 
       // Reset the form
@@ -1826,6 +1835,7 @@ function deleteCategory(categoryId) {
 
   renderCategoriesList();
   updateCategoryOptions();
+  updateCategoryFilterOptions(); // Refresh the category filter dropdown
   renderGanttChart(projectData);
   saveProjectData(projectData, true);
 }
