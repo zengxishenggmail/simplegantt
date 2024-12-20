@@ -469,6 +469,13 @@ button i {
     white-space: nowrap;
 }
 
+/* Add styles for month labels to display them horizontally */
+.date-label.month-label {
+    transform: none; /* Remove rotation */
+    top: 20px;       /* Adjust vertical position if needed */
+    font-size: 0.9em; /* Optional: Adjust font size */
+}
+
 .day-separator {
     position: absolute;
     top: 0;

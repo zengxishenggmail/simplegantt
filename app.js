@@ -231,6 +231,17 @@ projectNameInput.addEventListener("keyup", (event) => {
   }
 });
 
+function getISOWeekNumber(date) {
+  const tempDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  // Set to nearest Thursday: current date + 4 - current day number
+  tempDate.setUTCDate(tempDate.getUTCDate() + 4 - (tempDate.getUTCDay() || 7));
+  // Get first day of the year
+  const yearStart = new Date(Date.UTC(tempDate.getUTCFullYear(), 0, 1));
+  // Calculate full weeks to the nearest Thursday
+  const weekNo = Math.ceil(((tempDate - yearStart) / 86400000 + 1) / 7);
+  return weekNo;
+}
+
 let pixelsPerDay = 30; // For horizontal zoom
 let taskHeight = 30; // For vertical zoom
 let taskSpacing = 5;
@@ -674,21 +685,26 @@ function renderTimeScale(projectStartDate, projectEndDate) {
       daySeparator.style.left = `${i * pixelsPerDay}px`;
       timeScale.appendChild(daySeparator);
 
-      // Add date labels at every day
-      const dateLabel = document.createElement("div");
-      dateLabel.classList.add("date-label");
-      dateLabel.style.left = `${i * pixelsPerDay}px`;
-      dateLabel.textContent = date.toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-      });
-      timeScale.appendChild(dateLabel);
+      // Add date labels every 7 days
+      if (i % 7 === 0) {
+        const dateLabel = document.createElement("div");
+        dateLabel.classList.add("date-label");
+        dateLabel.style.left = `${i * pixelsPerDay}px`;
+        dateLabel.textContent = date.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+        });
+        timeScale.appendChild(dateLabel);
+      }
     }
   } else if (timeScaleUnit === 'weeks') {
     // Render weeks
-    // Find the Sunday before or equal to projectStartDate
+
+    // Adjust start date to the Monday before or equal to projectStartDate
     const startDate = new Date(projectStartDate);
-    startDate.setDate(startDate.getDate() - startDate.getDay()); // Set to Sunday (week start)
+    const day = startDate.getDay();
+    const diff = (day === 0 ? -6 : 1 - day); // Adjust when day is Sunday
+    startDate.setDate(startDate.getDate() + diff);
 
     let date = new Date(startDate);
     while (date <= projectEndDate) {
@@ -701,14 +717,14 @@ function renderTimeScale(projectStartDate, projectEndDate) {
       weekSeparator.style.left = `${position}px`;
       timeScale.appendChild(weekSeparator);
 
+      // Calculate Swedish (ISO) week number
+      const weekNumber = getISOWeekNumber(date);
+
       // Add week label
       const dateLabel = document.createElement("div");
       dateLabel.classList.add("date-label");
       dateLabel.style.left = `${position}px`;
-      dateLabel.textContent = `Week of ${date.toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-      })}`;
+      dateLabel.textContent = `W.${weekNumber}`;
       timeScale.appendChild(dateLabel);
 
       // Advance to next week
@@ -727,9 +743,9 @@ function renderTimeScale(projectStartDate, projectEndDate) {
       monthSeparator.style.left = `${position}px`;
       timeScale.appendChild(monthSeparator);
 
-      // Add month label
+      // Add month label with an additional class
       const dateLabel = document.createElement("div");
-      dateLabel.classList.add("date-label");
+      dateLabel.classList.add("date-label", "month-label"); // Add 'month-label' class
       dateLabel.style.left = `${position}px`;
       dateLabel.textContent = currentDate.toLocaleDateString(undefined, {
         month: "long",
