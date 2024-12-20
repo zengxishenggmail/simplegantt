@@ -1061,9 +1061,11 @@ function renderGanttChart(projectData) {
         }
 
         taskElement.innerHTML = `
-                    ${statusIndicatorHTML}
+                    <div class="task-content">
+                        ${statusIndicatorHTML}
+                        <span class="task-name">${taskName}${assignmentDisplay}</span>
+                    </div>
                     <div class="task-resize-handle left"></div>
-                    <span class="task-name">${taskName}${assignmentDisplay}</span>
                     <div class="task-buttons">
                         <button class="edit-task" data-index="${index}"><i class="fas fa-edit"></i></button>
                         <button class="delete-task" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
