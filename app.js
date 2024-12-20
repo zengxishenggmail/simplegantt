@@ -1480,7 +1480,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderCategoriesList();
       updateCategoryOptions();
       renderGanttChart(projectData);
-      updateCategoryFilterOptions(); // Add this line
+      updateCategoryFilterOptions();
       saveProjectData(projectData, true);
 
       // Reset the form
@@ -1502,7 +1502,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Now render the chart and update dependencies options
   renderGanttChart(projectData);
   updateDependenciesOptions();
-  renderCategoryFilter();
+  updateCategoryFilterOptions();
 });
 
 function updateDependenciesOptions(excludeIndex = null) {
