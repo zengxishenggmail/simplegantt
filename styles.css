@@ -1316,3 +1316,24 @@ legend {
   border: 1px solid #ccc;
   z-index: 1001;
 }
+
+/* Category Filter Styles */
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.category-filter label {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+  font-weight: normal;
+}
+
+.category-filter input[type="checkbox"] {
+  margin-right: 5px;
+}

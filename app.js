@@ -706,6 +706,65 @@ function renderTimeScale(projectStartDate, projectEndDate) {
   return timeScale;
 }
 
+function renderCategoryFilter() {
+  const categoryFilterDiv = document.getElementById('categoryFilter');
+  categoryFilterDiv.innerHTML = ''; // Clear existing content
+
+  // Add a label for the filter section
+  const filterLabel = document.createElement('span');
+  filterLabel.textContent = 'Filter by Category:';
+  filterLabel.style.marginRight = '10px';
+  categoryFilterDiv.appendChild(filterLabel);
+
+  // Create a checkbox for each category
+  projectData.categories.forEach(category => {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `filter-category-${category.id}`;
+    checkbox.value = category.id;
+    checkbox.checked = true; // All categories are shown by default
+
+    // Event listener to re-render the chart when checkbox state changes
+    checkbox.addEventListener('change', () => {
+      renderGanttChart(projectData);
+    });
+
+    const label = document.createElement('label');
+    label.htmlFor = checkbox.id;
+    label.textContent = category.name;
+
+    // Wrap the checkbox and label in a container
+    const container = document.createElement('div');
+    container.classList.add('checkbox-container');
+    container.appendChild(checkbox);
+    container.appendChild(label);
+
+    categoryFilterDiv.appendChild(container);
+  });
+
+  // Add a checkbox for 'Uncategorized' tasks
+  const uncategorizedCheckbox = document.createElement('input');
+  uncategorizedCheckbox.type = 'checkbox';
+  uncategorizedCheckbox.id = 'filter-category-uncategorized';
+  uncategorizedCheckbox.value = 'uncategorized';
+  uncategorizedCheckbox.checked = true;
+
+  uncategorizedCheckbox.addEventListener('change', () => {
+    renderGanttChart(projectData);
+  });
+
+  const uncategorizedLabel = document.createElement('label');
+  uncategorizedLabel.htmlFor = uncategorizedCheckbox.id;
+  uncategorizedLabel.textContent = 'Uncategorized';
+
+  const uncategorizedContainer = document.createElement('div');
+  uncategorizedContainer.classList.add('checkbox-container');
+  uncategorizedContainer.appendChild(uncategorizedCheckbox);
+  uncategorizedContainer.appendChild(uncategorizedLabel);
+
+  categoryFilterDiv.appendChild(uncategorizedContainer);
+}
+
 function renderGanttChart(projectData) {
   if (!projectData || !Array.isArray(projectData.tasks)) {
     console.error("Invalid project data provided to renderGanttChart.");
@@ -723,21 +782,67 @@ function renderGanttChart(projectData) {
   if (projectData.tasks.length === 0 && projectData.milestones.length === 0)
     return;
 
+  // Get selected categories
+  const selectedCategoryIds = [];
+  projectData.categories.forEach(category => {
+    const checkbox = document.getElementById(`filter-category-${category.id}`);
+    if (checkbox && checkbox.checked) {
+      selectedCategoryIds.push(category.id);
+    }
+  });
+
+  // Check if 'Uncategorized' is selected
+  const uncategorizedCheckbox = document.getElementById('filter-category-uncategorized');
+  const showUncategorized = uncategorizedCheckbox ? uncategorizedCheckbox.checked : false;
+
   const taskStartDates = {};
   projectData.tasks.forEach((task, index) => {
     computeTaskStartDate(index, taskStartDates, projectData);
   });
 
-  const startDates = Object.values(taskStartDates).map((date) => date);
-  const endDates = projectData.tasks.map((task, index) => {
-    const startDate = taskStartDates[index];
-    return new Date(startDate.getTime() + task.duration * 24 * 60 * 60 * 1000);
+  // Group tasks by categories (only include tasks from selected categories)
+  const tasksByCategory = {};
+  projectData.tasks.forEach((task, index) => {
+    // Use 'uncategorized' for tasks without a categoryId
+    const categoryId = (task.categoryId !== undefined && task.categoryId !== null) ? task.categoryId : 'uncategorized';
+
+    // Check if the category is selected
+    if ((categoryId === 'uncategorized' && showUncategorized) ||
+        (categoryId !== 'uncategorized' && selectedCategoryIds.includes(categoryId))) {
+
+      if (!tasksByCategory[categoryId]) {
+        tasksByCategory[categoryId] = [];
+      }
+      tasksByCategory[categoryId].push({ task, index });
+    }
+  });
+
+  // Collect start and end dates of displayed tasks
+  const startDates = [];
+  const endDates = [];
+
+  Object.values(tasksByCategory).forEach(taskArray => {
+    taskArray.forEach(({ task, index }) => {
+      const startDate = taskStartDates[index];
+      const endDate = new Date(startDate.getTime() + task.duration * 24 * 60 * 60 * 1000);
+      startDates.push(startDate);
+      endDates.push(endDate);
+    });
   });
 
   // Collect milestone dates
   const milestoneDates = projectData.milestones.map(
     (milestone) => new Date(milestone.date + "T00:00:00Z")
   );
+
+  if (startDates.length === 0) {
+    ganttChart.innerHTML = ''; // Clear the chart
+    const noTasksMessage = document.createElement('div');
+    noTasksMessage.textContent = 'No tasks to display. Please select at least one category.';
+    noTasksMessage.style.padding = '20px';
+    ganttChart.appendChild(noTasksMessage);
+    return; // Exit the function early
+  }
 
   let startDate = new Date(Math.min(...startDates));
   let endDate = new Date(Math.max(...endDates));
@@ -760,20 +865,6 @@ function renderGanttChart(projectData) {
   const fragment = document.createDocumentFragment();
   const TIME_SCALE_HEIGHT = 60; // The height of the time scale in pixels
   let currentTop = TIME_SCALE_HEIGHT; // Start rendering tasks below the time scale
-
-  // Group tasks by categories
-  const tasksByCategory = {};
-  projectData.tasks.forEach((task, index) => {
-    // Use 'uncategorized' for tasks without a categoryId
-    const categoryId =
-      task.categoryId !== undefined && task.categoryId !== null
-        ? task.categoryId
-        : "uncategorized";
-    if (!tasksByCategory[categoryId]) {
-      tasksByCategory[categoryId] = [];
-    }
-    tasksByCategory[categoryId].push({ task, index });
-  });
 
   // Sort tasks within each category by starting date
   Object.keys(tasksByCategory).forEach((categoryId) => {
@@ -1446,6 +1537,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Now render the chart and update dependencies options
   renderGanttChart(projectData);
   updateDependenciesOptions();
+  renderCategoryFilter();
 });
 
 function updateDependenciesOptions(excludeIndex = null) {
@@ -1783,6 +1875,7 @@ function updateCategoryOptions() {
     option.textContent = category.name;
     categorySelect.appendChild(option);
   });
+  renderCategoryFilter();
 }
 
 openTaskModalButton.addEventListener("click", () => {
