@@ -164,7 +164,21 @@ main {
 }
 
 /* ===== Gantt Chart Styles ===== */
+main {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 90px); /* Adjust based on header and status bar height */
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
 #ganttChart {
+    flex: 1; /* Allow the chart to fill the remaining space */
     position: relative;
     margin-top: 20px;
     border: 1px solid #ccc;
@@ -172,7 +186,10 @@ main {
     overflow-y: auto;
     white-space: nowrap;
     cursor: grab;
-    height: calc(100vh - 200px); /* Set height to viewport height minus 200px */
+}
+
+#categoryFilter {
+    margin-bottom: 10px; /* Add spacing below the dropdown */
 }
 
 #ganttChart.grabbing {
