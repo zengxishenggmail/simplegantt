@@ -1840,7 +1840,7 @@ function updateCategoryOptions() {
     option.textContent = category.name;
     categorySelect.appendChild(option);
   });
-  renderCategoryFilter();
+  updateCategoryFilterOptions();
 }
 
 openTaskModalButton.addEventListener("click", () => {
