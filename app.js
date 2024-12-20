@@ -1612,6 +1612,12 @@ openMilestoneModalButton.addEventListener("click", () => {
   const defaultEmoji = "🚩";
   document.getElementById("milestoneEmoji").value = defaultEmoji;
   populateEmojiGrid(defaultEmoji);
+
+  // Reset submit button text to 'Add Milestone'
+  document.querySelector('#addMilestoneForm button[type="submit"]').textContent = 'Add Milestone';
+  // Ensure data-edit-id attribute is removed
+  document.getElementById('addMilestoneForm').removeAttribute('data-edit-id');
+
   milestoneModal.style.display = "block";
 });
 
@@ -2075,6 +2081,8 @@ document
       // Reset form state
       event.target.removeAttribute("data-edit-id");
       milestoneModalTitle.textContent = "Add Milestone";
+      // Reset submit button text to 'Add Milestone'
+      document.querySelector('#addMilestoneForm button[type="submit"]').textContent = 'Add Milestone';
     } else {
       // Add new milestone
       const milestone = {
@@ -2200,6 +2208,9 @@ function editMilestone(milestoneId) {
   const selectedEmoji = milestone.emoji || "🚩"; // Use default if not set
   document.getElementById("milestoneEmoji").value = selectedEmoji;
   populateEmojiGrid(selectedEmoji);
+
+  // Update submit button text to 'Update Milestone'
+  document.querySelector('#addMilestoneForm button[type="submit"]').textContent = 'Update Milestone';
 
   // Open the milestone modal
   milestoneModal.style.display = "block";
