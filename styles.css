@@ -699,6 +699,15 @@ input[type="color"] {
     transform: translateY(-2px);
 }
 
+/* Specific styles for Task modal submit buttons */
+#taskModal button[type="submit"] {
+    background-color: var(--primary-color);
+}
+
+#taskModal button[type="submit"]:hover {
+    background-color: var(--primary-color-light);
+}
+
 .modal button[type="submit"]:active {
     transform: translateY(0);
 }
