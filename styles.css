@@ -211,8 +211,27 @@ main {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     z-index: 1; /* Ensure tasks are below the time scale */
     min-width: 100px; /* Adjust this value as needed */
-    overflow: visible; /* Allow content to overflow if necessary */
+    overflow: hidden; /* Hide overflowing content */
     padding-right: 5px; /* Space between content and buttons */
+}
+
+.task-content {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: transform 0.1s linear;
+}
+
+.task-bar::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+    pointer-events: none;
 }
 
 .task-resize-handle {
@@ -430,6 +449,12 @@ button i {
 .task-buttons {
     display: flex;
     gap: 5px;
+}
+
+.task-bar .task-buttons {
+    display: flex;
+    margin-left: auto;
+    z-index: 1; /* Ensure buttons are above task-content */
 }
 
 .task-bar button {

@@ -207,6 +207,36 @@ function stopResizing(e) {
   saveProjectData(projectData, true);
 }
 
+function handleScroll() {
+    const ganttChartRect = ganttChart.getBoundingClientRect();
+
+    // Select all task bars
+    const taskBars = ganttChart.querySelectorAll('.task-bar');
+
+    taskBars.forEach(taskBar => {
+        const taskBarRect = taskBar.getBoundingClientRect();
+        const taskContent = taskBar.querySelector('.task-content');
+        const taskButtons = taskBar.querySelector('.task-buttons');
+
+        if (taskContent && taskButtons) {
+            // Calculate the amount the task bar is hidden to the left
+            const offset = ganttChartRect.left - taskBarRect.left;
+
+            // Calculate the maximum offset to prevent overlapping with the buttons
+            const maxOffset = Math.max(0, taskBarRect.width - taskButtons.offsetWidth - taskContent.offsetWidth);
+
+            if (offset > 0) {
+                // Task bar is partially hidden to the left
+                const adjustedOffset = Math.min(offset, maxOffset);
+                taskContent.style.transform = `translateX(${adjustedOffset}px)`;
+            } else {
+                // Reset the transform when the task bar is fully visible
+                taskContent.style.transform = 'translateX(0)';
+            }
+        }
+    });
+}
+
 // When the edit button is clicked
 editProjectNameButton.addEventListener("click", () => {
   projectNameDisplay.style.display = "none";
@@ -1416,6 +1446,8 @@ document.addEventListener("DOMContentLoaded", () => {
     isPanning = false;
     ganttChart.classList.remove("grabbing");
   });
+
+  ganttChart.addEventListener('scroll', handleScroll);
 
   // Touch events for mobile devices
   ganttChart.addEventListener("touchstart", (e) => {
