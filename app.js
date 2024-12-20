@@ -775,6 +775,15 @@ function renderGanttChart(projectData) {
     tasksByCategory[categoryId].push({ task, index });
   });
 
+  // Sort tasks within each category by starting date
+  Object.keys(tasksByCategory).forEach((categoryId) => {
+    tasksByCategory[categoryId].sort((a, b) => {
+      const startDateA = taskStartDates[a.index];
+      const startDateB = taskStartDates[b.index];
+      return startDateA - startDateB;
+    });
+  });
+
   // Iterate over categories as per projectData.categories order
   for (const category of projectData.categories) {
     const categoryId = category.id;
