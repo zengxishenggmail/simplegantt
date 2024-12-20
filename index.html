@@ -60,50 +60,52 @@
     </header>
 
     <main>
-      <div class="project-header">
-        <button id="openTaskModal" class="header-button"><i class="fas fa-plus"></i> Add Task</button>
-        <button id="openMilestoneModal" class="header-button"><i class="fas fa-flag"></i> Add Milestone</button>
-        <button id="manageCategoriesButton" class="header-button">
-          <i class="fas fa-tags"></i> Manage Categories
-        </button>
-        <button id="managePeopleButton" class="header-button">
-          <i class="fas fa-users"></i> Manage People
-        </button>
-      </div>
-      <!-- Zoom Controls moved here -->
-      <div class="zoom-controls">
-        <!-- Horizontal Zoom Controls -->
-        <div class="zoom-group">
-          <label for="horizontalZoom">Horizontal Zoom:</label>
-          <input
-            type="range"
-            id="horizontalZoom"
-            min="10"
-            max="100"
-            value="30"
-            step="5"
-          />
-          <span id="horizontalZoomValue">30</span>
+      <div class="main-content">
+        <div class="project-header">
+          <button id="openTaskModal" class="header-button"><i class="fas fa-plus"></i> Add Task</button>
+          <button id="openMilestoneModal" class="header-button"><i class="fas fa-flag"></i> Add Milestone</button>
+          <button id="manageCategoriesButton" class="header-button">
+            <i class="fas fa-tags"></i> Manage Categories
+          </button>
+          <button id="managePeopleButton" class="header-button">
+            <i class="fas fa-users"></i> Manage People
+          </button>
         </div>
-        <!-- Vertical Zoom Controls -->
-        <div class="zoom-group">
-          <label for="verticalZoom">Vertical Zoom:</label>
-          <input
-            type="range"
-            id="verticalZoom"
-            min="10"
-            max="60"
-            value="30"
-            step="5"
-          />
-          <span id="verticalZoomValue">30</span>
+        <!-- Zoom Controls moved here -->
+        <div class="zoom-controls">
+          <!-- Horizontal Zoom Controls -->
+          <div class="zoom-group">
+            <label for="horizontalZoom">Horizontal Zoom:</label>
+            <input
+              type="range"
+              id="horizontalZoom"
+              min="10"
+              max="100"
+              value="30"
+              step="5"
+            />
+            <span id="horizontalZoomValue">30</span>
+          </div>
+          <!-- Vertical Zoom Controls -->
+          <div class="zoom-group">
+            <label for="verticalZoom">Vertical Zoom:</label>
+            <input
+              type="range"
+              id="verticalZoom"
+              min="10"
+              max="60"
+              value="30"
+              step="5"
+            />
+            <span id="verticalZoomValue">30</span>
+          </div>
         </div>
-      </div>
 
-      <!-- Add a multi-select dropdown for category filtering -->
-      <select id="categoryFilter" multiple></select>
-      <div id="statusMessage"></div>
-      <div id="ganttChart"></div>
+        <!-- Add a multi-select dropdown for category filtering -->
+        <select id="categoryFilter" multiple></select>
+        <div id="statusMessage"></div>
+        <div id="ganttChart"></div>
+      </div>
     </main>
 
     <div id="taskModal" class="modal">
