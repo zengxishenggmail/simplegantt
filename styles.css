@@ -469,11 +469,20 @@ button i {
     white-space: nowrap;
 }
 
-/* Add styles for month labels to display them horizontally */
+/* Styles for month labels */
 .date-label.month-label {
-    transform: none; /* Remove rotation */
+    position: absolute;
     top: 20px;       /* Adjust vertical position if needed */
+    transform: none; /* Ensure no rotation is applied */
+    text-align: center; /* Center the text horizontally */
+    width: auto;     /* Allow the width to be set dynamically */
     font-size: 0.9em; /* Optional: Adjust font size */
+}
+
+.day-separator.month-separator {
+    /* Optional: Adjust the appearance of month separators if needed */
+    height: 100%;
+    border-left: 2px solid #ccc;
 }
 
 .day-separator {

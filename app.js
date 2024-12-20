@@ -737,23 +737,29 @@ function renderTimeScale(projectStartDate, projectEndDate) {
       const daysFromStart = (currentDate - projectStartDate) / (1000 * 60 * 60 * 24);
       const position = daysFromStart * pixelsPerDay;
 
-      // Create vertical grid lines
+      // Calculate the number of days in the current month
+      const nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+      const daysInMonth = (nextMonth - currentDate) / (1000 * 60 * 60 * 24);
+      const monthWidth = daysInMonth * pixelsPerDay;
+
+      // Create vertical grid lines for the month
       const monthSeparator = document.createElement("div");
-      monthSeparator.classList.add("day-separator");
+      monthSeparator.classList.add("day-separator", "month-separator");
       monthSeparator.style.left = `${position}px`;
       timeScale.appendChild(monthSeparator);
 
-      // Add month label with an additional class
+      // Create and position the date label
       const dateLabel = document.createElement("div");
-      dateLabel.classList.add("date-label", "month-label"); // Add 'month-label' class
+      dateLabel.classList.add("date-label", "month-label");
       dateLabel.style.left = `${position}px`;
+      dateLabel.style.width = `${monthWidth}px`; // Set the width to span the entire month
       dateLabel.textContent = currentDate.toLocaleDateString(undefined, {
         month: "long",
         year: "numeric",
       });
       timeScale.appendChild(dateLabel);
 
-      // Advance to next month
+      // Advance to the next month
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
   }
