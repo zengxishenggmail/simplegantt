@@ -33,6 +33,25 @@ const emojiList = [
   "📝",
 ];
 
+const filePathDisplay = document.getElementById("filePathDisplay");
+const lastEditedDisplay = document.getElementById("lastEditedDisplay");
+
+function updateStatusBar(lastEdited = null) {
+  if (fileHandle && fileHandle.name) {
+    filePathDisplay.textContent = `File: ${fileHandle.name}`;
+    filePathDisplay.title = fileHandle.name; // Set tooltip to full file name
+  } else {
+    filePathDisplay.textContent = "File: (unsaved project)";
+    filePathDisplay.title = "No file loaded.";
+  }
+
+  if (lastEdited) {
+    lastEditedDisplay.textContent = `Last Edited: ${lastEdited.toLocaleString()}`;
+  } else {
+    lastEditedDisplay.textContent = "";
+  }
+}
+
 function populateEmojiGrid(selectedEmoji) {
   const emojiGrid = document.getElementById("milestoneEmojiGrid");
   emojiGrid.innerHTML = ""; // Clear existing emojis
@@ -433,6 +452,18 @@ document
         // Save project data and file name to localStorage
         localStorage.setItem("projectData", JSON.stringify(projectData));
         localStorage.setItem("fileName", fileHandle.name);
+
+        // Update status bar with file info
+        if (fileHandle && fileHandle.name) {
+          const file = await fileHandle.getFile();
+          const lastModified = new Date(file.lastModified);
+          updateStatusBar(lastModified);
+
+          // Save last edited time to localStorage
+          localStorage.setItem("lastEdited", lastModified.toISOString());
+        } else {
+          updateStatusBar();
+        }
       } catch (error) {
         alert("Failed to load project: " + error.message);
         console.error("Error loading project:", error);
@@ -459,6 +490,9 @@ document
     // Clear localStorage when creating a new project
     localStorage.removeItem("projectData");
     localStorage.removeItem("fileName");
+
+    // Reset status bar
+    updateStatusBar();
   });
 
 document
@@ -1458,6 +1492,13 @@ async function saveProjectData(projectData, autosave = false) {
           ? "Autosaved."
           : "Project saved successfully.";
         statusMessage.style.color = "green";
+
+        // Update status bar with current time
+        const now = new Date();
+        updateStatusBar(now);
+
+        // Save last edited time to localStorage
+        localStorage.setItem("lastEdited", now.toISOString());
       } catch (err) {
         console.error("Error during save:", err);
         statusMessage.textContent = "Error saving project.";
@@ -1810,6 +1851,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // Now render the chart and update dependencies
   renderGanttChart(projectData);
   updateDependenciesOptions();
+
+  // Initialize status bar
+  const savedLastEdited = localStorage.getItem("lastEdited");
+  if (fileHandle && fileHandle.name) {
+    const lastEdited = savedLastEdited ? new Date(savedLastEdited) : null;
+    updateStatusBar(lastEdited);
+  } else {
+    updateStatusBar();
+  }
 });
 function getStatusClass(status) {
   switch (status) {
