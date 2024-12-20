@@ -1341,7 +1341,8 @@ legend {
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
 /* Increase z-index of the Choices.js dropdown */
-.choices__list--dropdown {
-    z-index: 20; /* Ensures it appears above other elements */
+.choices__list[aria-expanded] {
+    z-index: 1000; /* Ensures it appears above other elements */
 }
