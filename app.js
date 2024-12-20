@@ -35,6 +35,7 @@ const emojiList = [
 
 let filePathDisplay;
 let lastEditedDisplay;
+let categoryFilterChoices;
 
 function updateStatusBar(lastEdited = null) {
   if (fileHandle && fileHandle.name) {
@@ -706,63 +707,22 @@ function renderTimeScale(projectStartDate, projectEndDate) {
   return timeScale;
 }
 
-function renderCategoryFilter() {
-  const categoryFilterDiv = document.getElementById('categoryFilter');
-  categoryFilterDiv.innerHTML = ''; // Clear existing content
+function updateCategoryFilterOptions() {
+  const choicesList = projectData.categories.map((category) => ({
+    value: category.id.toString(),
+    label: category.name,
+    selected: true, // All categories selected by default
+  }));
 
-  // Add a label for the filter section
-  const filterLabel = document.createElement('span');
-  filterLabel.textContent = 'Filter by Category:';
-  filterLabel.style.marginRight = '10px';
-  categoryFilterDiv.appendChild(filterLabel);
-
-  // Create a checkbox for each category
-  projectData.categories.forEach(category => {
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = `filter-category-${category.id}`;
-    checkbox.value = category.id;
-    checkbox.checked = true; // All categories are shown by default
-
-    // Event listener to re-render the chart when checkbox state changes
-    checkbox.addEventListener('change', () => {
-      renderGanttChart(projectData);
-    });
-
-    const label = document.createElement('label');
-    label.htmlFor = checkbox.id;
-    label.textContent = category.name;
-
-    // Wrap the checkbox and label in a container
-    const container = document.createElement('div');
-    container.classList.add('checkbox-container');
-    container.appendChild(checkbox);
-    container.appendChild(label);
-
-    categoryFilterDiv.appendChild(container);
+  // Add the 'Uncategorized' option
+  choicesList.push({
+    value: 'uncategorized',
+    label: 'Uncategorized',
+    selected: true,
   });
 
-  // Add a checkbox for 'Uncategorized' tasks
-  const uncategorizedCheckbox = document.createElement('input');
-  uncategorizedCheckbox.type = 'checkbox';
-  uncategorizedCheckbox.id = 'filter-category-uncategorized';
-  uncategorizedCheckbox.value = 'uncategorized';
-  uncategorizedCheckbox.checked = true;
-
-  uncategorizedCheckbox.addEventListener('change', () => {
-    renderGanttChart(projectData);
-  });
-
-  const uncategorizedLabel = document.createElement('label');
-  uncategorizedLabel.htmlFor = uncategorizedCheckbox.id;
-  uncategorizedLabel.textContent = 'Uncategorized';
-
-  const uncategorizedContainer = document.createElement('div');
-  uncategorizedContainer.classList.add('checkbox-container');
-  uncategorizedContainer.appendChild(uncategorizedCheckbox);
-  uncategorizedContainer.appendChild(uncategorizedLabel);
-
-  categoryFilterDiv.appendChild(uncategorizedContainer);
+  categoryFilterChoices.clearChoices();
+  categoryFilterChoices.setChoices(choicesList, 'value', 'label', false);
 }
 
 function renderGanttChart(projectData) {
@@ -782,18 +742,11 @@ function renderGanttChart(projectData) {
   if (projectData.tasks.length === 0 && projectData.milestones.length === 0)
     return;
 
-  // Get selected categories
-  const selectedCategoryIds = [];
-  projectData.categories.forEach(category => {
-    const checkbox = document.getElementById(`filter-category-${category.id}`);
-    if (checkbox && checkbox.checked) {
-      selectedCategoryIds.push(category.id);
-    }
-  });
+  // Get selected categories from the Choices instance
+  const selectedCategoryIds = categoryFilterChoices.getValue(true); // Returns array of selected values as strings
 
-  // Check if 'Uncategorized' is selected
-  const uncategorizedCheckbox = document.getElementById('filter-category-uncategorized');
-  const showUncategorized = uncategorizedCheckbox ? uncategorizedCheckbox.checked : false;
+  // Check if 'uncategorized' is selected
+  const showUncategorized = selectedCategoryIds.includes('uncategorized');
 
   const taskStartDates = {};
   projectData.tasks.forEach((task, index) => {
@@ -804,12 +757,16 @@ function renderGanttChart(projectData) {
   const tasksByCategory = {};
   projectData.tasks.forEach((task, index) => {
     // Use 'uncategorized' for tasks without a categoryId
-    const categoryId = (task.categoryId !== undefined && task.categoryId !== null) ? task.categoryId : 'uncategorized';
+    const categoryId =
+      task.categoryId !== undefined && task.categoryId !== null
+        ? task.categoryId.toString()
+        : 'uncategorized';
 
     // Check if the category is selected
-    if ((categoryId === 'uncategorized' && showUncategorized) ||
-        (categoryId !== 'uncategorized' && selectedCategoryIds.includes(categoryId))) {
-
+    if (
+      (categoryId === 'uncategorized' && showUncategorized) ||
+      selectedCategoryIds.includes(categoryId)
+    ) {
       if (!tasksByCategory[categoryId]) {
         tasksByCategory[categoryId] = [];
       }
@@ -1326,6 +1283,13 @@ document.addEventListener("DOMContentLoaded", () => {
     placeholderValue: "Assign people...",
   });
 
+  categoryFilterChoices = new Choices("#categoryFilter", {
+    removeItemButton: true,
+    shouldSort: false,
+    placeholderValue: "Filter by category...",
+    searchResultLimit: 10,
+  });
+
   const ganttChart = document.getElementById("ganttChart");
 
   // Mouse events
@@ -1516,6 +1480,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderCategoriesList();
       updateCategoryOptions();
       renderGanttChart(projectData);
+      updateCategoryFilterOptions(); // Add this line
       saveProjectData(projectData, true);
 
       // Reset the form
@@ -1934,6 +1899,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateProjectNameDisplay();
     updateCategoryOptions();
     renderCategoriesList();
+    updateCategoryFilterOptions();
 
     const savedFileName = localStorage.getItem("fileName") || "Last Project";
 

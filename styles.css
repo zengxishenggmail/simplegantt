@@ -1318,22 +1318,8 @@ legend {
 }
 
 /* Category Filter Styles */
-.category-filter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: center;
+#categoryFilter {
+  width: 100%;
   margin-top: 20px;
   margin-bottom: 20px;
-}
-
-.category-filter label {
-  display: flex;
-  align-items: center;
-  margin-right: 15px;
-  font-weight: normal;
-}
-
-.category-filter input[type="checkbox"] {
-  margin-right: 5px;
 }
