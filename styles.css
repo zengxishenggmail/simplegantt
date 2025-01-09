@@ -48,6 +48,7 @@ header h1 {
     flex-direction: column;
     gap: 10px;
     margin: 0;
+    margin-bottom: 20px;
     border: 1px solid #ccc;
 }
 
@@ -183,7 +184,6 @@ main {
     display: flex;
     flex-direction: column;
     overflow: visible; /* Allow dropdowns to overflow */
-    padding-bottom: 80px; /* Space for zoom controls */
 }
 
 #ganttChart {
@@ -204,6 +204,10 @@ main {
 
 #ganttChart.grabbing {
     cursor: grabbing;
+}
+
+.choices {
+    margin-bottom: 0px;
 }
 
 .task-bar {
