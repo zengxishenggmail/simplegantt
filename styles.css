@@ -36,11 +36,19 @@ header h1 {
 
 /* Zoom Controls Styling */
 .zoom-controls {
+    position: fixed;
+    bottom: 30px;  /* Position above status bar */
+    left: 10px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     display: flex;
-    gap: 20px;
-    align-items: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    border: 1px solid #ccc;
 }
 
 .zoom-group {
@@ -175,6 +183,7 @@ main {
     display: flex;
     flex-direction: column;
     overflow: visible; /* Allow dropdowns to overflow */
+    padding-bottom: 80px; /* Space for zoom controls */
 }
 
 #ganttChart {
@@ -1159,15 +1168,6 @@ body.fullscreen-mode #ganttChart {
 }
 
 /* Adjust zoom controls positioning in fullscreen mode */
-body.fullscreen-mode .zoom-controls {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    border-radius: 4px;
-}
 /* Milestone styles */
 .milestone {
     position: absolute;
