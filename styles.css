@@ -1155,6 +1155,7 @@ body.fullscreen-mode #categoryFilter {
 body.fullscreen-mode main {
     padding: 0;
     height: 100vh;
+    padding-top: 10px; /* Add minimal padding in fullscreen mode */
 }
 
 body.fullscreen-mode .main-content {
@@ -1168,6 +1169,10 @@ body.fullscreen-mode #ganttChart {
 }
 
 /* Adjust zoom controls positioning in fullscreen mode */
+body.fullscreen-mode .zoom-controls {
+    bottom: 0; /* Remove bottom padding in fullscreen */
+}
+
 /* Milestone styles */
 .milestone {
     position: absolute;
