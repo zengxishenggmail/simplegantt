@@ -4,6 +4,8 @@
 
 SimpleGantt is a lightweight project management tool designed for environments where software installation is restricted and cloud web applications are not permitted. It runs entirely in the browser.
 
+[Try it live here](https://aerugo.github.io/simplegantt/simplegantt), data is saved locally.
+
 # Requirements
 SimpleGantt requires a modern web browser with support for HTML5 and JavaScript. It has been tested on the latest versions of Chrome, Firefox, and Edge. It also depends on a number of third-party libraries which are pulled in via CDN. See the `simplegantt.html` file for the list of dependencies.
 
