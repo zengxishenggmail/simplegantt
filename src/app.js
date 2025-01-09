@@ -487,9 +487,10 @@ document
         }
 
         updateProjectNameDisplay();
+        updateCategoryOptions();
+        updateCategoryFilterOptions();
         updateDependenciesOptions();
         renderGanttChart(projectData);
-        updateCategoryOptions();
         renderCategoriesList();
 
         // Save project data and file name to localStorage
