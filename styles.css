@@ -1134,6 +1134,29 @@ legend {
 .modal {
     overflow-y: auto;
 }
+
+/* ===== Fullscreen Mode Styles ===== */
+body.fullscreen-mode header,
+body.fullscreen-mode .project-header,
+body.fullscreen-mode .zoom-controls,
+body.fullscreen-mode #statusBar,
+body.fullscreen-mode #categoryFilter {
+    display: none;
+}
+
+body.fullscreen-mode main {
+    padding: 0;
+    height: 100vh;
+}
+
+body.fullscreen-mode .main-content {
+    height: 100vh;
+}
+
+body.fullscreen-mode #ganttChart {
+    margin-top: 0;
+    height: 100vh;
+}
 /* Milestone styles */
 .milestone {
     position: absolute;

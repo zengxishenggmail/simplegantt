@@ -1388,6 +1388,21 @@ document.addEventListener("DOMContentLoaded", () => {
   filePathDisplay = document.getElementById("filePathDisplay");
   lastEditedDisplay = document.getElementById("lastEditedDisplay");
 
+  // Get reference to the fullscreen toggle button
+  const toggleFullscreenButton = document.getElementById('toggleFullscreen');
+
+  toggleFullscreenButton.addEventListener('click', () => {
+    // Toggle the 'fullscreen-mode' class on the body
+    document.body.classList.toggle('fullscreen-mode');
+
+    // Change the icon and text depending on the mode
+    if (document.body.classList.contains('fullscreen-mode')) {
+      toggleFullscreenButton.innerHTML = '<i class="fas fa-compress"></i> Exit Fullscreen';
+    } else {
+      toggleFullscreenButton.innerHTML = '<i class="fas fa-expand"></i> Fullscreen';
+    }
+  });
+
   choices = new Choices("#taskDependencies", {
     removeItemButton: true,
     shouldSort: false,
