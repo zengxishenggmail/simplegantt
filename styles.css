@@ -50,6 +50,8 @@ header h1 {
     margin: 0;
     margin-bottom: 20px;
     border: 1px solid #ccc;
+    transition: opacity 0.3s ease;
+    position: relative;
 }
 
 .zoom-group {
@@ -1200,6 +1202,46 @@ body.fullscreen-mode #toggleFullscreen {
 /* Adjust zoom controls positioning in fullscreen mode */
 body.fullscreen-mode .zoom-controls {
     bottom: 0; /* Remove bottom padding in fullscreen */
+}
+
+/* Position and style the zoom toggle button */
+.zoom-toggle-button {
+    position: fixed;
+    bottom: 30px;
+    left: 10px;
+    z-index: 1001;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--secondary-color);
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Hide the zoom toggle button when zoom controls are visible */
+.zoom-controls-visible .zoom-toggle-button {
+    display: none;
+}
+
+/* Hide the zoom controls when not visible */
+.zoom-controls-hidden .zoom-controls {
+    display: none;
+    opacity: 0;
+}
+
+/* Style the hide zoom controls button */
+.hide-zoom-controls-button {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    cursor: pointer;
+    align-self: flex-end;
+    padding: 5px;
+    font-size: 1.2em;
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }
 
 /* Milestone styles */

@@ -1388,6 +1388,39 @@ document.addEventListener("DOMContentLoaded", () => {
   filePathDisplay = document.getElementById("filePathDisplay");
   lastEditedDisplay = document.getElementById("lastEditedDisplay");
 
+  // Initialize zoom controls visibility
+  const zoomControls = document.querySelector('.zoom-controls');
+  const zoomToggleButton = document.getElementById('zoomToggleButton');
+  const hideZoomControlsButton = document.createElement('button');
+
+  // Create a hide button inside the zoom controls
+  hideZoomControlsButton.id = 'hideZoomControlsButton';
+  hideZoomControlsButton.classList.add('hide-zoom-controls-button');
+  hideZoomControlsButton.innerHTML = '<i class="fas fa-times"></i>';
+  hideZoomControlsButton.setAttribute('aria-label', 'Hide zoom controls');
+  zoomControls.appendChild(hideZoomControlsButton);
+
+  // Function to show the zoom controls
+  function showZoomControls() {
+    document.body.classList.add('zoom-controls-visible');
+    document.body.classList.remove('zoom-controls-hidden');
+  }
+
+  // Function to hide the zoom controls
+  function hideZoomControls() {
+    document.body.classList.add('zoom-controls-hidden');
+    document.body.classList.remove('zoom-controls-visible');
+  }
+
+  // Event listener to show zoom controls when the magnifying glass is clicked
+  zoomToggleButton.addEventListener('click', showZoomControls);
+
+  // Event listener to hide zoom controls when the close button is clicked
+  hideZoomControlsButton.addEventListener('click', hideZoomControls);
+
+  // Set initial state: Hide the zoom controls
+  hideZoomControls();
+
   // Get reference to the fullscreen toggle button
   const toggleFullscreenButton = document.getElementById('toggleFullscreen');
   const exitFullscreenButton = document.getElementById('exitFullscreenButton');
