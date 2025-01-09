@@ -62,8 +62,12 @@
     <main>
       <div class="main-content">
         <div class="project-header">
-          <button id="openTaskModal" class="header-button"><i class="fas fa-plus"></i> Add Task</button>
-          <button id="openMilestoneModal" class="header-button"><i class="fas fa-flag"></i> Add Milestone</button>
+          <button id="openTaskModal" class="header-button">
+            <i class="fas fa-plus"></i> Add Task
+          </button>
+          <button id="openMilestoneModal" class="header-button">
+            <i class="fas fa-flag"></i> Add Milestone
+          </button>
           <button id="manageCategoriesButton" class="header-button">
             <i class="fas fa-tags"></i> Manage Categories
           </button>
@@ -81,7 +85,7 @@
         <div class="zoom-controls">
           <!-- Horizontal Zoom Controls -->
           <div class="zoom-group">
-            <label for="horizontalZoom">Horizontal Zoom:</label>
+            <label for="horizontalZoom">Horizontal</label>
             <input
               type="range"
               id="horizontalZoom"
@@ -94,7 +98,7 @@
           </div>
           <!-- Vertical Zoom Controls -->
           <div class="zoom-group">
-            <label for="verticalZoom">Vertical Zoom:</label>
+            <label for="verticalZoom">Vertical </label>
             <input
               type="range"
               id="verticalZoom"
@@ -112,10 +116,10 @@
         <div id="statusMessage"></div>
         <div id="ganttChart"></div>
         <button id="zoomToggleButton" class="zoom-toggle-button">
-            <i class="fas fa-search"></i>
+          <i class="fas fa-search"></i>
         </button>
         <button id="exitFullscreenButton" class="exit-fullscreen-button">
-            <i class="fas fa-compress"></i> Exit Fullscreen
+          <i class="fas fa-compress"></i> Exit Fullscreen
         </button>
       </div>
     </main>
@@ -302,8 +306,12 @@
             <dd id="detailAssignedPeople"></dd>
           </dl>
           <div class="task-details-buttons">
-            <button id="editTaskButton"><i class="fas fa-edit"></i> Edit Task</button>
-            <button id="deleteTaskButton"><i class="fas fa-trash-alt"></i> Delete Task</button>
+            <button id="editTaskButton">
+              <i class="fas fa-edit"></i> Edit Task
+            </button>
+            <button id="deleteTaskButton">
+              <i class="fas fa-trash-alt"></i> Delete Task
+            </button>
           </div>
         </div>
       </div>
@@ -346,66 +354,83 @@
 
     <!-- Milestone Modal -->
     <div id="milestoneModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="milestoneModalTitle" class="modal-title">Add Milestone</h2>
-            <form id="addMilestoneForm">
-                <div class="form-group">
-                    <label for="milestoneName">Milestone Name:</label>
-                    <input type="text" id="milestoneName" placeholder="Enter milestone name" required />
-                </div>
-                <div class="form-group">
-                    <label for="milestoneDate">Date:</label>
-                    <input type="date" id="milestoneDate" required />
-                </div>
-                <div class="form-group">
-                    <label for="milestoneCategory">Category:</label>
-                    <select id="milestoneCategory">
-                        <!-- Categories will be populated dynamically -->
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="milestoneDescription">Description:</label>
-                    <textarea id="milestoneDescription" placeholder="Enter milestone description"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="milestoneEmojiGrid">Select Emoji:</label>
-                    <div id="milestoneEmojiGrid" class="emoji-grid">
-                        <!-- Emojis will be populated here -->
-                    </div>
-                    <!-- Hidden input to store the selected emoji -->
-                    <input type="hidden" id="milestoneEmoji" value="🚩">
-                </div>
-                <!-- Error Message and Submit Button -->
-                <div id="milestoneFormErrorMessage" style="color: red; margin-top: 10px"></div>
-                <button type="submit">Add Milestone</button>
-            </form>
-        </div>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2 id="milestoneModalTitle" class="modal-title">Add Milestone</h2>
+        <form id="addMilestoneForm">
+          <div class="form-group">
+            <label for="milestoneName">Milestone Name:</label>
+            <input
+              type="text"
+              id="milestoneName"
+              placeholder="Enter milestone name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="milestoneDate">Date:</label>
+            <input type="date" id="milestoneDate" required />
+          </div>
+          <div class="form-group">
+            <label for="milestoneCategory">Category:</label>
+            <select id="milestoneCategory">
+              <!-- Categories will be populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="milestoneDescription">Description:</label>
+            <textarea
+              id="milestoneDescription"
+              placeholder="Enter milestone description"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="milestoneEmojiGrid">Select Emoji:</label>
+            <div id="milestoneEmojiGrid" class="emoji-grid">
+              <!-- Emojis will be populated here -->
+            </div>
+            <!-- Hidden input to store the selected emoji -->
+            <input type="hidden" id="milestoneEmoji" value="🚩" />
+          </div>
+          <!-- Error Message and Submit Button -->
+          <div
+            id="milestoneFormErrorMessage"
+            style="color: red; margin-top: 10px"
+          ></div>
+          <button type="submit">Add Milestone</button>
+        </form>
+      </div>
     </div>
 
     <!-- Milestone Details Modal -->
     <div id="milestoneDetailsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Milestone Details</h2>
-            <div class="milestone-details-content">
-                <h3 id="detailMilestoneName">Milestone Name</h3>
-                <p id="detailMilestoneDescription">Milestone description goes here.</p>
-                <dl>
-                    <dt><i class="fas fa-calendar-alt"></i> Date:</dt>
-                    <dd id="detailMilestoneDate"></dd>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Milestone Details</h2>
+        <div class="milestone-details-content">
+          <h3 id="detailMilestoneName">Milestone Name</h3>
+          <p id="detailMilestoneDescription">
+            Milestone description goes here.
+          </p>
+          <dl>
+            <dt><i class="fas fa-calendar-alt"></i> Date:</dt>
+            <dd id="detailMilestoneDate"></dd>
 
-                    <dt><i class="fas fa-tag"></i> Category:</dt>
-                    <dd id="detailMilestoneCategory"></dd>
-                    <dt><i class="fas fa-smile"></i> Emoji:</dt>
-                    <dd id="detailMilestoneEmoji"></dd>
-                </dl>
-                <div class="milestone-details-buttons">
-                    <button id="editMilestoneButton"><i class="fas fa-edit"></i> Edit Milestone</button>
-                    <button id="deleteMilestoneButton"><i class="fas fa-trash-alt"></i> Delete Milestone</button>
-                </div>
-            </div>
+            <dt><i class="fas fa-tag"></i> Category:</dt>
+            <dd id="detailMilestoneCategory"></dd>
+            <dt><i class="fas fa-smile"></i> Emoji:</dt>
+            <dd id="detailMilestoneEmoji"></dd>
+          </dl>
+          <div class="milestone-details-buttons">
+            <button id="editMilestoneButton">
+              <i class="fas fa-edit"></i> Edit Milestone
+            </button>
+            <button id="deleteMilestoneButton">
+              <i class="fas fa-trash-alt"></i> Delete Milestone
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <div id="settingsModal" class="modal">
@@ -441,7 +466,7 @@
     <!-- Include Sortable.js -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="app.js"></script>
-    
+
     <!-- Status Bar -->
     <div id="statusBar">
       <span id="filePathDisplay">No file loaded.</span>
