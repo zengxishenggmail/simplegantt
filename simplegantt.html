@@ -27,7 +27,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css"
     />
     <!-- Your custom styles -->
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="src/styles.css" />
   </head>
   <body>
     <header>
@@ -115,7 +115,11 @@
         <select id="categoryFilter" multiple></select>
         <div id="statusMessage"></div>
         <div id="ganttChart"></div>
-        <button id="zoomToggleButton" class="zoom-toggle-button" aria-label="Show zoom controls">
+        <button
+          id="zoomToggleButton"
+          class="zoom-toggle-button"
+          aria-label="Show zoom controls"
+        >
           <i class="fas fa-search"></i>
         </button>
         <button id="exitFullscreenButton" class="exit-fullscreen-button">
@@ -465,7 +469,7 @@
     <!-- Your custom scripts -->
     <!-- Include Sortable.js -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script src="app.js"></script>
+    <script src="src/app.js"></script>
 
     <!-- Status Bar -->
     <div id="statusBar">
