@@ -1138,7 +1138,6 @@ legend {
 /* ===== Fullscreen Mode Styles ===== */
 body.fullscreen-mode header,
 body.fullscreen-mode .project-header,
-body.fullscreen-mode .zoom-controls,
 body.fullscreen-mode #statusBar,
 body.fullscreen-mode #categoryFilter {
     display: none;
@@ -1151,11 +1150,23 @@ body.fullscreen-mode main {
 
 body.fullscreen-mode .main-content {
     height: 100vh;
+    position: relative;
 }
 
 body.fullscreen-mode #ganttChart {
     margin-top: 0;
     height: 100vh;
+}
+
+/* Adjust zoom controls positioning in fullscreen mode */
+body.fullscreen-mode .zoom-controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 4px;
 }
 /* Milestone styles */
 .milestone {
