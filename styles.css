@@ -1172,6 +1172,31 @@ body.fullscreen-mode #ganttChart {
     height: 100vh;
 }
 
+/* Styles for Exit Fullscreen Button */
+.exit-fullscreen-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1001;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: none;
+}
+
+/* Show the exit fullscreen button only in fullscreen mode */
+body.fullscreen-mode .exit-fullscreen-button {
+    display: block;
+}
+
+/* Hide the original fullscreen toggle button in fullscreen mode */
+body.fullscreen-mode #toggleFullscreen {
+    display: none;
+}
+
 /* Adjust zoom controls positioning in fullscreen mode */
 body.fullscreen-mode .zoom-controls {
     bottom: 0; /* Remove bottom padding in fullscreen */
