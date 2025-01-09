@@ -37,19 +37,21 @@ header h1 {
 /* Zoom Controls Styling */
 .zoom-controls {
     position: fixed;
-    bottom: 30px;
-    left: 10px;
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 10px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    bottom: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin: 0;
     border: 1px solid #ccc;
-    transition: opacity 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    transform: scale(0.95);
 }
 
 .zoom-group {
@@ -1205,27 +1207,40 @@ body.fullscreen-mode .zoom-controls {
 /* Position and style the zoom toggle button */
 .zoom-toggle-button {
     position: fixed;
-    bottom: 30px;
-    left: 10px;
-    z-index: 1001;
-    background-color: rgba(255, 255, 255, 0.9);
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.95);
     color: var(--secondary-color);
     border: none;
-    padding: 10px;
+    padding: 12px;
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.zoom-toggle-button i {
+    font-size: 1.5em;
+}
+
+/* Show zoom controls with fade-in effect */
+.zoom-controls-visible .zoom-controls {
+    display: flex;
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Hide zoom controls with fade-out effect */
+.zoom-controls-hidden .zoom-controls {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    display: none;
 }
 
 /* Hide the zoom toggle button when zoom controls are visible */
 .zoom-controls-visible .zoom-toggle-button {
     display: none;
-}
-
-/* Hide the zoom controls when not visible */
-.zoom-controls-hidden .zoom-controls {
-    display: none;
-    opacity: 0;
 }
 
 /* Style the hide zoom controls button */
@@ -1234,12 +1249,30 @@ body.fullscreen-mode .zoom-controls {
     border: none;
     color: var(--secondary-color);
     cursor: pointer;
-    align-self: flex-end;
-    padding: 5px;
-    font-size: 1.2em;
     position: absolute;
     top: 5px;
     right: 5px;
+    padding: 5px;
+    font-size: 1.2em;
+}
+
+/* Adjust input ranges within zoom controls */
+.zoom-controls .zoom-group input[type="range"] {
+    width: 160px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .zoom-controls {
+        bottom: 10px;
+        left: 10px;
+        padding: 10px;
+    }
+    .zoom-toggle-button {
+        bottom: 10px;
+        left: 10px;
+        padding: 10px;
+    }
 }
 
 /* Milestone styles */
