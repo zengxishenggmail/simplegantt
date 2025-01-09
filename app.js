@@ -1390,6 +1390,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Get reference to the fullscreen toggle button
   const toggleFullscreenButton = document.getElementById('toggleFullscreen');
+  const exitFullscreenButton = document.getElementById('exitFullscreenButton');
 
   toggleFullscreenButton.addEventListener('click', () => {
     // Toggle the 'fullscreen-mode' class on the body
@@ -1401,6 +1402,14 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       toggleFullscreenButton.innerHTML = '<i class="fas fa-expand"></i> Fullscreen';
     }
+  });
+
+  // Event listener for the exit fullscreen button
+  exitFullscreenButton.addEventListener('click', () => {
+    // Exit fullscreen mode by removing the class
+    document.body.classList.remove('fullscreen-mode');
+    // Update the toggle fullscreen button text and icon
+    toggleFullscreenButton.innerHTML = '<i class="fas fa-expand"></i> Fullscreen';
   });
 
   choices = new Choices("#taskDependencies", {
