@@ -1687,6 +1687,17 @@ document.addEventListener("DOMContentLoaded", () => {
   renderGanttChart(projectData);
   updateDependenciesOptions();
   updateCategoryFilterOptions();
+
+  // Add language switcher event listener
+  const languageSelect = document.getElementById('languageSelect');
+  languageSelect.value = window.i18n.currentLang;
+  
+  languageSelect.addEventListener('change', (e) => {
+    window.i18n.setLanguage(e.target.value);
+  });
+
+  // Initialize with current language
+  window.i18n.updatePageContent();
 });
 
 function updateDependenciesOptions(excludeIndex = null) {
