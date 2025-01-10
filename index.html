@@ -32,7 +32,7 @@
   <body>
     <header>
       <h1>
-        <span id="projectNameDisplay">Untitled Project</span>
+        <span id="projectNameDisplay" data-i18n="projectName">Untitled Project</span>
         <input
           type="text"
           id="projectNameInput"
@@ -43,16 +43,20 @@
       </h1>
       <nav>
         <div class="nav-left">
-          <button id="saveProject"><i class="fas fa-save"></i> Save</button>
-          <button id="saveAsProject">
+          <button id="saveProject" data-i18n="saveProject"><i class="fas fa-save"></i> Save</button>
+          <button id="saveAsProject" data-i18n="saveAsProject">
             <i class="fas fa-save"></i> Save As
           </button>
+          <select id="languageSelect" style="margin-left: 10px; padding: 5px; border-radius: 4px;">
+            <option value="en" data-i18n="language.en">English</option>
+            <option value="zh" data-i18n="language.zh">中文</option>
+          </select>
         </div>
         <div class="nav-right">
-          <button id="loadProject">
+          <button id="loadProject" data-i18n="loadProject">
             <i class="fas fa-folder-open"></i> Load Project
           </button>
-          <button id="newProject">
+          <button id="newProject" data-i18n="newProject">
             <i class="fas fa-file"></i> New Project
           </button>
         </div>
@@ -62,22 +66,22 @@
     <main>
       <div class="main-content">
         <div class="project-header">
-          <button id="openTaskModal" class="header-button">
+          <button id="openTaskModal" class="header-button" data-i18n="addTask">
             <i class="fas fa-plus"></i> Add Task
           </button>
-          <button id="openMilestoneModal" class="header-button">
+          <button id="openMilestoneModal" class="header-button" data-i18n="addMilestone">
             <i class="fas fa-flag"></i> Add Milestone
           </button>
-          <button id="manageCategoriesButton" class="header-button">
+          <button id="manageCategoriesButton" class="header-button" data-i18n="manageCategories">
             <i class="fas fa-tags"></i> Manage Categories
           </button>
-          <button id="managePeopleButton" class="header-button">
+          <button id="managePeopleButton" class="header-button" data-i18n="managePeople">
             <i class="fas fa-users"></i> Manage People
           </button>
-          <button id="openSettingsModal" class="header-button">
+          <button id="openSettingsModal" class="header-button" data-i18n="settings">
             <i class="fas fa-cog"></i> Settings
           </button>
-          <button id="toggleFullscreen" class="header-button">
+          <button id="toggleFullscreen" class="header-button" data-i18n="toggleFullscreen">
             <i class="fas fa-expand"></i> Fullscreen
           </button>
         </div>
@@ -85,7 +89,7 @@
         <div class="zoom-controls">
           <!-- Horizontal Zoom Controls -->
           <div class="zoom-group">
-            <label for="horizontalZoom">Horizontal</label>
+            <label for="horizontalZoom" data-i18n="horizontalZoom">Horizontal</label>
             <input
               type="range"
               id="horizontalZoom"
@@ -98,7 +102,7 @@
           </div>
           <!-- Vertical Zoom Controls -->
           <div class="zoom-group">
-            <label for="verticalZoom">Vertical </label>
+            <label for="verticalZoom" data-i18n="verticalZoom">Vertical </label>
             <input
               type="range"
               id="verticalZoom"
@@ -112,17 +116,18 @@
         </div>
 
         <!-- Add a multi-select dropdown for category filtering -->
-        <select id="categoryFilter" multiple></select>
+        <select id="categoryFilter" multiple data-i18n="categoryFilter"></select>
         <div id="statusMessage"></div>
         <div id="ganttChart"></div>
         <button
           id="zoomToggleButton"
           class="zoom-toggle-button"
           aria-label="Show zoom controls"
+          data-i18n="zoomToggleButton"
         >
           <i class="fas fa-search"></i>
         </button>
-        <button id="exitFullscreenButton" class="exit-fullscreen-button">
+        <button id="exitFullscreenButton" class="exit-fullscreen-button" data-i18n="exitFullscreen">
           <i class="fas fa-compress"></i> Exit Fullscreen
         </button>
       </div>
@@ -131,11 +136,11 @@
     <div id="taskModal" class="modal">
       <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h2 id="modalTitle" class="modal-title">Add Task</h2>
+        <h2 id="modalTitle" class="modal-title" data-i18n="addTask">Add Task</h2>
         <form id="addTaskForm">
           <!-- Task Name Section -->
           <fieldset class="task-name-section">
-            <legend>Task Name</legend>
+            <legend data-i18n="taskName">Task Name</legend>
             <div class="form-group">
               <input
                 type="text"
@@ -148,7 +153,7 @@
 
           <!-- Description Section -->
           <fieldset class="description-section">
-            <legend>Description</legend>
+            <legend data-i18n="description">Description</legend>
             <div class="form-group">
               <textarea
                 id="taskDescription"
@@ -159,17 +164,13 @@
 
           <!-- Task Details Section -->
           <fieldset class="task-details-section">
-            <legend>Task Details</legend>
+            <legend data-i18n="taskDetails">Task Details</legend>
             <div class="form-group">
-              <label for="taskStart"
-                ><i class="fas fa-calendar-alt"></i> Start Date:</label
-              >
+              <label for="taskStart" data-i18n="startDate"><i class="fas fa-calendar-alt"></i> Start Date:</label>
               <input type="date" id="taskStart" required />
             </div>
             <div class="form-group">
-              <label for="taskDuration"
-                ><i class="fas fa-hourglass-half"></i> Duration (days):</label
-              >
+              <label for="taskDuration" data-i18n="duration"><i class="fas fa-hourglass-half"></i> Duration (days):</label>
               <input
                 type="number"
                 id="taskDuration"
@@ -179,9 +180,7 @@
               />
             </div>
             <div class="form-group">
-              <label for="taskCategory"
-                ><i class="fas fa-tag"></i> Category:</label
-              >
+              <label for="taskCategory" data-i18n="category"><i class="fas fa-tag"></i> Category:</label>
               <select id="taskCategory" required>
                 <!-- Categories will be populated dynamically -->
               </select>
@@ -190,17 +189,13 @@
 
           <!-- Assignment Section -->
           <fieldset>
-            <legend>Assignment</legend>
+            <legend data-i18n="assignment">Assignment</legend>
             <div class="form-group">
-              <label for="taskPeople"
-                ><i class="fas fa-users"></i> Assigned People:</label
-              >
+              <label for="taskPeople" data-i18n="assignedTo"><i class="fas fa-users"></i> Assigned People:</label>
               <select id="taskPeople" multiple></select>
             </div>
             <div class="form-group">
-              <label for="taskDependencies"
-                ><i class="fas fa-link"></i> Dependencies:</label
-              >
+              <label for="taskDependencies" data-i18n="dependencies"><i class="fas fa-link"></i> Dependencies:</label>
               <select id="taskDependencies" multiple></select>
               <small
                 >Select tasks that must be completed before this task can
@@ -211,24 +206,20 @@
 
           <!-- Status Section -->
           <fieldset class="status-section">
-            <legend>Status</legend>
+            <legend data-i18n="status">Status</legend>
             <div class="form-group">
-              <label for="taskStatus"
-                ><i class="fas fa-info-circle"></i> Task Status:</label
-              >
+              <label for="taskStatus" data-i18n="taskStatus"><i class="fas fa-info-circle"></i> Task Status:</label>
               <select id="taskStatus">
-                <option value="on-track">On-track</option>
-                <option value="some risk">Some risk of delay</option>
-                <option value="high risk">High risk of delay</option>
-                <option value="scrapped">Scrapped</option>
-                <option value="finished">Finished</option>
+                <option value="on-track" data-i18n="status.onTrack">On-track</option>
+                <option value="some risk" data-i18n="status.someRisk">Some risk of delay</option>
+                <option value="high risk" data-i18n="status.highRisk">High risk of delay</option>
+                <option value="scrapped" data-i18n="status.scrapped">Scrapped</option>
+                <option value="finished" data-i18n="status.finished">Finished</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="statusExplanation"
-                ><i class="fas fa-comment-dots"></i> Status Explanation
-                (Optional):</label
-              >
+              <label for="statusExplanation" data-i18n="statusExplanation"><i class="fas fa-comment-dots"></i> Status Explanation
+                (Optional):</label>
               <textarea
                 id="statusExplanation"
                 placeholder="Add any comments about the status"
@@ -238,7 +229,7 @@
 
           <!-- Error Message and Submit Button -->
           <div id="formErrorMessage" style="color: red; margin-top: 10px"></div>
-          <button type="submit">Add Task</button>
+          <button type="submit" data-i18n="addTask">Add Task</button>
         </form>
       </div>
     </div>
@@ -246,17 +237,17 @@
     <div id="categoriesModal" class="modal">
       <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h2>Manage Categories</h2>
+        <h2 data-i18n="manageCategories">Manage Categories</h2>
 
         <div class="tabs">
-          <button class="tab-button active" data-tab="add">Add Category</button>
-          <button class="tab-button" data-tab="list">View Categories</button>
+          <button class="tab-button active" data-tab="add" data-i18n="addCategory">Add Category</button>
+          <button class="tab-button" data-tab="list" data-i18n="viewCategories">View Categories</button>
         </div>
 
         <div class="tab-content active" id="addTab">
           <form id="addCategoryForm">
             <div class="form-group">
-              <label for="categoryName">Category Name:</label>
+              <label for="categoryName" data-i18n="categoryName">Category Name:</label>
               <input
                 type="text"
                 id="categoryName"
@@ -265,10 +256,10 @@
               />
             </div>
             <div class="form-group">
-              <label for="categoryColor">Category Color:</label>
+              <label for="categoryColor" data-i18n="categoryColor">Category Color:</label>
               <input type="text" id="categoryColor" value="#4CAF50" required />
             </div>
-            <button type="submit">Add Category</button>
+            <button type="submit" data-i18n="addCategory">Add Category</button>
           </form>
         </div>
 
@@ -283,37 +274,37 @@
     <div id="taskDetailsModal" class="modal">
       <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h2>Task Details</h2>
+        <h2 data-i18n="taskDetails">Task Details</h2>
         <div class="task-details-content">
-          <h3 id="detailTaskName">Task Name</h3>
-          <p id="detailTaskDescription">Task description goes here.</p>
+          <h3 id="detailTaskName" data-i18n="taskName">Task Name</h3>
+          <p id="detailTaskDescription" data-i18n="description">Task description goes here.</p>
           <dl>
-            <dt><i class="fas fa-calendar-alt"></i> Start Date:</dt>
+            <dt><i class="fas fa-calendar-alt"></i> <span data-i18n="startDate">Start Date:</span></dt>
             <dd id="detailTaskStart"></dd>
 
-            <dt><i class="fas fa-hourglass-start"></i> Duration:</dt>
+            <dt><i class="fas fa-hourglass-start"></i> <span data-i18n="duration">Duration:</span></dt>
             <dd id="detailTaskDuration"></dd>
 
-            <dt><i class="fas fa-link"></i> Dependencies:</dt>
+            <dt><i class="fas fa-link"></i> <span data-i18n="dependencies">Dependencies:</span></dt>
             <dd id="detailTaskDependencies"></dd>
 
-            <dt><i class="fas fa-project-diagram"></i> Dependent Tasks:</dt>
+            <dt><i class="fas fa-project-diagram"></i> <span data-i18n="dependentTasks">Dependent Tasks:</span></dt>
             <dd id="detailInboundDependencies"></dd>
 
-            <dt><i class="fas fa-info-circle"></i> Status:</dt>
+            <dt><i class="fas fa-info-circle"></i> <span data-i18n="taskStatus">Status:</span></dt>
             <dd id="detailTaskStatus"></dd>
 
-            <dt><i class="fas fa-comment-dots"></i> Status Explanation:</dt>
+            <dt><i class="fas fa-comment-dots"></i> <span data-i18n="statusExplanation">Status Explanation:</span></dt>
             <dd id="detailStatusExplanation"></dd>
 
-            <dt><i class="fas fa-user"></i> Assigned People:</dt>
+            <dt><i class="fas fa-user"></i> <span data-i18n="assignedTo">Assigned People:</span></dt>
             <dd id="detailAssignedPeople"></dd>
           </dl>
           <div class="task-details-buttons">
-            <button id="editTaskButton">
+            <button id="editTaskButton" data-i18n="editTask">
               <i class="fas fa-edit"></i> Edit Task
             </button>
-            <button id="deleteTaskButton">
+            <button id="deleteTaskButton" data-i18n="deleteTask">
               <i class="fas fa-trash-alt"></i> Delete Task
             </button>
           </div>
@@ -324,19 +315,17 @@
     <div id="peopleModal" class="modal">
       <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h2>Manage People</h2>
+        <h2 data-i18n="managePeople">Manage People</h2>
 
         <div class="tabs">
-          <button class="tab-button active" data-tab="add-person">
-            Add Person
-          </button>
-          <button class="tab-button" data-tab="list-people">View People</button>
+          <button class="tab-button active" data-tab="add-person" data-i18n="addPerson">Add Person</button>
+          <button class="tab-button" data-tab="list-people" data-i18n="viewPeople">View People</button>
         </div>
 
         <div class="tab-content active" id="add-personTab">
           <form id="addPersonForm">
             <div class="form-group">
-              <label for="personName">Person Name:</label>
+              <label for="personName" data-i18n="personName">Person Name:</label>
               <input
                 type="text"
                 id="personName"
@@ -344,7 +333,7 @@
                 required
               />
             </div>
-            <button type="submit">Add Person</button>
+            <button type="submit" data-i18n="addPerson">Add Person</button>
           </form>
         </div>
 
@@ -360,10 +349,10 @@
     <div id="milestoneModal" class="modal">
       <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h2 id="milestoneModalTitle" class="modal-title">Add Milestone</h2>
+        <h2 id="milestoneModalTitle" class="modal-title" data-i18n="addMilestone">Add Milestone</h2>
         <form id="addMilestoneForm">
           <div class="form-group">
-            <label for="milestoneName">Milestone Name:</label>
+            <label for="milestoneName" data-i18n="milestoneName">Milestone Name:</label>
             <input
               type="text"
               id="milestoneName"
@@ -372,24 +361,24 @@
             />
           </div>
           <div class="form-group">
-            <label for="milestoneDate">Date:</label>
+            <label for="milestoneDate" data-i18n="milestoneDate">Date:</label>
             <input type="date" id="milestoneDate" required />
           </div>
           <div class="form-group">
-            <label for="milestoneCategory">Category:</label>
+            <label for="milestoneCategory" data-i18n="milestoneCategory">Category:</label>
             <select id="milestoneCategory">
               <!-- Categories will be populated dynamically -->
             </select>
           </div>
           <div class="form-group">
-            <label for="milestoneDescription">Description:</label>
+            <label for="milestoneDescription" data-i18n="milestoneDescription">Description:</label>
             <textarea
               id="milestoneDescription"
               placeholder="Enter milestone description"
             ></textarea>
           </div>
           <div class="form-group">
-            <label for="milestoneEmojiGrid">Select Emoji:</label>
+            <label for="milestoneEmojiGrid" data-i18n="milestoneEmoji">Select Emoji:</label>
             <div id="milestoneEmojiGrid" class="emoji-grid">
               <!-- Emojis will be populated here -->
             </div>
@@ -401,7 +390,7 @@
             id="milestoneFormErrorMessage"
             style="color: red; margin-top: 10px"
           ></div>
-          <button type="submit">Add Milestone</button>
+          <button type="submit" data-i18n="addMilestone">Add Milestone</button>
         </form>
       </div>
     </div>
@@ -410,26 +399,26 @@
     <div id="milestoneDetailsModal" class="modal">
       <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h2>Milestone Details</h2>
+        <h2 data-i18n="milestoneDetails">Milestone Details</h2>
         <div class="milestone-details-content">
-          <h3 id="detailMilestoneName">Milestone Name</h3>
-          <p id="detailMilestoneDescription">
+          <h3 id="detailMilestoneName" data-i18n="milestoneName">Milestone Name</h3>
+          <p id="detailMilestoneDescription" data-i18n="milestoneDescription">
             Milestone description goes here.
           </p>
           <dl>
-            <dt><i class="fas fa-calendar-alt"></i> Date:</dt>
+            <dt><i class="fas fa-calendar-alt"></i> <span data-i18n="milestoneDate">Date:</span></dt>
             <dd id="detailMilestoneDate"></dd>
 
-            <dt><i class="fas fa-tag"></i> Category:</dt>
+            <dt><i class="fas fa-tag"></i> <span data-i18n="milestoneCategory">Category:</span></dt>
             <dd id="detailMilestoneCategory"></dd>
-            <dt><i class="fas fa-smile"></i> Emoji:</dt>
+            <dt><i class="fas fa-smile"></i> <span data-i18n="milestoneEmoji">Emoji:</span></dt>
             <dd id="detailMilestoneEmoji"></dd>
           </dl>
           <div class="milestone-details-buttons">
-            <button id="editMilestoneButton">
+            <button id="editMilestoneButton" data-i18n="editMilestone">
               <i class="fas fa-edit"></i> Edit Milestone
             </button>
-            <button id="deleteMilestoneButton">
+            <button id="deleteMilestoneButton" data-i18n="deleteMilestone">
               <i class="fas fa-trash-alt"></i> Delete Milestone
             </button>
           </div>
@@ -440,18 +429,20 @@
     <div id="settingsModal" class="modal">
       <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h2>Settings</h2>
+        <h2 data-i18n="settings">Settings</h2>
         <form id="settingsForm">
           <div class="form-group">
-            <label for="timeScaleUnit">Time Scale Unit:</label>
+            <label for="timeScaleUnit" data-i18n="timeScaleUnit">Time Scale Unit:</label>
             <select id="timeScaleUnit" required>
-              <option value="days">Days</option>
-              <option value="weeks">Weeks</option>
-              <option value="months">Months</option>
+              <option value="days" data-i18n="timeScaleUnit.days">Days</option>
+              <option value="weeks" data-i18n="timeScaleUnit.weeks">Weeks</option>
+              <option value="months" data-i18n="timeScaleUnit.months">Months</option>
             </select>
-            <small>Select how the time scale is displayed in the chart.</small>
+            <small
+              >Select how the time scale is displayed in the chart.</small
+            >
           </div>
-          <button type="submit">Save Settings</button>
+          <button type="submit" data-i18n="saveSettings">Save Settings</button>
         </form>
       </div>
     </div>
@@ -469,11 +460,12 @@
     <!-- Your custom scripts -->
     <!-- Include Sortable.js -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="src/i18n.js"></script>
     <script src="src/app.js"></script>
 
     <!-- Status Bar -->
     <div id="statusBar">
-      <span id="filePathDisplay">No file loaded.</span>
+      <span id="filePathDisplay" data-i18n="noFileLoaded">No file loaded.</span>
       <span id="lastEditedDisplay"></span>
     </div>
   </body>
